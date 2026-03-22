@@ -27,6 +27,8 @@ interface DetailViewProps {
   usdRate: number;          // VND → USD
   onUsdRateChange: (v: number) => void;
   onBack: () => void;
+  onRegister: () => void;
+  isRegistering: boolean;
 }
 
 export default function DetailView({
@@ -39,6 +41,8 @@ export default function DetailView({
   usdRate,
   onUsdRateChange,
   onBack,
+  onRegister,
+  isRegistering,
 }: DetailViewProps) {
 
   return (
@@ -49,14 +53,16 @@ export default function DetailView({
       exit={{ opacity: 0, scale: 0.95 }}
       className="space-y-6"
     >
-      {/* Nút quay lại */}
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors font-medium"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Quay lại
-      </button>
+      {/* Nút quay lại Nổi bật - Sticky */}
+      <div className="sticky top-4 z-50 mb-4 flex justify-between items-center backdrop-blur-md bg-white/80 p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100/50">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-blue-600 font-bold hover:bg-blue-50 px-4 py-2 rounded-xl transition-all shadow-sm"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Quay lại để sửa thông tin
+        </button>
+      </div>
 
       {/* Hero ảnh trường */}
       <div className="relative h-64 rounded-3xl overflow-hidden shadow-2xl">
@@ -168,9 +174,19 @@ export default function DetailView({
       </div>
 
       {/* CTA */}
-      <button className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 active:scale-[0.98]">
-        <CheckCircle2 className="w-5 h-5" />
-        Đăng ký ngay
+      <button
+        onClick={onRegister}
+        disabled={isRegistering}
+        className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 active:scale-[0.98] disabled:opacity-70 disabled:scale-100"
+      >
+        {isRegistering ? (
+          <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        ) : (
+          <>
+            <CheckCircle2 className="w-6 h-6" />
+            <span className="text-lg">Xác nhận gửi thông tin Đăng ký</span>
+          </>
+        )}
       </button>
     </motion.div>
   );

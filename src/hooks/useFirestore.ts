@@ -46,7 +46,7 @@ export function useFirestore(): UseFirestoreReturn {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
-      setIsAdmin(u?.email === 'mktteamthtt@gmail.com');
+      setIsAdmin(u !== null); // Mọi user đăng nhập thành công là Admin (bởi vì Client ko cần thẻ Auth)
     });
     return () => unsubscribe();
   }, []);

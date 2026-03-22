@@ -14,8 +14,8 @@ interface HeaderProps {
   isAdmin: boolean;
   onLogin: () => void;
   onOpenSettings: () => void;
-  onSeedData: () => void;
-  isSeeding: boolean;
+  onOpenRegistrations: () => void;
+  onOpenUniversities: () => void;
 }
 
 export default function Header({
@@ -24,8 +24,8 @@ export default function Header({
   isAdmin,
   onLogin,
   onOpenSettings,
-  onSeedData,
-  isSeeding,
+  onOpenRegistrations,
+  onOpenUniversities,
 }: HeaderProps) {
   return (
     <header className="bg-[#1e40af] text-white py-8 px-4 relative overflow-hidden">
@@ -67,19 +67,25 @@ export default function Header({
               <div className="flex flex-col items-end gap-2">
                 <span className="text-xs text-blue-100">Chào, {user.displayName}</span>
                 {isAdmin && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center flex-wrap justify-end">
+                    <button
+                      onClick={onOpenRegistrations}
+                      className="bg-emerald-500 text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-emerald-600 transition-colors"
+                    >
+                      DS Đăng ký
+                    </button>
+                    <button
+                      onClick={onOpenUniversities}
+                      className="bg-purple-600 text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-purple-700 transition-colors shadow-sm"
+                    >
+                      🎓 Quản lý Trường
+                    </button>
+                    <div className="h-4 w-px bg-blue-400/50 mx-1"></div>
                     <button
                       onClick={onOpenSettings}
                       className="bg-blue-500 text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-blue-600 transition-colors"
                     >
-                      Cài đặt chi phí
-                    </button>
-                    <button
-                      onClick={onSeedData}
-                      disabled={isSeeding}
-                      className="bg-amber-500 text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-amber-600 transition-colors disabled:opacity-50"
-                    >
-                      {isSeeding ? 'Đang cập nhật...' : 'Cập nhật Database'}
+                      Cài đặt
                     </button>
                   </div>
                 )}

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   GraduationCap,
   Globe,
@@ -20,6 +20,7 @@ import { University, GlobalConfig, FormData, Selections } from '../types';
 import { VISA_TYPES, TOPIK_LEVELS } from '../data';
 import { formatVND } from '../utils/format';
 import UniversityDropdown from './UniversityDropdown';
+import { toast } from 'react-hot-toast';
 
 interface FormViewProps {
   formData: FormData;
@@ -54,6 +55,23 @@ export default function FormView({
   costsTotal,
   onViewDetail,
 }: FormViewProps) {
+  const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean }>({});
+
+  const handleViewDetail = () => {
+    const newErrors = {
+      name: !formData.name.trim(),
+      phone: !formData.phone.trim(),
+    };
+    setErrors(newErrors);
+    
+    if (newErrors.name || newErrors.phone) {
+      toast.error('Vui lòng điền đủ Tên & Số điện thoại!');
+      return;
+    }
+    
+    onViewDetail();
+  };
+
   const filteredUnis = universities.filter(
     (u) =>
       u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -87,9 +105,12 @@ export default function FormView({
           <input
             type="text"
             placeholder="Nguyễn Văn A"
-            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-slate-50/50"
+            className={`w-full px-4 py-3 rounded-xl border ${errors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-slate-50/50`}
             value={formData.name}
-            onChange={(e) => onFormChange('name', e.target.value)}
+            onChange={(e) => {
+              onFormChange('name', e.target.value);
+              if (errors.name) setErrors({ ...errors, name: false });
+            }}
           />
         </div>
 
@@ -101,9 +122,12 @@ export default function FormView({
           <input
             type="text"
             placeholder="+84 987 654 321 hoặc 0987654321"
-            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-slate-50/50"
+            className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-slate-50/50`}
             value={formData.phone}
-            onChange={(e) => onFormChange('phone', e.target.value)}
+            onChange={(e) => {
+              onFormChange('phone', e.target.value);
+              if (errors.phone) setErrors({ ...errors, phone: false });
+            }}
           />
         </div>
 
@@ -243,7 +267,7 @@ export default function FormView({
       </div>
 
       <button
-        onClick={onViewDetail}
+        onClick={handleViewDetail}
         className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-[0.98]"
       >
         <Search className="w-5 h-5" />
