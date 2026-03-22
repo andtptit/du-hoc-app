@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "university": {
+      "title": "University",
+      "description": "Information about a university in Asia for study abroad programs.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "nameKr": { "type": "string" },
+        "visaTop": { "type": "number" },
+        "address": { "type": "string" },
+        "rank": { "type": "string" },
+        "majors": { "type": "string" },
+        "admissionRequirements": { "type": "string" },
+        "tuitionD4": { "type": "string" },
+        "tuitionD2_2": { "type": "string" },
+        "tuitionD2_3": { "type": "string" },
+        "scholarship": { "type": "string" },
+        "dormitory": { "type": "string" },
+        "jobOpportunities": { "type": "string" },
+        "calcTuitionD4": { "type": "number" },
+        "calcTuitionD2_2": { "type": "number" },
+        "calcTuitionD2_3": { "type": "number" },
+        "image": { "type": "string" },
+        "minGpaD4": { "type": "number" },
+        "minGpaD2": { "type": "number" }
+      },
+      "required": ["id", "name", "nameKr", "visaTop", "address", "rank", "majors", "admissionRequirements", "tuitionD4", "tuitionD2_2", "tuitionD2_3", "scholarship", "dormitory", "jobOpportunities", "calcTuitionD4", "calcTuitionD2_2", "calcTuitionD2_3", "image", "minGpaD4", "minGpaD2"]
+    },
+    "globalConfig": {
+      "title": "Global Config",
+      "description": "Global cost settings for the application",
+      "type": "object",
+      "properties": {
+        "consultingFee": { "type": "number" },
+        "thirdPartyFee": { "type": "number" },
+        "applicationFee": { "type": "number" },
+        "enrollmentFee": { "type": "number" },
+        "koreanLanguageOptions": { 
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "dormVietnamPricePerMonth": { "type": "number" },
+        "dormKoreaOptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": { "type": "string" },
+              "price": { "type": "number" }
+            }
+          }
+        },
+        "flightOptions": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "defaultTuitionKrw": { "type": "number" }
+      }
+    }
+  },
+  "firestore": {
+    "universities": {
+      "schema": "university",
+      "description": "A collection of universities."
+    },
+    "settings": {
+      "schema": "globalConfig",
+      "description": "Global settings and costs"
+    }
+  }
+}

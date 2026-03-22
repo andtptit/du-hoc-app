@@ -1,0 +1,125 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: universities
+    // Document ID: universityId
+    // Fields:
+    //   - id: string (required)
+    //   - name: string (required)
+    //   - nameKr: string (required)
+    //   - visaTop: number (required)
+    //   - address: string (required)
+    //   - rank: string (required)
+    //   - majors: string (required)
+    //   - admissionRequirements: string (required)
+    //   - tuitionD4: string (required)
+    //   - tuitionD2_2: string (required)
+    //   - tuitionD2_3: string (required)
+    //   - scholarship: string (required)
+    //   - dormitory: string (required)
+    //   - jobOpportunities: string (required)
+    //   - calcTuitionD4: number (required)
+    //   - calcTuitionD2_2: number (required)
+    //   - calcTuitionD2_3: number (required)
+    //   - image: string (required)
+    //   - minGpaD4: number (required)
+    //   - minGpaD2: number (required)
+    //
+    // Collection: settings
+    // Document ID: costs
+    // Fields:
+    //   - consultingFee: number
+    //   - thirdPartyFee: number
+    //   - applicationFee: number
+    //   - enrollmentFee: number
+    //   - koreanLanguageOptions: list of numbers
+    //   - dormVietnamPricePerMonth: number
+    //   - dormKoreaOptions: list of objects {label, price}
+    //   - flightOptions: list of numbers
+    //   - defaultTuitionKrw: number
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "mktteamthtt@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidUniversity(data) {
+      return data.keys().hasAll(['id', 'name', 'nameKr', 'visaTop', 'address', 'rank', 'majors', 'admissionRequirements', 'tuitionD4', 'tuitionD2_2', 'tuitionD2_3', 'scholarship', 'dormitory', 'jobOpportunities', 'calcTuitionD4', 'calcTuitionD2_2', 'calcTuitionD2_3', 'image', 'minGpaD4', 'minGpaD2']) &&
+             data.id is string &&
+             data.name is string && data.name.size() < 200 &&
+             data.nameKr is string && data.nameKr.size() < 200 &&
+             data.visaTop is number &&
+             data.address is string && data.address.size() < 500 &&
+             data.rank is string &&
+             data.majors is string &&
+             data.admissionRequirements is string &&
+             data.tuitionD4 is string &&
+             data.tuitionD2_2 is string &&
+             data.tuitionD2_3 is string &&
+             data.scholarship is string &&
+             data.dormitory is string &&
+             data.jobOpportunities is string &&
+             data.calcTuitionD4 is number &&
+             data.calcTuitionD2_2 is number &&
+             data.calcTuitionD2_3 is number &&
+             data.image is string &&
+             data.minGpaD4 is number &&
+             data.minGpaD2 is number;
+    }
+
+    function isValidGlobalConfig(data) {
+      return data.keys().hasAll(['consultingFee', 'thirdPartyFee', 'applicationFee', 'enrollmentFee', 'koreanLanguageOptions', 'dormVietnamPricePerMonth', 'dormKoreaOptions', 'flightOptions', 'defaultTuitionKrw']) &&
+             data.consultingFee is number &&
+             data.thirdPartyFee is number &&
+             data.applicationFee is number &&
+             data.enrollmentFee is number &&
+             data.koreanLanguageOptions is list &&
+             data.dormVietnamPricePerMonth is number &&
+             data.dormKoreaOptions is list &&
+             data.flightOptions is list &&
+             data.defaultTuitionKrw is number;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /universities/{universityId} {
+      // Allow public read for university directory
+      allow read: if true;
+      
+      // Only admins can create or update university data
+      allow create: if isAdmin() && isValidUniversity(request.resource.data);
+      allow update: if isAdmin() && isValidUniversity(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      // Allow public read for global costs
+      allow read: if true;
+      
+      // Only admins can update global costs
+      allow write: if isAdmin() && (settingId != 'costs' || isValidGlobalConfig(request.resource.data));
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == userId && request.resource.data.role == 'user';
+      allow update: if isAuthenticated() && (request.auth.uid == userId && request.resource.data.role == resource.data.role) || isAdmin();
+    }
+  }
+}
