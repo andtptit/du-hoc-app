@@ -41,13 +41,18 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
   };
 
   const handleDownloadTemplate = () => {
-    const headers = ['id', 'name', 'nameKr', 'visaTop', 'address', 'rank', 'majors', 'admissionRequirements', 'tuitionD4', 'tuitionD2_2', 'tuitionD2_3', 'scholarship', 'dormitory', 'jobOpportunities', 'calcTuitionD4', 'calcTuitionD2_2', 'calcTuitionD2_3', 'image', 'minGpaD4', 'minGpaD2'];
-    const sample = ['', 'Đại học Mẫu', 'Sample University', '1', '123 Seoul', 'Top 1', 'Kinh Tế', 'Tốt nghiệp THPT', '1,500,000 KRW', '2,000,000 KRW', '3,000,000 KRW', '30%', '500k', 'Tốt', '1500000', '2000000', '3000000', '', '6.5', '7.0'];
+    const sampleData = [{
+      id: '', name: 'Đại học Mẫu', nameKr: 'Sample University', visaTop: 1,
+      address: '123 Seoul\nHàn Quốc', rank: 'Top 1', 
+      majors: 'Kinh Tế\nTruyền thông', admissionRequirements: 'Tốt nghiệp THPT\nGPA > 6.5', 
+      tuitionD4: '1,500,000 KRW', tuitionD2_2: '2,000,000 KRW', tuitionD2_3: '3,000,000 KRW', 
+      scholarship: '30%\n50%', dormitory: '500k\n6 tháng', jobOpportunities: 'Tốt\nLàm thêm 20h/tuần', 
+      calcTuitionD4: 1500000, calcTuitionD2_2: 2000000, calcTuitionD2_3: 3000000, 
+      image: '', minGpaD4: 6.5, minGpaD2: 7.0
+    }];
     
     // Sử dụng \uFEFF BOM để Excel mở tiếng Việt không bị lỗi font UTF-8
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
-      + headers.join(",") + "\n"
-      + sample.map(v => `"${v}"`).join(",");
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + Papa.unparse(sampleData);
       
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");

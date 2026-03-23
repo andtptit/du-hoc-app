@@ -1,193 +1,274 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React from 'react';
-import {
-  ArrowLeft,
-  Globe,
-  Award,
-  BookOpen,
-  Info,
-  CheckCircle2,
+import { motion } from 'framer-motion';
+import { 
+  ArrowLeft, 
+  MapPin, 
+  GraduationCap, 
+  Award, 
+  BookOpen, 
+  CheckCircle2, 
+  Home, 
+  Briefcase,
+  User,
+  Phone,
+  LayoutDashboard,
+  Calculator
 } from 'lucide-react';
-import { motion } from 'motion/react';
-import { University, GlobalConfig, Selections, CostBreakdown } from '../types';
-import { formatVND, formatUSD, formatKRW } from '../utils/format';
+import { University, FormData, CostBreakdown, GlobalConfig, Selections } from '../types';
+import { formatVND } from '../utils/format';
 import CostBreakdownTable from './CostBreakdownTable';
 
 interface DetailViewProps {
-  selectedUni: University;
+  university: University;
+  onBack: () => void;
+  onApply: () => void;
+  formData: FormData;
   costs: Partial<CostBreakdown> & { total: number };
   globalConfig: GlobalConfig;
   selections: Selections;
   onSelectionsChange: (s: Selections) => void;
-  exchangeRate: number;     // KRW → VND
-  usdRate: number;          // VND → USD
-  onUsdRateChange: (v: number) => void;
-  onBack: () => void;
-  onRegister: () => void;
-  isRegistering: boolean;
 }
 
 export default function DetailView({
-  selectedUni,
+  university,
+  onBack,
+  onApply,
+  formData,
   costs,
   globalConfig,
   selections,
-  onSelectionsChange,
-  exchangeRate,
-  usdRate,
-  onUsdRateChange,
-  onBack,
-  onRegister,
-  isRegistering,
+  onSelectionsChange
 }: DetailViewProps) {
+  
+  const TopVisaBadge = () => {
+    const colors = {
+      1: 'bg-emerald-500',
+      2: 'bg-orange-500',
+      3: 'bg-rose-500'
+    };
+    const color = colors[university.visaTop as keyof typeof colors] || 'bg-blue-600';
+    
+    return (
+      <div className={`${color} inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-white font-black text-[11px] uppercase tracking-wider shadow-lg`}>
+        <Award className="w-3.5 h-3.5" />
+        TOP {university.visaTop} VISA
+      </div>
+    );
+  };
+
+  const InfoCard = ({ icon: Icon, label, value }: { icon: any, label: string, value: string }) => (
+    <div className="flex gap-4 p-5 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+      <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 h-fit">
+        <Icon className="w-5 h-5" />
+      </div>
+      <div>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+        <p className="text-sm font-bold text-slate-700 leading-relaxed whitespace-pre-line">{value}</p>
+      </div>
+    </div>
+  );
 
   return (
     <motion.div
-      key="detail"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      className="space-y-6"
+      initial={{ opacity: 0, x: 50 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -50 }}
+      className="max-w-7xl mx-auto"
     >
-      {/* Nút quay lại Nổi bật - Sticky */}
-      <div className="sticky top-4 z-50 mb-4 flex justify-between items-center backdrop-blur-md bg-white/80 p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100/50">
+      {/* Header Controls */}
+      <div className="flex items-center justify-between mb-8 px-2">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-blue-600 font-bold hover:bg-blue-50 px-4 py-2 rounded-xl transition-all shadow-sm"
+          className="flex items-center gap-2 text-slate-500 hover:text-[#0f3493] font-bold transition-all group"
         >
-          <ArrowLeft className="w-5 h-5" />
-          Quay lại để sửa thông tin
+          <div className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center group-hover:border-[#0f3493] group-hover:bg-blue-50 transition-all">
+            <ArrowLeft className="w-5 h-5" />
+          </div>
+          Trở lại tìm kiếm
         </button>
       </div>
 
-      {/* Hero ảnh trường */}
-      <div className="relative h-64 rounded-3xl overflow-hidden shadow-2xl">
-        <img
-          src={selectedUni.image}
-          alt={selectedUni.name}
-          className="w-full h-full object-cover"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-8">
-          <div className="flex items-center gap-2 text-white/70 text-sm mb-2">
-            <span className="bg-white/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">CN</span>
-            <Globe className="w-3 h-3" />
-            <span>Hàn Quốc</span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* Left Column: University Details (8/12) */}
+        <div className="lg:col-span-8 space-y-8">
+          
+          {/* Hero Banner Section */}
+          <div className="relative rounded-[40px] overflow-hidden shadow-2xl bg-white border border-slate-100">
+            <div className="h-48 md:h-64 relative">
+              <img src={university.image} alt="" className="w-full h-full object-cover brightness-75" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8 md:p-12">
+                 <div className="flex items-center gap-3 text-white/80 font-bold text-xs md:text-sm mb-2">
+                    <img src="https://tbtgroup.vn/wp-content/uploads/2023/11/logo-tbt.png" className="h-6 brightness-200" alt="" />
+                    <span className="opacity-60">|</span>
+                    <span className="tracking-[0.2em] uppercase">Hệ Thống Giáo Dục Du Học TBT</span>
+                 </div>
+                 <h1 className="text-white text-3xl md:text-5xl font-black uppercase tracking-tight leading-tight">
+                    {university.nameKr}
+                 </h1>
+              </div>
+            </div>
+
+            {/* Circular Logo & Name Bar */}
+            <div className="px-8 md:px-12 py-8 flex flex-col md:flex-row items-center gap-8 bg-white relative">
+              <div className="relative -mt-24 md:-mt-32">
+                 <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-full p-3 shadow-2xl border-4 border-white flex items-center justify-center overflow-hidden">
+                    <img src={university.image} alt="" className="w-full h-full object-cover rounded-full" />
+                 </div>
+                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
+                    <TopVisaBadge />
+                 </div>
+              </div>
+              
+              <div className="flex-1 text-center md:text-left pt-4 md:pt-0">
+                <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight mb-1">{university.name}</h2>
+                <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-3">
+                  <div className="flex items-center gap-2 text-[12px] font-bold text-blue-600 bg-blue-50 px-4 py-1.5 rounded-full uppercase tracking-wider">
+                    <GraduationCap className="w-3.5 h-3.5" />
+                    RANK {university.rank}
+                  </div>
+                  <div className="flex items-center gap-2 text-[12px] font-bold text-slate-500">
+                    <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                    Hàn Quốc
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-white mb-2">
-            {selectedUni.name} ({selectedUni.nameKr})
-          </h2>
-          <p className="text-white/80 text-sm">{selectedUni.rank}</p>
+
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <InfoCard icon={MapPin} label="Địa chỉ" value={university.address} />
+            <InfoCard icon={BookOpen} label="Chuyên ngành nổi bật" value={university.majors} />
+            <InfoCard icon={CheckCircle2} label="Điều kiện tuyển sinh" value={university.admissionRequirements} />
+            <InfoCard icon={GraduationCap} label="Học thuật & Xếp hạng" value={university.rank} />
+          </div>
+
+          {/* Fee Calculation Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 px-2">
+              <Calculator className="w-6 h-6 text-[#0f3493]" />
+              <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Dự toán chi phí & Lộ trình</h3>
+            </div>
+            
+            <CostBreakdownTable 
+              costs={costs}
+              globalConfig={globalConfig}
+              selections={selections}
+              onSelectionsChange={onSelectionsChange}
+            />
+          </div>
+
+          {/* Additional Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 text-[#0f3493] font-bold uppercase text-xs tracking-widest">
+                <Home className="w-4 h-4" /> Ký túc xá & Nhà ở
+              </div>
+              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line font-medium">{university.dormitory}</p>
+            </div>
+            <div className="bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 text-emerald-600 font-bold uppercase text-xs tracking-widest">
+                <Briefcase className="w-4 h-4" /> Việc làm thêm (Part-time)
+              </div>
+              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line font-medium">{university.jobOpportunities}</p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Right Column: Student Info & Summary (4/12) */}
+        <div className="lg:col-span-4 space-y-6">
+          
+          <div className="sticky top-28 space-y-6">
+            {/* Student Profile Card */}
+            <div className="bg-[#0f3493] rounded-[40px] p-8 text-white shadow-2xl relative overflow-hidden">
+              {/* Background Decor */}
+              <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl" />
+
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-6">
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                    <User className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black uppercase tracking-tight leading-none">Thông tin học viên</h3>
+                    <p className="text-[10px] text-white/60 font-medium uppercase tracking-[0.2em] mt-1">Dữ liệu từ biểu mẫu</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Họ và tên</p>
+                    <p className="text-lg font-bold">{formData.name || '---'}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Số điện thoại</p>
+                    <p className="text-lg font-bold">{formData.phone || '---'}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">GPA THPT</p>
+                      <p className="text-lg font-bold">{formData.gpaThpt || '---'}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">GPA ĐẠI HỌC</p>
+                      <p className="text-lg font-bold">{formData.gpaUni || '---'}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Chương trình / TOPIK</p>
+                    <p className="text-[15px] font-bold">{formData.visaType} - TOPIK {formData.topikLevel}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Cost Banner */}
+            <div className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-xl space-y-6">
+              <div className="space-y-1">
+                <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">TỔNG CHI PHÍ DỰ TÍNH (TRỌN GÓI)</p>
+                <p className="text-4xl font-black text-[#0f3493] tracking-tighter text-center">
+                  {formatVND(costs.total)}
+                </p>
+              </div>
+
+              <div className="bg-blue-50/50 p-4 rounded-2xl space-y-3">
+                 <div className="flex justify-between text-xs font-bold">
+                    <span className="text-slate-500">Phí hồ sơ & xử lý:</span>
+                    <span className="text-slate-700">{formatVND((costs.consultingFee ?? 0) + (costs.thirdPartyFee ?? 0))}</span>
+                 </div>
+                 <div className="flex justify-between text-xs font-bold">
+                    <span className="text-slate-500">Học phí & Nhập học:</span>
+                    <span className="text-slate-700">{formatVND((costs.tuitionVnd ?? 0) + (costs.enrollmentFee ?? 0))}</span>
+                 </div>
+                 <div className="flex justify-between text-xs font-bold">
+                    <span className="text-slate-500">Sinh hoạt & KTX (VN + HQ):</span>
+                    <span className="text-slate-700">{formatVND((costs.dormVnCost ?? 0) + (costs.dormKrCost ?? 0))}</span>
+                 </div>
+              </div>
+
+              <button
+                onClick={onApply}
+                className="w-full bg-[#ef4444] text-white py-5 rounded-full font-black text-lg uppercase tracking-widest shadow-xl shadow-red-200 hover:bg-red-600 transition-all active:scale-[0.98]"
+              >
+                Đăng ký ngay
+              </button>
+              <p className="text-[10px] text-slate-400 text-center font-medium italic">
+                * Chi phí có thể thay đổi tùy theo tỷ giá và chính sách trường
+              </p>
+            </div>
+
+            {/* Sidebar Footer Link */}
+            <div className="bg-slate-50 p-6 rounded-[32px] border border-dashed border-slate-200 flex flex-col items-center gap-4">
+               <img src="https://tbtgroup.vn/wp-content/uploads/2023/11/logo-tbt.png" className="h-4 grayscale opacity-40" alt="" />
+               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">Hệ thống giáo dục TBT - Đồng hành cùng ước mơ của bạn</p>
+            </div>
+          </div>
+
         </div>
       </div>
-
-      {/* Thông tin chung */}
-      <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
-        <h3 className="text-xl font-bold text-slate-800 mb-6">Thông tin chung</h3>
-        <div className="space-y-6">
-          <div className="flex gap-4">
-            <Award className="w-5 h-5 text-amber-500 shrink-0 mt-1" />
-            <div>
-              <p className="text-sm font-bold text-slate-700">Xếp hạng &amp; Vị trí:</p>
-              <p className="text-sm text-slate-500">{selectedUni.rank}</p>
-              <p className="text-xs text-slate-400 mt-1">{selectedUni.address}</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <BookOpen className="w-5 h-5 text-blue-500 shrink-0 mt-1" />
-            <div>
-              <p className="text-sm font-bold text-slate-700">Chuyên ngành tiêu biểu:</p>
-              <p className="text-sm text-slate-500 mt-1">{selectedUni.majors}</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <Info className="w-5 h-5 text-emerald-500 shrink-0 mt-1" />
-            <div>
-              <p className="text-sm font-bold text-slate-700">Điều kiện tuyển sinh:</p>
-              <p className="text-sm text-slate-500 mt-1">{selectedUni.admissionRequirements}</p>
-            </div>
-          </div>
-
-          <div className="pt-6 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                <Award className="w-4 h-4 text-amber-500" /> Chính sách học bổng
-              </p>
-              <p className="text-xs text-slate-500 leading-relaxed bg-amber-50 p-3 rounded-xl border border-amber-100">
-                {selectedUni.scholarship}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                <Globe className="w-4 h-4 text-blue-500" /> Cơ hội việc làm
-              </p>
-              <p className="text-xs text-slate-500 leading-relaxed bg-blue-50 p-3 rounded-xl border border-blue-100">
-                {selectedUni.jobOpportunities}
-              </p>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <p className="text-sm font-bold text-slate-700 mb-2">Thông tin Ký túc xá</p>
-            <p className="text-xs text-slate-500 leading-relaxed">{selectedUni.dormitory}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Bảng bóc giá */}
-      <CostBreakdownTable
-        costs={costs}
-        globalConfig={globalConfig}
-        selections={selections}
-        onSelectionsChange={onSelectionsChange}
-      />
-
-      {/* Total Card */}
-      <div className="bg-blue-600 rounded-3xl p-8 border border-blue-500 shadow-2xl shadow-blue-200">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <h4 className="text-xl font-bold text-white">TỔNG CHI PHÍ TRỌN GÓI:</h4>
-            <div className="flex gap-3 text-xs text-blue-100 mt-2">
-              <span className="bg-white/10 px-2 py-0.5 rounded">
-                ~{formatUSD(costs.total, usdRate)}
-              </span>
-              <span className="bg-white/10 px-2 py-0.5 rounded">
-                ~{formatKRW(costs.total, exchangeRate)}
-              </span>
-            </div>
-          </div>
-          <div className="text-right">
-            <span className="text-5xl font-black text-white tracking-tighter drop-shadow-lg">
-              {formatVND(costs.total)}
-            </span>
-            <p className="text-[10px] text-blue-100 mt-2 italic opacity-80">
-              * Chi phí thực tế có thể thay đổi tùy thời điểm
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <button
-        onClick={onRegister}
-        disabled={isRegistering}
-        className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 active:scale-[0.98] disabled:opacity-70 disabled:scale-100"
-      >
-        {isRegistering ? (
-          <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-        ) : (
-          <>
-            <CheckCircle2 className="w-6 h-6" />
-            <span className="text-lg">Xác nhận gửi thông tin Đăng ký</span>
-          </>
-        )}
-      </button>
     </motion.div>
   );
 }

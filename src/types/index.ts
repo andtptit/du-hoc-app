@@ -52,7 +52,8 @@ export interface FormData {
   visaType: string;
   topikLevel: string;
   universityId: string;
-  gpa: string;
+  gpaThpt: string;
+  gpaUni: string;
 }
 
 export interface CostBreakdown {

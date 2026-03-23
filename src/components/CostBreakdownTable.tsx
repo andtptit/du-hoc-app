@@ -1,10 +1,5 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React from 'react';
-import { Settings, Plus, Minus } from 'lucide-react';
+import { Settings, Plus, Minus, Calculator } from 'lucide-react';
 import { GlobalConfig, Selections, CostBreakdown } from '../types';
 import { formatVND } from '../utils/format';
 
@@ -24,194 +19,140 @@ export default function CostBreakdownTable({
   const update = (patch: Partial<Selections>) =>
     onSelectionsChange({ ...selections, ...patch });
 
+  const Row = ({ stt, label, subLabel, cost, options }: { 
+    stt: string, 
+    label: string, 
+    subLabel?: string, 
+    cost: number, 
+    options?: React.ReactNode 
+  }) => (
+    <tr className="border-b border-slate-50 last:border-0 hover:bg-slate-50/30 transition-colors group">
+      <td className="py-5 px-4">
+        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 tabular-nums border border-slate-100 group-hover:bg-[#0f3493] group-hover:text-white group-hover:border-[#0f3493] transition-all italic">
+            {stt}
+        </div>
+      </td>
+      <td className="py-5 px-4">
+        <p className="text-[15px] font-black text-slate-700 uppercase tracking-tight">{label}</p>
+        {subLabel && <p className="text-[11px] text-slate-400 font-bold mt-0.5">{subLabel}</p>}
+      </td>
+      <td className="py-5 px-4 text-right">
+        <span className={`text-[15px] font-black ${cost < 0 ? 'text-emerald-600' : 'text-[#0f3493]'}`}>
+            {cost < 0 ? '-' : ''}{formatVND(Math.abs(cost))}
+        </span>
+      </td>
+      <td className="py-5 px-4">
+        <div className="flex justify-end">
+          {options || <span className="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-black uppercase tracking-wider">Cố định</span>}
+        </div>
+      </td>
+    </tr>
+  );
+
   return (
-    <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-slate-800">Bóc giá chi tiết (Breakdown)</h3>
-        <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-          <Settings className="w-3 h-3" />
+    <div className="bg-white rounded-[40px] p-8 md:p-10 shadow-xl border border-slate-100 overflow-hidden">
+      <div className="flex items-center justify-between mb-10 pb-6 border-b border-slate-50">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-[#0f3493]">
+            <Calculator className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Chi tiết bóc tách chi phí</h3>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Minh bạch - Rõ ràng - Tối ưu</p>
+          </div>
+        </div>
+        <div className="hidden md:flex items-center gap-2 text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">
+          <Settings className="w-4 h-4 text-slate-300" />
           <span>Tùy chỉnh lộ trình</span>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+      <div className="overflow-x-auto -mx-8 md:-mx-10">
+        <table className="w-full text-left border-collapse min-w-[600px]">
           <thead>
-            <tr className="border-b border-slate-100">
-              <th className="py-4 px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-12">STT</th>
-              <th className="py-4 px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hạng mục</th>
-              <th className="py-4 px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Chi phí</th>
-              <th className="py-4 px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mô tả / Tùy chọn</th>
+            <tr className="bg-slate-50/50">
+              <th className="py-5 px-4 pl-10 text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] w-24 italic">STT</th>
+              <th className="py-5 px-4 text-[11px] font-black text-slate-400 uppercase tracking-[0.1em]">Hạng mục chi tiết</th>
+              <th className="py-5 px-4 text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] text-right">Chi phí (VND)</th>
+              <th className="py-5 px-4 pr-10 text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] text-right w-48">Tùy chọn</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-
-            {/* 01. Học tiếng Hàn */}
-            <tr>
-              <td className="py-4 px-2 text-sm text-slate-400">01</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-slate-700">Học tiếng Hàn</p>
-                <p className="text-[10px] text-slate-400">Từ 0 đến Topik 2/4</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-blue-600">{formatVND(costs.koreanLangCost ?? 0)}</span>
-              </td>
-              <td className="py-4 px-2">
+            <Row 
+              stt="01" 
+              label="Học tiếng Hàn" 
+              subLabel="Từ 0 đến Topik 2/4" 
+              cost={costs.koreanLangCost ?? 0}
+              options={
                 <select
-                  className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-blue-500"
+                  className="text-[11px] font-bold bg-white border border-slate-200 rounded-xl px-4 py-2 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-[#0f3493] shadow-sm transition-all"
                   value={selections.koreanLangIdx}
                   onChange={(e) => update({ koreanLangIdx: Number(e.target.value) })}
                 >
                   {globalConfig.koreanLanguageOptions.map((opt, i) => (
                     <option key={i} value={i}>
-                      {opt === 0 ? 'Tự học / Đã có bằng (0đ)' : `Gói ${i}: ${formatVND(opt)}`}
+                      {opt === 0 ? 'Tự học (0đ)' : `Gói ${i}: ${formatVND(opt)}`}
                     </option>
                   ))}
                 </select>
-              </td>
-            </tr>
-
-            {/* 02. Phí tư vấn */}
-            <tr>
-              <td className="py-4 px-2 text-sm text-slate-400">02</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-slate-700">Phí tư vấn &amp; Xử lý hồ sơ</p>
-                <p className="text-[10px] text-slate-400">Trọn gói xây dựng hồ sơ</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-slate-700">{formatVND(costs.consultingFee ?? 0)}</span>
-              </td>
-              <td className="py-4 px-2">
-                <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase">Cố định</span>
-              </td>
-            </tr>
-
-            {/* 03. Phí bên thứ 3 */}
-            <tr>
-              <td className="py-4 px-2 text-sm text-slate-400">03</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-slate-700">Phí thu hộ bên thứ 3</p>
-                <p className="text-[10px] text-slate-400">Công chứng, Tem vàng/tím, Visa, Khám SK, Ship, Đưa đón...</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-slate-700">{formatVND(costs.thirdPartyFee ?? 0)}</span>
-              </td>
-              <td className="py-4 px-2">
-                <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase">Cố định</span>
-              </td>
-            </tr>
-
-            {/* 04. Phí Apply */}
-            <tr>
-              <td className="py-4 px-2 text-sm text-slate-400">04</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-slate-700">Phí Apply trường</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-slate-700">{formatVND(costs.applicationFee ?? 0)}</span>
-              </td>
-              <td className="py-4 px-2">
-                <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase">Cố định</span>
-              </td>
-            </tr>
-
-            {/* 05. Phí nhập học */}
-            <tr>
-              <td className="py-4 px-2 text-sm text-slate-400">05</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-slate-700">Phí nhập học trường HQ</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-slate-700">{formatVND(costs.enrollmentFee ?? 0)}</span>
-              </td>
-              <td className="py-4 px-2">
-                <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase">Cố định</span>
-              </td>
-            </tr>
-
-            {/* 06. KTX VN */}
-            <tr>
-              <td className="py-4 px-2 text-sm text-slate-400">06</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-slate-700">Ký túc xá tại VN</p>
-                <p className="text-[10px] text-slate-400">800.000đ / tháng</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-blue-600">{formatVND(costs.dormVnCost ?? 0)}</span>
-              </td>
-              <td className="py-4 px-2">
-                <div className="flex items-center gap-2">
+              }
+            />
+            <Row stt="02" label="Phí tư vấn & Xử lý hồ sơ" subLabel="Trọn gói xây dựng hồ sơ" cost={costs.consultingFee ?? 0} />
+            <Row stt="03" label="Phí thu hộ bên thứ 3" subLabel="Công chứng, Tem vàng, Visa, Khám SK..." cost={costs.thirdPartyFee ?? 0} />
+            <Row stt="04" label="Phí Apply & Nhập học" subLabel="Phí xét tuyển và nhập học HQ" cost={(costs.applicationFee ?? 0) + (costs.enrollmentFee ?? 0)} />
+            
+            <Row 
+              stt="05" 
+              label="Ký túc xá tại VN" 
+              subLabel="800.000đ / tháng" 
+              cost={costs.dormVnCost ?? 0}
+              options={
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => update({ dormVnMonths: Math.max(0, selections.dormVnMonths - 1) })}
-                    className="p-1 bg-slate-100 rounded hover:bg-slate-200"
+                    className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                   >
-                    <Minus className="w-3 h-3" />
+                    <Minus className="w-4 h-4 text-slate-500" />
                   </button>
-                  <span className="text-xs font-bold w-6 text-center">{selections.dormVnMonths}</span>
+                  <span className="text-sm font-black w-4 text-center">{selections.dormVnMonths}</span>
                   <button
                     onClick={() => update({ dormVnMonths: Math.min(12, selections.dormVnMonths + 1) })}
-                    className="p-1 bg-slate-100 rounded hover:bg-slate-200"
+                    className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                   >
-                    <Plus className="w-3 h-3" />
+                    <Plus className="w-4 h-4 text-slate-500" />
                   </button>
-                  <span className="text-[10px] text-slate-400">tháng</span>
                 </div>
-              </td>
-            </tr>
+              }
+            />
 
-            {/* 07. Học phí HQ */}
-            <tr>
-              <td className="py-4 px-2 text-sm text-slate-400">07</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-slate-700">Học phí trường HQ</p>
-                <p className="text-[10px] text-slate-400">1 năm (4 kỳ)</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-slate-700">
-                  {formatVND((costs.tuitionVnd ?? 0) + (costs.scholarshipAmount ?? 0))}
-                </span>
-              </td>
-              <td className="py-4 px-2">
-                <span className="text-[10px] text-slate-500 italic">Theo trường đã chọn</span>
-              </td>
-            </tr>
-
-            {/* 08. Học bổng */}
-            <tr className="bg-emerald-50/50">
-              <td className="py-4 px-2 text-sm text-slate-400">08</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-emerald-700">Học bổng</p>
-                <p className="text-[10px] text-emerald-600">Giảm trừ học phí</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-emerald-600">-{formatVND(costs.scholarshipAmount ?? 0)}</span>
-              </td>
-              <td className="py-4 px-2">
+            <Row stt="06" label="Học phí trường HQ" subLabel="Dự kiến 1 năm (4 kỳ)" cost={costs.tuitionVnd ?? 0} />
+            
+            <Row 
+              stt="07" 
+              label="Học bổng" 
+              subLabel="Chính sách giảm trừ của trường" 
+              cost={-(costs.scholarshipAmount ?? 0)}
+              options={
                 <select
-                  className="text-xs bg-white border border-emerald-200 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="text-[11px] font-bold bg-white border border-emerald-200 rounded-xl px-4 py-2 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 shadow-sm transition-all text-emerald-600"
                   value={selections.scholarshipPercent}
                   onChange={(e) => update({ scholarshipPercent: Number(e.target.value) })}
                 >
-                  {[0, 10, 15, 30, 40, 50, 60, 70, 80, 90, 100].map((p) => (
-                    <option key={p} value={p}>{p}%</option>
+                  {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((p) => (
+                    <option key={p} value={p}>{p}% Học bổng</option>
                   ))}
                 </select>
-              </td>
-            </tr>
+              }
+            />
 
-            {/* 09. KTX HQ */}
-            <tr>
-              <td className="py-4 px-2 text-sm text-slate-400">09</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-slate-700">KTX / Tiền nhà HQ</p>
-                <p className="text-[10px] text-slate-400">Dự kiến 6 tháng</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-blue-600">{formatVND(costs.dormKrCost ?? 0)}</span>
-              </td>
-              <td className="py-4 px-2">
+            <Row 
+              stt="08" 
+              label="KTX / Tiền nhà HQ" 
+              subLabel="Dự kiến 6 tháng đầu" 
+              cost={costs.dormKrCost ?? 0}
+              options={
                 <select
-                  className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-blue-500"
+                  className="text-[11px] font-bold bg-white border border-slate-200 rounded-xl px-4 py-2 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-[#0f3493] shadow-sm transition-all"
                   value={selections.dormKrIdx}
                   onChange={(e) => update({ dormKrIdx: Number(e.target.value) })}
                 >
@@ -219,32 +160,26 @@ export default function CostBreakdownTable({
                     <option key={i} value={i}>{opt.label}</option>
                   ))}
                 </select>
-              </td>
-            </tr>
+              }
+            />
 
-            {/* 10. Vé máy bay — số thứ tự sửa từ 11 thành 10 */}
-            <tr>
-              <td className="py-4 px-2 text-sm text-slate-400">10</td>
-              <td className="py-4 px-2">
-                <p className="text-sm font-bold text-slate-700">Vé máy bay 1 chiều</p>
-                <p className="text-[10px] text-slate-400">Bao gồm 40kg ký gửi</p>
-              </td>
-              <td className="py-4 px-2 text-right">
-                <span className="text-sm font-bold text-blue-600">{formatVND(costs.flightCost ?? 0)}</span>
-              </td>
-              <td className="py-4 px-2">
+            <Row 
+              stt="09" 
+              label="Vé máy bay" 
+              subLabel="Một chiều (Bao gồm ký gửi)" 
+              cost={costs.flightCost ?? 0}
+              options={
                 <select
-                  className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-blue-500"
+                  className="text-[11px] font-bold bg-white border border-slate-200 rounded-xl px-4 py-2 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-[#0f3493] shadow-sm transition-all"
                   value={selections.flightIdx}
                   onChange={(e) => update({ flightIdx: Number(e.target.value) })}
                 >
                   {globalConfig.flightOptions.map((opt, i) => (
-                    <option key={i} value={i}>{formatVND(opt)}</option>
+                    <option key={i} value={i}>Gói {i+1}: {formatVND(opt)}</option>
                   ))}
                 </select>
-              </td>
-            </tr>
-
+              }
+            />
           </tbody>
         </table>
       </div>

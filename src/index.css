@@ -3,6 +3,7 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-tbt-primary: #4F46E5; /* Example TBT primary color */
 }
 
 @layer base {

@@ -141,11 +141,11 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="col-span-2">
                 <label className="block text-sm font-bold text-slate-700 mb-2">Địa Chỉ</label>
-                <input type="text" value={formData.address} onChange={e => handleChange('address', e.target.value)} className="w-full p-3 border rounded-xl" />
+                <textarea rows={2} value={formData.address} onChange={e => handleChange('address', e.target.value)} className="w-full p-3 border rounded-xl" />
               </div>
               <div className="col-span-2">
                 <label className="block text-sm font-bold text-slate-700 mb-2">Ngành Nổi Bật</label>
-                <input type="text" value={formData.majors} onChange={e => handleChange('majors', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Kinh tế, Kỹ thuật, Y tế..." />
+                <textarea rows={2} value={formData.majors} onChange={e => handleChange('majors', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Kinh tế, Kỹ thuật, Y tế..." />
               </div>
               <div className="col-span-2">
                 <label className="block text-sm font-bold text-slate-700 mb-2">Điều Kiện Tuyển Sinh</label>

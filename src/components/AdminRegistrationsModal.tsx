@@ -115,7 +115,14 @@ export default function AdminRegistrationsModal({ onClose }: Props) {
                     <td className="px-4 py-4 text-xs space-y-1">
                       <p><span className="text-slate-400">Visa:</span> <span className="font-medium text-slate-700">{reg.visaType}</span></p>
                       <p><span className="text-slate-400">Topik:</span> <span className="font-medium text-slate-700">{reg.topikLevel}</span></p>
-                      <p><span className="text-slate-400">GPA:</span> <span className="font-medium inline-block px-2 py-0.5 bg-green-100 text-green-700 rounded-sm">{reg.gpa}</span></p>
+                      {reg.gpaThpt || reg.gpaUni ? (
+                        <>
+                          {reg.gpaThpt && <p><span className="text-slate-400">10:</span> <span className="font-medium inline-block px-1.5 py-0.5 bg-green-100 text-green-700 rounded-sm">{reg.gpaThpt}</span></p>}
+                          {reg.gpaUni && <p><span className="text-slate-400">4:</span> <span className="font-medium inline-block px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-sm">{reg.gpaUni}</span></p>}
+                        </>
+                      ) : (
+                        <p><span className="text-slate-400">GPA:</span> <span className="font-medium inline-block px-2 py-0.5 bg-slate-100 text-slate-700 rounded-sm">{reg.gpa || 'N/A'}</span></p>
+                      )}
                     </td>
                     <td className="px-4 py-4">
                       <p className="font-bold text-amber-600 text-lg">{formatVND(reg.costsTotal || 0)}</p>
