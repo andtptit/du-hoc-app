@@ -8,6 +8,7 @@ export interface University {
   name: string;
   nameKr: string;
   visaTop: number;
+  region?: string;
   address: string;
   rank: string;
   majors: string;

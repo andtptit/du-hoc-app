@@ -127,7 +127,7 @@ export default function CostBreakdownTable({
               }
             />
             <Row stt="02" label="Phí tư vấn & Xử lý hồ sơ" subLabel="Trọn gói xây dựng hồ sơ" cost={costs.consultingFee ?? 0} />
-            <Row stt="03" label="Phí thu hộ bên thứ 3" subLabel="Công chứng, Tem vàng/tím, Visa, Khám SK, Ship, Đưa đón..." cost={costs.thirdPartyFee ?? 0} />
+            <Row stt="03" label="Phí thu hộ bên thứ 3" subLabel="Phí công chứng, Tem vàng, Tem tím, Xin visa, Khám sức khoẻ, Phí ship hồ sơ qua các đơn vị tại Việt Nam, Phí ship hồ sơ sang trường, Phí đưa đón Hàn Quốc, Phí tìm ký túc xá" cost={costs.thirdPartyFee ?? 0} />
             <Row
               stt="04"
               label="Phí apply trường HQ"

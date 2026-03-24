@@ -154,30 +154,44 @@ export default function FormView({
 
         {/* University Selection */}
         <div className="space-y-4 mb-12">
-          <UniversityDropdown
-            searchQuery={searchQuery}
-            onSearchChange={onSearchChange}
-            showDropdown={showUniDropdown}
-            onShowDropdown={onShowUniDropdown}
-            filteredUnis={filteredUnis}
-            onSelect={(id) => {
-              onFormChange('universityId', id);
-              onShowUniDropdown(false);
-            }}
-          />
-
-          {selectedUni && (
-            <div className="flex items-center gap-6 p-6 bg-[#f8fbff] rounded-[30px] border border-blue-100/50 mt-4">
-              <img src={selectedUni.image} alt="" className="w-20 h-20 object-cover bg-white rounded-2xl border border-blue-100 shadow-sm" />
+          {universities.length === 0 ? (
+            <div className="w-full p-6 rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center text-center gap-3">
+              <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-slate-400">
+                <Search className="w-5 h-5" />
+              </div>
               <div>
-                <h4 className="font-black text-blue-900 text-xl uppercase leading-tight">{selectedUni.nameKr}</h4>
-                <p className="text-[15px] text-blue-600 font-bold mt-1">{selectedUni.name}</p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-black uppercase rounded-full tracking-wider italic">RANK {selectedUni.rank}</span>
-                  <span className={`px-3 py-1 ${selectedUni.visaTop === 1 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'} text-[10px] font-black uppercase rounded-full tracking-wider`}>TOP {selectedUni.visaTop} VISA</span>
-                </div>
+                <p className="text-slate-600 font-bold mb-1">Hệ thống đang cập nhật dữ liệu</p>
+                <p className="text-xs text-slate-400">Vui lòng quay lại sau, hoặc đăng nhập Admin để nhập liệu.</p>
               </div>
             </div>
+          ) : (
+            <>
+              <UniversityDropdown
+                searchQuery={searchQuery}
+                onSearchChange={onSearchChange}
+                showDropdown={showUniDropdown}
+                onShowDropdown={onShowUniDropdown}
+                filteredUnis={filteredUnis}
+                onSelect={(id) => {
+                  onFormChange('universityId', id);
+                  onShowUniDropdown(false);
+                }}
+              />
+
+              {selectedUni && (
+                <div className="flex items-center gap-6 p-6 bg-[#f8fbff] rounded-[30px] border border-blue-100/50 mt-4">
+                  <img src={selectedUni.image} alt="" className="w-20 h-20 object-cover bg-white rounded-2xl border border-blue-100 shadow-sm" />
+                  <div>
+                    <h4 className="font-black text-blue-900 text-xl uppercase leading-tight">{selectedUni.nameKr}</h4>
+                    <p className="text-[15px] text-blue-600 font-bold mt-1">{selectedUni.name}</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-black uppercase rounded-full tracking-wider italic">RANK {selectedUni.rank}</span>
+                      <span className={`px-3 py-1 ${selectedUni.visaTop === 1 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'} text-[10px] font-black uppercase rounded-full tracking-wider`}>TOP {selectedUni.visaTop} VISA</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 

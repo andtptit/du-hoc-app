@@ -47,7 +47,7 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
     const sampleData = [
       {
         id: '(Bỏ trống để hệ thống tự tạo)', name: 'BẮT BUỘC ĐIỀN (Dòng này sẽ bị bỏ qua khi Import)', nameKr: 'BẮT BUỘC ĐIỀN', visaTop: 'Ghi số (1, 2, 3)',
-        address: 'VD: 123 Seoul (Alt+Enter xuống dòng)', rank: 'VD: Top 1', 
+        region: 'VD: Seoul, Busan', address: 'VD: 123 Seoul (Alt+Enter xuống dòng)', rank: 'VD: Top 1', 
         majors: 'Mỗi ngành xuống dòng (Alt+Enter)', admissionRequirements: 'Ví dụ: Tốt nghiệp THPT', 
         tuitionD4: 'Ví dụ: 1.500.000 KRW/kỳ', tuitionD2_1: 'Ví dụ: 1.800.000 KRW/kỳ', tuitionD2_2: 'Ví dụ: 2.000.000 KRW/kỳ', tuitionD2_3: 'Ví dụ: 3.000.000 KRW/kỳ', 
         scholarship: 'Mô tả học bổng tùy ý', dormitory: 'Phòng 2: 500k KRW; Phòng 4: 300k KRW', jobOpportunities: 'Làm thêm...', 
@@ -57,7 +57,7 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
       },
       {
         id: '(Bỏ trống)', name: 'Đại học Mẫu Demo', nameKr: 'Sample University', visaTop: 1,
-        address: '123 Seoul\nHàn Quốc', rank: 'Top 1', 
+        region: 'Seoul', address: '123 Seoul\nHàn Quốc', rank: 'Top 1', 
         majors: 'Kinh Tế\nTruyền thông', admissionRequirements: 'Tốt nghiệp THPT\nGPA > 6.5', 
         tuitionD4: 'Khoảng 1.500.000 KRW/kỳ', tuitionD2_1: 'Từ 1.800.000 KRW/kỳ', tuitionD2_2: '2.000.000 KRW/kỳ', tuitionD2_3: '3.000.000 KRW/kỳ', 
         scholarship: '30%\n50%', dormitory: 'Hệ tiếng: 500.000 KRW; Hệ Đại học: 700.000 KRW', jobOpportunities: 'Tốt\nLàm thêm 20h/tuần', 
@@ -112,6 +112,7 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
               name: row.name || '',
               nameKr: row.nameKr || '',
               visaTop: Number(row.visaTop) || 1,
+              region: row.region || '',
               address: row.address || '',
               rank: row.rank || '',
               majors: row.majors || '',

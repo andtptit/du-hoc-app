@@ -158,6 +158,10 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                 <input type="text" value={formData.nameKr} onChange={e => handleChange('nameKr', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Seoul National University" />
               </div>
               <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Khu Vực (Region)</label>
+                <input type="text" value={formData.region || ''} onChange={e => handleChange('region', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Ví dụ: Seoul, Busan..." />
+              </div>
+              <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">ID Nội bộ (Bỏ trống tự sinh)</label>
                 <input type="text" disabled={!!initialData} value={formData.id} onChange={e => handleChange('id', e.target.value)} className="w-full p-3 border rounded-xl bg-slate-100 placeholder:text-slate-400" placeholder="seoul-national-uni" />
               </div>

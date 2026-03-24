@@ -29,7 +29,7 @@ export default function App() {
     phone: '',
     visaType: VISA_TYPES[2].id,
     topikLevel: TOPIK_LEVELS[0].id,
-    universityId: STATIC_UNIVERSITIES[0].id,
+    universityId: STATIC_UNIVERSITIES[0]?.id || '',
     gpaThpt: '',
     gpaUni: '',
   });
@@ -169,7 +169,7 @@ export default function App() {
                 onShowUniDropdown={setShowUniDropdown}
                 filteredUnis={filteredUnis}
               />
-            ) : (
+            ) : selectedUni ? (
               <motion.div
                 key="detail"
                 initial={{ opacity: 0, y: 20 }}
@@ -188,7 +188,7 @@ export default function App() {
                   onSelectionsChange={setSelections}
                 />
               </motion.div>
-            )}
+            ) : null}
           </AnimatePresence>
         </div>
       </main>

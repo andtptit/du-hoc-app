@@ -19,12 +19,6 @@ export default function TopVisaUniversities({ universities }: Props) {
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
         {unis.map(u => {
-          const addressParts = u.address.split(',');
-          let city = addressParts.length > 1 ? addressParts[addressParts.length - 1].trim() : u.address.split(' ').slice(-2).join(' ');
-          if (city.toLowerCase().includes('hàn quốc') && addressParts.length > 2) {
-              city = addressParts[addressParts.length - 2].trim();
-          }
-
           return (
             <div key={u.id} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors border-b border-slate-50 last:border-0">
               <div className="flex-1 min-w-0 pr-4">
@@ -32,7 +26,7 @@ export default function TopVisaUniversities({ universities }: Props) {
                 <p className="text-xs text-slate-500 truncate">{u.name}</p>
               </div>
               <div className="w-24 text-right text-xs text-slate-500 truncate">
-                {city.length > 15 ? 'Hàn Quốc' : city}
+                {u.region || ''}
               </div>
             </div>
           );
