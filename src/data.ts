@@ -357,9 +357,10 @@ export const UNIVERSITIES: University[] = [
 ];
 
 export const VISA_TYPES = [
-  { id: 'd4-1', label: 'D4-1 (Khóa học tiếng Hàn)', multiplier: 1.0, field: 'calcTuitionD4' },
-  { id: 'd2-2', label: 'D2-2 (Đại học)', multiplier: 1.0, field: 'calcTuitionD2_2' },
-  { id: 'd2-3', label: 'D2-3 (Sau đại học)', multiplier: 1.0, field: 'calcTuitionD2_3' },
+  { id: 'd4-1', label: 'D4-1: Hệ tiếng', multiplier: 1.0, field: 'calcTuitionD4' },
+  { id: 'd2-1', label: 'D2-1: Hệ Cao Đẳng', multiplier: 1.0, field: 'calcTuitionD2_1' },
+  { id: 'd2-2', label: 'D2-2: Hệ Đại Học', multiplier: 1.0, field: 'calcTuitionD2_2' },
+  { id: 'd2-3', label: 'D2-3: Hệ Thạc Sĩ', multiplier: 1.0, field: 'calcTuitionD2_3' },
 ];
 
 export const TOPIK_LEVELS = [

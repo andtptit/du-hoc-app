@@ -98,14 +98,9 @@ export default function DetailView({
             <div className="h-48 md:h-64 relative">
               <img src={university.image} alt="" className="w-full h-full object-cover brightness-75" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8 md:p-12">
-                 <div className="flex items-center gap-3 text-white/80 font-bold text-xs md:text-sm mb-2">
-                    <img src="https://tbtgroup.vn/wp-content/uploads/2023/11/logo-tbt.png" className="h-6 brightness-200" alt="" />
-                    <span className="opacity-60">|</span>
-                    <span className="tracking-[0.2em] uppercase">Hệ Thống Giáo Dục Du Học TBT</span>
-                 </div>
-                 <h1 className="text-white text-3xl md:text-5xl font-black uppercase tracking-tight leading-tight">
+                  <h1 className="text-white text-3xl md:text-5xl font-black uppercase tracking-tight leading-tight -mt-4">
                     {university.nameKr}
-                 </h1>
+                  </h1>
               </div>
             </div>
 
@@ -113,7 +108,7 @@ export default function DetailView({
             <div className="px-8 md:px-12 py-8 flex flex-col md:flex-row items-center gap-8 bg-white relative">
               <div className="relative -mt-24 md:-mt-32">
                  <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-full p-3 shadow-2xl border-4 border-white flex items-center justify-center overflow-hidden">
-                    <img src={university.image} alt="" className="w-full h-full object-cover rounded-full" />
+                    <img src={university.logoUrl || university.image} alt="" className="w-full h-full object-contain rounded-full" />
                  </div>
                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
                     <TopVisaBadge />
@@ -155,7 +150,11 @@ export default function DetailView({
               costs={costs}
               globalConfig={globalConfig}
               selections={selections}
-              onSelectionsChange={onSelectionsChange}
+              onSelectionsChange={(newS) => {
+                onSelectionsChange(newS);
+              }}
+              university={university}
+              visaId={formData.visaType}
             />
           </div>
 

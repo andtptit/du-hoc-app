@@ -12,6 +12,7 @@ import DetailView from './components/DetailView';
 import AdminLoginModal from './components/AdminLoginModal';
 import AdminUniversitiesModal from './components/AdminUniversitiesModal';
 import AdminRegistrationsModal from './components/AdminRegistrationsModal';
+import AdminSettingsModal from './components/AdminSettingsModal';
 
 import { useFirestore } from './hooks/useFirestore';
 import { useCosts } from './hooks/useCosts';
@@ -22,7 +23,6 @@ const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz_pY7mUfD6L
 
 export default function App() {
   const [view, setView] = useState<'form' | 'detail'>('form');
-  const [exchangeRate] = useState(18.5); // TBT default
   
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -53,6 +53,7 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isUniversitiesOpen, setIsUniversitiesOpen] = useState(false);
   const [isRegistrationsOpen, setIsRegistrationsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const { universities, globalConfig, isAdmin, defaultUniversityId } = useFirestore();
 
@@ -74,7 +75,7 @@ export default function App() {
     topikLevelId: formData.topikLevel,
     globalConfig,
     selections,
-    exchangeRate,
+    exchangeRate: globalConfig.exchangeRate,
   });
 
   // Sync universityId when universities are loaded
@@ -102,6 +103,12 @@ export default function App() {
 
   const handleFormChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'visaType') {
+      setSelections(prev => ({
+        ...prev,
+        tuitionTerms: value === 'd4-1' ? 4 : 1
+      }));
+    }
   };
 
   const handleLogout = async () => {
@@ -141,6 +148,7 @@ export default function App() {
         onLoginClick={() => setIsLoginOpen(true)}
         onManageUnis={() => setIsUniversitiesOpen(true)}
         onManageRegs={() => setIsRegistrationsOpen(true)}
+        onSettingsClick={() => setIsSettingsOpen(true)}
         onLogout={handleLogout}
       />
       
@@ -197,6 +205,13 @@ export default function App() {
         {isRegistrationsOpen && (
           <AdminRegistrationsModal
             onClose={() => setIsRegistrationsOpen(false)}
+          />
+        )}
+
+        {isSettingsOpen && (
+          <AdminSettingsModal
+            config={globalConfig}
+            onClose={() => setIsSettingsOpen(false)}
           />
         )}
       </AnimatePresence>

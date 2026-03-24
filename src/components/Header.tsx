@@ -6,6 +6,7 @@ interface HeaderProps {
   onLoginClick: () => void;
   onManageUnis: () => void;
   onManageRegs: () => void;
+  onSettingsClick: () => void;
   onLogout: () => void;
 }
 
@@ -14,6 +15,7 @@ export default function Header({
   onLoginClick, 
   onManageUnis, 
   onManageRegs, 
+  onSettingsClick,
   onLogout 
 }: HeaderProps) {
   return (
@@ -47,6 +49,13 @@ export default function Header({
               >
                 <List className="w-3.5 h-3.5" />
                 Danh sách ĐK
+              </button>
+              <button 
+                onClick={onSettingsClick}
+                className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-white hover:text-[#0f3493] rounded-xl transition-all hover:shadow-sm"
+              >
+                <Settings className="w-3.5 h-3.5" />
+                Cài đặt
               </button>
             </div>
           )}

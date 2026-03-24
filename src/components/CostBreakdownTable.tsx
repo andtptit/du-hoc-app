@@ -1,13 +1,16 @@
 import React from 'react';
 import { Settings, Plus, Minus, Calculator } from 'lucide-react';
-import { GlobalConfig, Selections, CostBreakdown } from '../types';
+import { GlobalConfig, Selections, CostBreakdown, University } from '../types';
 import { formatVND } from '../utils/format';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface CostBreakdownTableProps {
   costs: Partial<CostBreakdown> & { total: number };
   globalConfig: GlobalConfig;
   selections: Selections;
   onSelectionsChange: (s: Selections) => void;
+  university: University;
+  visaId: string;
 }
 
 export default function CostBreakdownTable({
@@ -15,6 +18,8 @@ export default function CostBreakdownTable({
   globalConfig,
   selections,
   onSelectionsChange,
+  university,
+  visaId,
 }: CostBreakdownTableProps) {
   const update = (patch: Partial<Selections>) =>
     onSelectionsChange({ ...selections, ...patch });
@@ -25,29 +30,52 @@ export default function CostBreakdownTable({
     subLabel?: string, 
     cost: number, 
     options?: React.ReactNode 
-  }) => (
-    <tr className="border-b border-slate-50 last:border-0 hover:bg-slate-50/30 transition-colors group">
-      <td className="py-5 px-4">
-        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 tabular-nums border border-slate-100 group-hover:bg-[#0f3493] group-hover:text-white group-hover:border-[#0f3493] transition-all italic">
-            {stt}
-        </div>
-      </td>
-      <td className="py-5 px-4">
-        <p className="text-[15px] font-black text-slate-700 uppercase tracking-tight">{label}</p>
-        {subLabel && <p className="text-[11px] text-slate-400 font-bold mt-0.5">{subLabel}</p>}
-      </td>
-      <td className="py-5 px-4 text-right">
-        <span className={`text-[15px] font-black ${cost < 0 ? 'text-emerald-600' : 'text-[#0f3493]'}`}>
-            {cost < 0 ? '-' : ''}{formatVND(Math.abs(cost))}
-        </span>
-      </td>
-      <td className="py-5 px-4">
-        <div className="flex justify-end">
-          {options || <span className="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-black uppercase tracking-wider">Cố định</span>}
-        </div>
-      </td>
-    </tr>
-  );
+  }) => {
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    const hasLongDescription = subLabel && subLabel.length > 40;
+
+    return (
+      <tr className="border-b border-slate-50 last:border-0 hover:bg-slate-50/30 transition-colors group">
+        <td className="py-5 px-4 align-top">
+          <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 tabular-nums border border-slate-100 group-hover:bg-[#0f3493] group-hover:text-white group-hover:border-[#0f3493] transition-all italic">
+              {stt}
+          </div>
+        </td>
+        <td className="py-5 px-4">
+          <p className="text-[15px] font-black text-slate-700 uppercase tracking-tight">{label}</p>
+          {subLabel && (
+            <div className="mt-0.5">
+              <p className={`text-[11px] text-slate-400 font-bold ${!isExpanded && hasLongDescription ? 'line-clamp-1' : ''}`}>
+                {subLabel}
+              </p>
+              {hasLongDescription && (
+                <button 
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-[10px] text-blue-500 font-black uppercase tracking-widest mt-1 flex items-center gap-1 hover:text-blue-700"
+                >
+                  {isExpanded ? (
+                    <><ChevronUp className="w-3 h-3" /> Thu gọn</>
+                  ) : (
+                    <><ChevronDown className="w-3 h-3" /> Xem thêm</>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+        </td>
+        <td className="py-5 px-4 text-right align-top">
+          <span className={`text-[15px] font-black ${cost < 0 ? 'text-emerald-600' : 'text-[#0f3493]'}`}>
+              {cost < 0 ? '-' : ''}{formatVND(Math.abs(cost))}
+          </span>
+        </td>
+        <td className="py-5 px-4 align-top">
+          <div className="flex justify-end">
+            {options || <span className="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-black uppercase tracking-wider">Cố định</span>}
+          </div>
+        </td>
+      </tr>
+    );
+  };
 
   return (
     <div className="bg-white rounded-[40px] p-8 md:p-10 shadow-xl border border-slate-100 overflow-hidden">
@@ -89,9 +117,9 @@ export default function CostBreakdownTable({
                   value={selections.koreanLangIdx}
                   onChange={(e) => update({ koreanLangIdx: Number(e.target.value) })}
                 >
-                  {globalConfig.koreanLanguageOptions.map((opt, i) => (
+                  {globalConfig.koreanLanguageOptions.map((opt: any, i) => (
                     <option key={i} value={i}>
-                      {opt === 0 ? 'Tự học (0đ)' : `Gói ${i}: ${formatVND(opt)}`}
+                      {typeof opt === 'object' ? opt.label : (opt === 0 ? 'Tự học (0đ)' : `Gói ${i}: ${formatVND(opt)}`)}
                     </option>
                   ))}
                 </select>
@@ -125,12 +153,42 @@ export default function CostBreakdownTable({
               }
             />
 
-            <Row stt="06" label="Học phí trường HQ" subLabel="Dự kiến 1 năm (4 kỳ)" cost={costs.tuitionVnd ?? 0} />
+            <Row 
+              stt="06" 
+              label="Học phí trường HQ" 
+              subLabel={`Dự kiến ${selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1)} kỳ`} 
+              cost={costs.tuitionVnd ?? 0}
+              options={
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      const currentTerms = selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1);
+                      update({ tuitionTerms: Math.max(1, currentTerms - 1) });
+                    }}
+                    className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                  >
+                    <Minus className="w-4 h-4 text-slate-500" />
+                  </button>
+                  <span className="text-sm font-black w-4 text-center">
+                    {selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1)}
+                  </span>
+                  <button
+                    onClick={() => {
+                      const currentTerms = selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1);
+                      update({ tuitionTerms: Math.min(8, currentTerms + 1) });
+                    }}
+                    className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                  >
+                    <Plus className="w-4 h-4 text-slate-500" />
+                  </button>
+                </div>
+              }
+            />
             
             <Row 
               stt="07" 
               label="Học bổng" 
-              subLabel="Chính sách giảm trừ của trường" 
+              subLabel={university.scholarship || "Chính sách giảm trừ của trường"} 
               cost={-(costs.scholarshipAmount ?? 0)}
               options={
                 <select

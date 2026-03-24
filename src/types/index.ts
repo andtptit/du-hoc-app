@@ -13,17 +13,22 @@ export interface University {
   majors: string;
   admissionRequirements: string;
   tuitionD4: string;
+  tuitionD2_1?: string;
   tuitionD2_2: string;
   tuitionD2_3: string;
   scholarship: string;
   dormitory: string;
   jobOpportunities: string;
   calcTuitionD4: number;
+  calcTuitionD2_1?: number;
   calcTuitionD2_2: number;
   calcTuitionD2_3: number;
   image: string;
   minGpaD4: number;
   minGpaD2: number;
+  logoUrl?: string;
+  applicationFee?: number;
+  enrollmentFee?: number;
 }
 
 export interface GlobalConfig {
@@ -31,16 +36,18 @@ export interface GlobalConfig {
   thirdPartyFee: number;
   applicationFee: number;
   enrollmentFee: number;
-  koreanLanguageOptions: number[];
+  koreanLanguageOptions: { label: string; price: number }[];
   dormVietnamPricePerMonth: number;
   dormKoreaOptions: { label: string; price: number }[];
   flightOptions: number[];
   defaultTuitionKrw: number;
+  exchangeRate: number;
 }
 
 export interface Selections {
   koreanLangIdx: number;
   dormVnMonths: number;
+  tuitionTerms?: number;
   dormKrIdx: number;
   flightIdx: number;
   scholarshipPercent: number;

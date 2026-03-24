@@ -21,17 +21,22 @@ const emptyUni: University = {
   majors: '',
   admissionRequirements: '',
   tuitionD4: '0 KRW',
+  tuitionD2_1: '0 KRW',
   tuitionD2_2: '0 KRW',
   tuitionD2_3: '0 KRW',
   scholarship: '',
   dormitory: '',
   jobOpportunities: '',
   calcTuitionD4: 0,
+  calcTuitionD2_1: 0,
   calcTuitionD2_2: 0,
   calcTuitionD2_3: 0,
   image: '',
+  logoUrl: '',
   minGpaD4: 6.0,
   minGpaD2: 6.5,
+  applicationFee: 0,
+  enrollmentFee: 2000000,
 };
 
 export default function UniversityFormModal({ initialData, onClose }: Props) {
@@ -134,6 +139,11 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                 <input type="text" value={formData.image} onChange={e => handleChange('image', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="https://images.unsplash.com/..." />
                 {formData.image && <img src={formData.image} alt="Preview" className="mt-4 h-32 rounded-xl object-cover border" />}
               </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-bold text-slate-700 mb-2">Ảnh LOGO Trường (URL)</label>
+                <input type="text" value={formData.logoUrl} onChange={e => handleChange('logoUrl', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="https://..." />
+                {formData.logoUrl && <img src={formData.logoUrl} alt="Logo Preview" className="mt-4 h-20 w-20 rounded-xl object-contain border bg-slate-50 p-2" />}
+              </div>
             </div>
           )}
 
@@ -176,14 +186,18 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                     <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D4</label>
                     <input type="text" value={formData.tuitionD4} onChange={e => handleChange('tuitionD4', e.target.value)} className="w-full p-3 border rounded-xl" />
                   </div>
-                  <div className="flex gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex-1">
+                      <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D2-1</label>
+                      <input type="text" value={formData.tuitionD2_1} onChange={e => handleChange('tuitionD2_1', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Cao Đẳng" />
+                    </div>
                     <div className="flex-1">
                       <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D2-2</label>
-                      <input type="text" value={formData.tuitionD2_2} onChange={e => handleChange('tuitionD2_2', e.target.value)} className="w-full p-3 border rounded-xl" />
+                      <input type="text" value={formData.tuitionD2_2} onChange={e => handleChange('tuitionD2_2', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Đại Học" />
                     </div>
                     <div className="flex-1">
                       <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D2-3</label>
-                      <input type="text" value={formData.tuitionD2_3} onChange={e => handleChange('tuitionD2_3', e.target.value)} className="w-full p-3 border rounded-xl" />
+                      <input type="text" value={formData.tuitionD2_3} onChange={e => handleChange('tuitionD2_3', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Thạc Sĩ" />
                     </div>
                   </div>
                   <div>
@@ -206,12 +220,26 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                     <input type="number" value={formData.calcTuitionD4} onChange={e => handleChange('calcTuitionD4', Number(e.target.value))} className="w-full p-3 border rounded-xl" />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Tính Học Phí CĐ/ĐH D2-2 KRW (1 Kỳ)</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Tính Học Phí Cao Đẳng D2-1 KRW (1 Kỳ)</label>
+                    <input type="number" value={formData.calcTuitionD2_1} onChange={e => handleChange('calcTuitionD2_1', Number(e.target.value))} className="w-full p-3 border rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Tính Học Phí ĐH D2-2 KRW (1 Kỳ)</label>
                     <input type="number" value={formData.calcTuitionD2_2} onChange={e => handleChange('calcTuitionD2_2', Number(e.target.value))} className="w-full p-3 border rounded-xl" />
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-1">Tính Học Phí Thạc Sĩ D2-3 KRW (1 Kỳ)</label>
                     <input type="number" value={formData.calcTuitionD2_3} onChange={e => handleChange('calcTuitionD2_3', Number(e.target.value))} className="w-full p-3 border rounded-xl" />
+                  </div>
+                  <div className="flex gap-4 border-t border-amber-200/50 pt-4">
+                    <div className="flex-1">
+                      <label className="block text-sm font-bold text-slate-700 mb-1">Phí Apply (VND)</label>
+                      <input type="number" value={formData.applicationFee} onChange={e => handleChange('applicationFee', Number(e.target.value))} className="w-full p-3 border rounded-xl" placeholder="0" />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm font-bold text-slate-700 mb-1">Phí Nhập Học (VND)</label>
+                      <input type="number" value={formData.enrollmentFee} onChange={e => handleChange('enrollmentFee', Number(e.target.value))} className="w-full p-3 border rounded-xl" placeholder="2000000" />
+                    </div>
                   </div>
                 </div>
               </div>

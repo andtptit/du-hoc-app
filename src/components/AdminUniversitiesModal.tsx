@@ -45,10 +45,11 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
       id: '', name: 'Đại học Mẫu', nameKr: 'Sample University', visaTop: 1,
       address: '123 Seoul\nHàn Quốc', rank: 'Top 1', 
       majors: 'Kinh Tế\nTruyền thông', admissionRequirements: 'Tốt nghiệp THPT\nGPA > 6.5', 
-      tuitionD4: '1,500,000 KRW', tuitionD2_2: '2,000,000 KRW', tuitionD2_3: '3,000,000 KRW', 
+      tuitionD4: '1,500,000 KRW', tuitionD2_1: '1,800,000 KRW', tuitionD2_2: '2,000,000 KRW', tuitionD2_3: '3,000,000 KRW', 
       scholarship: '30%\n50%', dormitory: '500k\n6 tháng', jobOpportunities: 'Tốt\nLàm thêm 20h/tuần', 
-      calcTuitionD4: 1500000, calcTuitionD2_2: 2000000, calcTuitionD2_3: 3000000, 
-      image: '', minGpaD4: 6.5, minGpaD2: 7.0
+      calcTuitionD4: 1500000, calcTuitionD2_1: 1800000, calcTuitionD2_2: 2000000, calcTuitionD2_3: 3000000, 
+      image: '', logoUrl: '', minGpaD4: 6.5, minGpaD2: 7.0,
+      applicationFee: 0, enrollmentFee: 2000000
     }];
     
     // Sử dụng \uFEFF BOM để Excel mở tiếng Việt không bị lỗi font UTF-8
@@ -96,17 +97,22 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
               majors: row.majors || '',
               admissionRequirements: row.admissionRequirements || '',
               tuitionD4: row.tuitionD4 || '0 KRW',
+              tuitionD2_1: row.tuitionD2_1 || '0 KRW',
               tuitionD2_2: row.tuitionD2_2 || '0 KRW',
               tuitionD2_3: row.tuitionD2_3 || '0 KRW',
               scholarship: row.scholarship || '',
               dormitory: row.dormitory || '',
               jobOpportunities: row.jobOpportunities || '',
               calcTuitionD4: Number(row.calcTuitionD4) || 0,
+              calcTuitionD2_1: Number(row.calcTuitionD2_1) || 0,
               calcTuitionD2_2: Number(row.calcTuitionD2_2) || 0,
               calcTuitionD2_3: Number(row.calcTuitionD2_3) || 0,
               image: row.image || '',
+              logoUrl: row.logoUrl || '',
               minGpaD4: Number(row.minGpaD4) || 0,
               minGpaD2: Number(row.minGpaD2) || 0,
+              applicationFee: Number(row.applicationFee) || 0,
+              enrollmentFee: Number(row.enrollmentFee) || 2000000,
             };
 
             const docRef = doc(db, 'universities', docId);

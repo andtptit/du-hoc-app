@@ -15,7 +15,11 @@ const DEFAULT_CONFIG: GlobalConfig = {
   thirdPartyFee: 11000000,
   applicationFee: 0,
   enrollmentFee: 2000000,
-  koreanLanguageOptions: [0, 13000000, 14000000, 26000000, 27000000],
+  koreanLanguageOptions: [
+    { label: 'Tự học (0đ)', price: 0 },
+    { label: 'Gói 1: 13.000.000 đ', price: 13000000 },
+    { label: 'Gói 2: 26.000.000 đ', price: 26000000 }
+  ],
   dormVietnamPricePerMonth: 800000,
   dormKoreaOptions: [
     { label: 'Phòng 4 người (14M/6 tháng)', price: 14000000 },
@@ -23,6 +27,7 @@ const DEFAULT_CONFIG: GlobalConfig = {
   ],
   flightOptions: [5000000, 8000000, 10000000, 13000000, 17000000],
   defaultTuitionKrw: 120000000 / DEFAULT_KRW_TO_VND,
+  exchangeRate: 18.5,
 };
 
 export { DEFAULT_CONFIG };

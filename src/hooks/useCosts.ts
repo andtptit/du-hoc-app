@@ -32,17 +32,20 @@ export function useCosts({
   return useMemo(() => {
     if (!selectedUni || !globalConfig) return { total: 0 };
 
-    const visaField = selectedVisa.field as 'calcTuitionD4' | 'calcTuitionD2_2' | 'calcTuitionD2_3';
+    const visaField = selectedVisa.field as 'calcTuitionD4' | 'calcTuitionD2_1' | 'calcTuitionD2_2' | 'calcTuitionD2_3';
 
-    const koreanLangCost = globalConfig.koreanLanguageOptions[selections.koreanLangIdx] || 0;
+    const opt = globalConfig.koreanLanguageOptions[selections.koreanLangIdx];
+    const koreanLangCost = typeof opt === 'object' ? opt.price : (opt || 0);
     const consultingFee = globalConfig.consultingFee;
     const thirdPartyFee = globalConfig.thirdPartyFee;
-    const applicationFee = globalConfig.applicationFee;
-    const enrollmentFee = globalConfig.enrollmentFee;
+    const applicationFee = selectedUni.applicationFee ?? globalConfig.applicationFee ?? 0;
+    const enrollmentFee = selectedUni.enrollmentFee ?? globalConfig.enrollmentFee ?? 2000000;
     const dormVnCost = selections.dormVnMonths * globalConfig.dormVietnamPricePerMonth;
 
-    const baseTuitionKrw = selectedUni[visaField] || globalConfig.defaultTuitionKrw;
-    const tuitionVnd = baseTuitionKrw * exchangeRate;
+    const baseTuitionKrw = selectedUni[visaField] || 0;
+    const defaultTerms = visaTypeId === 'd4-1' ? 4 : 1;
+    const tuitionTerms = selections.tuitionTerms ?? defaultTerms;
+    const tuitionVnd = baseTuitionKrw * exchangeRate * tuitionTerms;
     const scholarshipAmount = tuitionVnd * (selections.scholarshipPercent / 100);
     const finalTuitionVnd = tuitionVnd - scholarshipAmount;
 
