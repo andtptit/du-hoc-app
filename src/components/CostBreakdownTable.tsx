@@ -3,9 +3,11 @@ import { Settings, Plus, Minus, Calculator } from 'lucide-react';
 import { GlobalConfig, Selections, CostBreakdown, University } from '../types';
 import { formatVND } from '../utils/format';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ParsedDormOption } from '../hooks/useCosts';
+import { VISA_TYPES } from '../data';
 
 interface CostBreakdownTableProps {
-  costs: Partial<CostBreakdown> & { total: number };
+  costs: Partial<CostBreakdown> & { total: number; parsedDormOptions?: ParsedDormOption[] };
   globalConfig: GlobalConfig;
   selections: Selections;
   onSelectionsChange: (s: Selections) => void;
@@ -24,12 +26,16 @@ export default function CostBreakdownTable({
   const update = (patch: Partial<Selections>) =>
     onSelectionsChange({ ...selections, ...patch });
 
-  const Row = ({ stt, label, subLabel, cost, options }: { 
-    stt: string, 
-    label: string, 
-    subLabel?: string, 
-    cost: number, 
-    options?: React.ReactNode 
+  const selectedVisa = VISA_TYPES.find(v => v.id === visaId) || VISA_TYPES[2];
+  const visaField = selectedVisa.field as 'calcTuitionD4' | 'calcTuitionD2_1' | 'calcTuitionD2_2' | 'calcTuitionD2_3';
+  const baseTuitionKrw = university[visaField] || 0;
+
+  const Row = ({ stt, label, subLabel, cost, options }: {
+    stt: string,
+    label: string,
+    subLabel?: string,
+    cost: number,
+    options?: React.ReactNode
   }) => {
     const [isExpanded, setIsExpanded] = React.useState(false);
     const hasLongDescription = subLabel && subLabel.length > 40;
@@ -38,7 +44,7 @@ export default function CostBreakdownTable({
       <tr className="border-b border-slate-50 last:border-0 hover:bg-slate-50/30 transition-colors group">
         <td className="py-5 px-4 align-top">
           <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 tabular-nums border border-slate-100 group-hover:bg-[#0f3493] group-hover:text-white group-hover:border-[#0f3493] transition-all italic">
-              {stt}
+            {stt}
           </div>
         </td>
         <td className="py-5 px-4">
@@ -49,7 +55,7 @@ export default function CostBreakdownTable({
                 {subLabel}
               </p>
               {hasLongDescription && (
-                <button 
+                <button
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="text-[10px] text-blue-500 font-black uppercase tracking-widest mt-1 flex items-center gap-1 hover:text-blue-700"
                 >
@@ -65,7 +71,7 @@ export default function CostBreakdownTable({
         </td>
         <td className="py-5 px-4 text-right align-top">
           <span className={`text-[15px] font-black ${cost < 0 ? 'text-emerald-600' : 'text-[#0f3493]'}`}>
-              {cost < 0 ? '-' : ''}{formatVND(Math.abs(cost))}
+            {cost < 0 ? '-' : ''}{formatVND(Math.abs(cost))}
           </span>
         </td>
         <td className="py-5 px-4 align-top">
@@ -106,10 +112,10 @@ export default function CostBreakdownTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            <Row 
-              stt="01" 
-              label="Học tiếng Hàn" 
-              subLabel="Từ 0 đến Topik 2/4" 
+            <Row
+              stt="01"
+              label="Học phí học tiếng Hàn tại trung tâm"
+
               cost={costs.koreanLangCost ?? 0}
               options={
                 <select
@@ -119,7 +125,13 @@ export default function CostBreakdownTable({
                 >
                   {globalConfig.koreanLanguageOptions.map((opt: any, i) => (
                     <option key={i} value={i}>
-                      {typeof opt === 'object' ? opt.label : (opt === 0 ? 'Tự học (0đ)' : `Gói ${i}: ${formatVND(opt)}`)}
+                      {typeof opt === 'object' ? opt.label : (
+                        opt === 0 ? 'Tự học (0đ)' : (
+                          i === 1 ? `Từ 0 đến TOPIK 2: ${formatVND(opt)}` : (
+                            i === 2 ? `Từ 0 đến TOPIK 4: ${formatVND(opt)}` : `Gói ${i}: ${formatVND(opt)}`
+                          )
+                        )
+                      )}
                     </option>
                   ))}
                 </select>
@@ -127,12 +139,34 @@ export default function CostBreakdownTable({
             />
             <Row stt="02" label="Phí tư vấn & Xử lý hồ sơ" subLabel="Trọn gói xây dựng hồ sơ" cost={costs.consultingFee ?? 0} />
             <Row stt="03" label="Phí thu hộ bên thứ 3" subLabel="Công chứng, Tem vàng, Visa, Khám SK..." cost={costs.thirdPartyFee ?? 0} />
-            <Row stt="04" label="Phí Apply & Nhập học" subLabel="Phí xét tuyển và nhập học HQ" cost={(costs.applicationFee ?? 0) + (costs.enrollmentFee ?? 0)} />
-            
-            <Row 
-              stt="05" 
-              label="Ký túc xá tại VN" 
-              subLabel="800.000đ / tháng" 
+            <Row
+              stt="04"
+              label="Phí xét duyệt hồ sơ"
+              subLabel="Phí apply trường HQ"
+              cost={costs.applicationFee ?? 0}
+              options={
+                <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
+                  CỐ ĐỊNH
+                </span>
+              }
+            />
+
+            <Row
+              stt="05"
+              label="Phí nhập học"
+              subLabel="Nộp thẳng cho trường"
+              cost={costs.enrollmentFee ?? 2000000}
+              options={
+                <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
+                  CỐ ĐỊNH
+                </span>
+              }
+            />
+
+            <Row
+              stt="06"
+              label="Ký túc xá tại VN"
+              subLabel="800.000đ / tháng"
               cost={costs.dormVnCost ?? 0}
               options={
                 <div className="flex items-center gap-3">
@@ -153,10 +187,10 @@ export default function CostBreakdownTable({
               }
             />
 
-            <Row 
-              stt="06" 
-              label="Học phí trường HQ" 
-              subLabel={`Dự kiến ${selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1)} kỳ`} 
+            <Row
+              stt="07"
+              label="Học phí trường HQ"
+              subLabel={`Dự kiến ${selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1)} kỳ, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`}
               cost={costs.tuitionVnd ?? 0}
               options={
                 <div className="flex items-center gap-3">
@@ -184,11 +218,11 @@ export default function CostBreakdownTable({
                 </div>
               }
             />
-            
-            <Row 
-              stt="07" 
-              label="Học bổng" 
-              subLabel={university.scholarship || "Chính sách giảm trừ của trường"} 
+
+            <Row
+              stt="08"
+              label="Học bổng"
+              subLabel={university.scholarship || "Chính sách giảm trừ của trường"}
               cost={-(costs.scholarshipAmount ?? 0)}
               options={
                 <select
@@ -203,10 +237,10 @@ export default function CostBreakdownTable({
               }
             />
 
-            <Row 
-              stt="08" 
-              label="KTX / Tiền nhà HQ" 
-              subLabel="Dự kiến 6 tháng đầu" 
+            <Row
+              stt="09"
+              label="KTX / Tiền nhà HQ"
+              subLabel="Dự kiến 6 tháng đầu"
               cost={costs.dormKrCost ?? 0}
               options={
                 <select
@@ -214,17 +248,17 @@ export default function CostBreakdownTable({
                   value={selections.dormKrIdx}
                   onChange={(e) => update({ dormKrIdx: Number(e.target.value) })}
                 >
-                  {globalConfig.dormKoreaOptions.map((opt, i) => (
+                  {(costs.parsedDormOptions || globalConfig.dormKoreaOptions).map((opt, i) => (
                     <option key={i} value={i}>{opt.label}</option>
                   ))}
                 </select>
               }
             />
 
-            <Row 
-              stt="09" 
-              label="Vé máy bay" 
-              subLabel="Một chiều (Bao gồm ký gửi)" 
+            <Row
+              stt="10"
+              label="Vé máy bay"
+              subLabel="Một chiều (Bao gồm ký gửi)"
               cost={costs.flightCost ?? 0}
               options={
                 <select
@@ -233,7 +267,7 @@ export default function CostBreakdownTable({
                   onChange={(e) => update({ flightIdx: Number(e.target.value) })}
                 >
                   {globalConfig.flightOptions.map((opt, i) => (
-                    <option key={i} value={i}>Gói {i+1}: {formatVND(opt)}</option>
+                    <option key={i} value={i}>Gói {i + 1}: {formatVND(opt)}</option>
                   ))}
                 </select>
               }

@@ -5,6 +5,44 @@ import { University } from '../types';
 import { setDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { toast } from 'react-hot-toast';
+import { extractNumbers } from '../utils/extract';
+
+const SmartTags = ({ text, onSelect }: { text: string | undefined, onSelect: (val: number) => void }) => {
+  if (!text) return null;
+  const nums = extractNumbers(text);
+  if (nums.length === 0) return null;
+  
+  if (nums.length === 1) {
+    return (
+      <button 
+        type="button"
+        onClick={() => onSelect(nums[0])}
+        className="mt-1 flex items-center gap-1 text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md hover:bg-blue-100 transition-colors w-fit"
+      >
+        👇 Gán số: {nums[0].toLocaleString('vi-VN')}
+      </button>
+    );
+  }
+  
+  return (
+    <div className="mt-1 flex flex-wrap gap-2">
+      <button 
+        type="button"
+        onClick={() => onSelect(nums[0])}
+        className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md hover:bg-emerald-100 transition-colors w-fit"
+      >
+        👇 Gán Min: {nums[0].toLocaleString('vi-VN')}
+      </button>
+      <button 
+        type="button"
+        onClick={() => onSelect(nums[nums.length - 1])}
+        className="flex items-center gap-1 text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-md hover:bg-rose-100 transition-colors w-fit"
+      >
+        👇 Gán Max: {nums[nums.length - 1].toLocaleString('vi-VN')}
+      </button>
+    </div>
+  );
+};
 
 interface Props {
   initialData: University | null;
@@ -185,19 +223,23 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D4</label>
                     <input type="text" value={formData.tuitionD4} onChange={e => handleChange('tuitionD4', e.target.value)} className="w-full p-3 border rounded-xl" />
+                    <SmartTags text={formData.tuitionD4} onSelect={(val) => handleChange('calcTuitionD4', val)} />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="flex-1">
                       <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D2-1</label>
                       <input type="text" value={formData.tuitionD2_1} onChange={e => handleChange('tuitionD2_1', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Cao Đẳng" />
+                      <SmartTags text={formData.tuitionD2_1} onSelect={(val) => handleChange('calcTuitionD2_1', val)} />
                     </div>
                     <div className="flex-1">
                       <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D2-2</label>
                       <input type="text" value={formData.tuitionD2_2} onChange={e => handleChange('tuitionD2_2', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Đại Học" />
+                      <SmartTags text={formData.tuitionD2_2} onSelect={(val) => handleChange('calcTuitionD2_2', val)} />
                     </div>
                     <div className="flex-1">
                       <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D2-3</label>
                       <input type="text" value={formData.tuitionD2_3} onChange={e => handleChange('tuitionD2_3', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Thạc Sĩ" />
+                      <SmartTags text={formData.tuitionD2_3} onSelect={(val) => handleChange('calcTuitionD2_3', val)} />
                     </div>
                   </div>
                   <div>

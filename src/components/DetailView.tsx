@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { University, FormData, CostBreakdown, GlobalConfig, Selections } from '../types';
 import { formatVND } from '../utils/format';
+import { ParsedDormOption } from '../hooks/useCosts';
 import CostBreakdownTable from './CostBreakdownTable';
 
 interface DetailViewProps {
@@ -23,7 +24,7 @@ interface DetailViewProps {
   onBack: () => void;
   onApply: () => void;
   formData: FormData;
-  costs: Partial<CostBreakdown> & { total: number };
+  costs: Partial<CostBreakdown> & { total: number; parsedDormOptions?: ParsedDormOption[] };
   globalConfig: GlobalConfig;
   selections: Selections;
   onSelectionsChange: (s: Selections) => void;
@@ -159,13 +160,7 @@ export default function DetailView({
           </div>
 
           {/* Additional Info Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 text-[#0f3493] font-bold uppercase text-xs tracking-widest">
-                <Home className="w-4 h-4" /> Ký túc xá & Nhà ở
-              </div>
-              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line font-medium">{university.dormitory}</p>
-            </div>
+          <div className="grid grid-cols-1 gap-6">
             <div className="bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm space-y-4">
               <div className="flex items-center gap-2 text-emerald-600 font-bold uppercase text-xs tracking-widest">
                 <Briefcase className="w-4 h-4" /> Việc làm thêm (Part-time)

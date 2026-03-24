@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import Papa from 'papaparse';
 import React, { useState, useRef } from 'react';
 import UniversityFormModal from './UniversityFormModal';
+import { extractTuitionMin } from '../utils/extract';
 
 interface Props {
   universities: University[];
@@ -17,6 +18,8 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
   const [editingUni, setEditingUni] = useState<University | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [previewData, setPreviewData] = useState<University[] | null>(null);
+  const [previewFileName, setPreviewFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = async (id: string, name: string) => {
@@ -53,15 +56,17 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
     }];
     
     // Sử dụng \uFEFF BOM để Excel mở tiếng Việt không bị lỗi font UTF-8
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + Papa.unparse(sampleData);
-      
-    const encodedUri = encodeURI(csvContent);
+    const csvString = Papa.unparse(sampleData);
+    const blob = new Blob(["\uFEFF", csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.setAttribute("href", url);
     link.setAttribute("download", "DuHoc_MauUploadTruong.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,14 +75,16 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
 
     setIsImporting(true);
     toast.loading("Đang đọc file Excel/CSV...", { id: 'import' });
+    setPreviewFileName(file.name);
 
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      complete: async (results) => {
+      encoding: "UTF-8",
+      transformHeader: (header) => header.trim().replace(/^\uFEFF/, ''), // Loại bỏ BOM nếu có
+      complete: (results) => {
         try {
-          const batch = writeBatch(db);
-          let count = 0;
+          const parsedUnis: University[] = [];
           for (const row of results.data as any[]) {
             if (!row.name || !row.nameKr) continue; // Bỏ qua nếu dòng hỏng
             
@@ -103,10 +110,10 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
               scholarship: row.scholarship || '',
               dormitory: row.dormitory || '',
               jobOpportunities: row.jobOpportunities || '',
-              calcTuitionD4: Number(row.calcTuitionD4) || 0,
-              calcTuitionD2_1: Number(row.calcTuitionD2_1) || 0,
-              calcTuitionD2_2: Number(row.calcTuitionD2_2) || 0,
-              calcTuitionD2_3: Number(row.calcTuitionD2_3) || 0,
+              calcTuitionD4: row.calcTuitionD4 ? Number(row.calcTuitionD4) : extractTuitionMin(row.tuitionD4 || ''),
+              calcTuitionD2_1: row.calcTuitionD2_1 ? Number(row.calcTuitionD2_1) : extractTuitionMin(row.tuitionD2_1 || ''),
+              calcTuitionD2_2: row.calcTuitionD2_2 ? Number(row.calcTuitionD2_2) : extractTuitionMin(row.tuitionD2_2 || ''),
+              calcTuitionD2_3: row.calcTuitionD2_3 ? Number(row.calcTuitionD2_3) : extractTuitionMin(row.tuitionD2_3 || ''),
               image: row.image || '',
               logoUrl: row.logoUrl || '',
               minGpaD4: Number(row.minGpaD4) || 0,
@@ -114,17 +121,13 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
               applicationFee: Number(row.applicationFee) || 0,
               enrollmentFee: Number(row.enrollmentFee) || 2000000,
             };
-
-            const docRef = doc(db, 'universities', docId);
-            batch.set(docRef, uniData);
-            count++;
-            if (count >= 490) break; // Limit của writeBatch Firestore
+            parsedUnis.push(uniData);
           }
-          await batch.commit();
-          toast.success(`Nhập hàng loạt thành công ${count} trường!`, { id: 'import' });
+          setPreviewData(parsedUnis);
+          toast.success(`Đã đọc xong file, sẵn sàng import ${parsedUnis.length} trường!`, { id: 'import' });
         } catch (error: any) {
-          console.error("Batch Import Error:", error);
-          toast.error("Lỗi khi import: " + error.message, { id: 'import' });
+          console.error("Parse Error:", error);
+          toast.error("Lỗi khi đọc file: " + error.message, { id: 'import' });
         } finally {
           setIsImporting(false);
           if (fileInputRef.current) fileInputRef.current.value = '';
@@ -135,6 +138,32 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
         setIsImporting(false);
       }
     });
+  };
+
+  const handleConfirmImport = async () => {
+    if (!previewData || previewData.length === 0) return;
+    setIsImporting(true);
+    toast.loading(`Đang lưu ${previewData.length} trường lên hệ thống...`, { id: 'import' });
+    
+    try {
+      const batch = writeBatch(db);
+      let count = 0;
+      for (const uni of previewData) {
+        const docRef = doc(db, 'universities', uni.id);
+        batch.set(docRef, uni);
+        count++;
+        if (count >= 490) break; // Limit của writeBatch
+      }
+      await batch.commit();
+      toast.success(`Nhập hàng loạt thành công ${count} trường!`, { id: 'import' });
+      setPreviewData(null);
+      setPreviewFileName('');
+    } catch (error: any) {
+      console.error("Batch Import Error:", error);
+      toast.error("Lỗi khi import: " + error.message, { id: 'import' });
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   return (
@@ -191,6 +220,37 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
             </button>
           </div>
         </div>
+
+        {previewData && (
+          <div className="mb-6 shrink-0 bg-blue-50/50 border border-blue-200 p-6 rounded-2xl flex flex-wrap gap-4 items-center justify-between shadow-inner">
+            <div className="space-y-1">
+              <h4 className="text-blue-800 font-black tracking-tight text-lg">XÁC NHẬN IMPORT</h4>
+              <p className="text-blue-600/80 text-sm font-medium">
+                File gốc: <strong className="text-blue-700">{previewFileName}</strong> • Chuẩn bị đăng tải hộp dữ liệu <strong className="text-blue-700">{previewData.length} trường</strong>
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                disabled={isImporting}
+                onClick={() => {
+                  setPreviewData(null);
+                  setPreviewFileName('');
+                }}
+                className="px-5 py-2.5 rounded-xl font-bold bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-700 border border-slate-200 shadow-sm transition-colors disabled:opacity-50"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                disabled={isImporting}
+                onClick={handleConfirmImport}
+                className="px-6 py-2.5 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                <Upload className="w-4 h-4" />
+                Đồng ý Import ngay
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="flex-1 overflow-auto bg-slate-50/50 rounded-2xl p-4 border border-slate-200">
           {universities.length === 0 ? (

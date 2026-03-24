@@ -17,8 +17,8 @@ const DEFAULT_CONFIG: GlobalConfig = {
   enrollmentFee: 2000000,
   koreanLanguageOptions: [
     { label: 'Tự học (0đ)', price: 0 },
-    { label: 'Gói 1: 13.000.000 đ', price: 13000000 },
-    { label: 'Gói 2: 26.000.000 đ', price: 26000000 }
+    { label: 'Từ 0 đến TOPIK 2: 13.000.000 đ', price: 13000000 },
+    { label: 'Từ 0 đến TOPIK 4: 26.000.000 đ', price: 26000000 }
   ],
   dormVietnamPricePerMonth: 800000,
   dormKoreaOptions: [
