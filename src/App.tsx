@@ -89,13 +89,12 @@ export default function App() {
   useEffect(() => {
     const q = query(collection(db, 'banners'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      console.log("Firestore Banners Snapshot updated, size:", snapshot.size);
       if (!snapshot.empty) {
         const urls = snapshot.docs.map(doc => doc.data().url).filter(Boolean);
-        console.log("Banners URLs fetched:", urls);
-        if (urls.length > 0) setBanners(urls);
-      } else {
-        console.log("No banners found in collection 'banners'");
+        setBanners(prev => {
+          if (JSON.stringify(prev) === JSON.stringify(urls)) return prev;
+          return urls;
+        });
       }
     }, (err) => console.error("Banner fetch error:", err));
     return () => unsubscribe();

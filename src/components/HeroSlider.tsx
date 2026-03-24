@@ -9,7 +9,7 @@ interface Props {
 export default function HeroSlider({ bannerImages }: Props) {
   const [current, setCurrent] = useState(0);
   
-  console.log("HeroSlider rendered with images:", bannerImages);
+  // console.log("HeroSlider rendered with images:", bannerImages);
 
   useEffect(() => {
     if (!bannerImages || bannerImages.length <= 1) return;
@@ -52,7 +52,11 @@ export default function HeroSlider({ bannerImages }: Props) {
             alt="Banner" 
             className="w-full h-full object-cover"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://firebasestorage.googleapis.com/v0/b/du-hoc-test.appspot.com/o/banners%2Fkb-scholarship.png?alt=media';
+              const target = e.target as HTMLImageElement;
+              const fallback = 'https://firebasestorage.googleapis.com/v0/b/du-hoc-test.appspot.com/o/banners%2Fkb-scholarship.png?alt=media';
+              if (target.src !== fallback) {
+                target.src = fallback;
+              }
             }}
           />
         </motion.div>
