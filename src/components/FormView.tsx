@@ -160,7 +160,10 @@ export default function FormView({
               showDropdown={showUniDropdown}
               onShowDropdown={onShowUniDropdown}
               filteredUnis={filteredUnis}
-              onSelect={(id) => onFormChange('universityId', id)}
+              onSelect={(id) => {
+                onFormChange('universityId', id);
+                onShowUniDropdown(false);
+              }}
             />
           
           {selectedUni && (

@@ -30,34 +30,35 @@ export default function CostBreakdownTable({
   const visaField = selectedVisa.field as 'calcTuitionD4' | 'calcTuitionD2_1' | 'calcTuitionD2_2' | 'calcTuitionD2_3';
   const baseTuitionKrw = university[visaField] || 0;
 
-  const Row = ({ stt, label, subLabel, cost, options }: {
+  const Row = ({ stt, label, subLabel, cost, options, isHighlight = false }: {
     stt: string,
     label: string,
     subLabel?: string,
     cost: number,
-    options?: React.ReactNode
+    options?: React.ReactNode,
+    isHighlight?: boolean
   }) => {
     const [isExpanded, setIsExpanded] = React.useState(false);
     const hasLongDescription = subLabel && subLabel.length > 40;
 
     return (
-      <tr className="border-b border-slate-50 last:border-0 hover:bg-slate-50/30 transition-colors group">
-        <td className="py-5 px-4 align-top">
-          <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 tabular-nums border border-slate-100 group-hover:bg-[#0f3493] group-hover:text-white group-hover:border-[#0f3493] transition-all italic">
+      <tr className={`border-b border-blue-50/50 last:border-0 ${isHighlight ? 'bg-green-50/50' : 'bg-white'} transition-colors group`}>
+        <td className="py-6 px-4 pl-10 align-top w-24">
+          <span className={`text-[15px] font-medium ${isHighlight ? 'text-green-500' : 'text-blue-400'}`}>
             {stt}
-          </div>
+          </span>
         </td>
-        <td className="py-5 px-4">
-          <p className="text-[15px] font-black text-slate-700 uppercase tracking-tight">{label}</p>
+        <td className="py-6 px-4">
+          <p className={`text-[15px] font-bold ${isHighlight ? 'text-green-600' : 'text-slate-800'}`}>{label}</p>
           {subLabel && (
-            <div className="mt-0.5">
-              <p className={`text-[11px] text-slate-400 font-bold ${!isExpanded && hasLongDescription ? 'line-clamp-1' : ''}`}>
+            <div className="mt-1">
+              <p className={`text-[12px] italic ${isHighlight ? 'text-green-600/70' : 'text-slate-400 font-medium'} ${!isExpanded && hasLongDescription ? 'line-clamp-1' : ''}`}>
                 {subLabel}
               </p>
               {hasLongDescription && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-[10px] text-blue-500 font-black uppercase tracking-widest mt-1 flex items-center gap-1 hover:text-blue-700"
+                  className={`text-[10px] font-black uppercase tracking-widest mt-1 flex items-center gap-1 ${isHighlight ? 'text-green-600 hover:text-green-700' : 'text-blue-500 hover:text-blue-700'}`}
                 >
                   {isExpanded ? (
                     <><ChevronUp className="w-3 h-3" /> Thu gọn</>
@@ -69,14 +70,14 @@ export default function CostBreakdownTable({
             </div>
           )}
         </td>
-        <td className="py-5 px-4 text-right align-top">
-          <span className={`text-[15px] font-black ${cost < 0 ? 'text-emerald-600' : 'text-[#0f3493]'}`}>
-            {cost < 0 ? '-' : ''}{formatVND(Math.abs(cost))}
+        <td className="py-6 px-4 text-right align-top">
+          <span className={`text-[15px] font-bold ${isHighlight ? 'text-green-500' : 'text-blue-500'}`}>
+            {cost === 0 ? formatVND(0) : `${cost < 0 ? '-' : ''}${formatVND(Math.abs(cost))}`}
           </span>
         </td>
-        <td className="py-5 px-4 align-top">
+        <td className="py-6 px-4 pr-10 align-top">
           <div className="flex justify-end">
-            {options || <span className="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-black uppercase tracking-wider">Cố định</span>}
+            {options || <span className="text-[11px] bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full font-bold">Cố định</span>}
           </div>
         </td>
       </tr>
@@ -84,34 +85,22 @@ export default function CostBreakdownTable({
   };
 
   return (
-    <div className="bg-white rounded-[40px] p-8 md:p-10 shadow-xl border border-slate-100 overflow-hidden">
-      <div className="flex items-center justify-between mb-10 pb-6 border-b border-slate-50">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-[#0f3493]">
-            <Calculator className="w-6 h-6" />
-          </div>
-          <div>
-            <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Chi tiết bóc tách chi phí</h3>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Minh bạch - Rõ ràng - Tối ưu</p>
-          </div>
-        </div>
-        <div className="hidden md:flex items-center gap-2 text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">
-          <Settings className="w-4 h-4 text-slate-300" />
-          <span>Tùy chỉnh lộ trình</span>
-        </div>
+    <div className="bg-white rounded-[32px] p-6 md:p-10 border border-blue-100/60 shadow-[0_4px_24px_rgba(15,52,147,0.03)] overflow-hidden">
+      <div className="mb-8 px-2">
+        <h3 className="text-[20px] font-black text-[#0f3493] uppercase tracking-tight">Bảng giá bóc tách chi tiết</h3>
       </div>
 
-      <div className="overflow-x-auto -mx-8 md:-mx-10">
+      <div className="overflow-x-auto -mx-6 md:-mx-10">
         <table className="w-full text-left border-collapse min-w-[600px]">
           <thead>
-            <tr className="bg-slate-50/50">
-              <th className="py-5 px-4 pl-10 text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] w-24 italic">STT</th>
-              <th className="py-5 px-4 text-[11px] font-black text-slate-400 uppercase tracking-[0.1em]">Hạng mục chi tiết</th>
-              <th className="py-5 px-4 text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] text-right">Chi phí (VND)</th>
-              <th className="py-5 px-4 pr-10 text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] text-right w-48">Tùy chọn</th>
+            <tr className="border-b border-blue-50">
+              <th className="pb-4 px-4 pl-10 text-[11px] font-bold text-blue-400 uppercase tracking-widest w-20">STT</th>
+              <th className="pb-4 px-4 text-[11px] font-bold text-blue-400 uppercase tracking-widest">Hạng mục</th>
+              <th className="pb-4 px-4 text-[11px] font-bold text-blue-400 uppercase tracking-widest text-right">Chi phí</th>
+              <th className="pb-4 px-4 pr-10 text-[11px] font-bold text-blue-400 uppercase tracking-widest text-right w-52">Mô tả/Tùy chọn</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-50">
+          <tbody className="">
             <Row
               stt="01"
               label="Học phí học tiếng Hàn tại trung tâm"
@@ -119,9 +108,9 @@ export default function CostBreakdownTable({
               cost={costs.koreanLangCost ?? 0}
               options={
                 <select
-                  className="text-[11px] font-bold bg-white border border-slate-200 rounded-xl px-4 py-2 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-[#0f3493] shadow-sm transition-all"
                   value={selections.koreanLangIdx}
                   onChange={(e) => update({ koreanLangIdx: Number(e.target.value) })}
+                  className="w-full md:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] font-medium text-slate-600 outline-none hover:bg-slate-100 focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer appearance-none pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23475569%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[position:right_10px_center] bg-no-repeat"
                 >
                   {globalConfig.koreanLanguageOptions.map((opt: any, i) => (
                     <option key={i} value={i}>
@@ -138,11 +127,10 @@ export default function CostBreakdownTable({
               }
             />
             <Row stt="02" label="Phí tư vấn & Xử lý hồ sơ" subLabel="Trọn gói xây dựng hồ sơ" cost={costs.consultingFee ?? 0} />
-            <Row stt="03" label="Phí thu hộ bên thứ 3" subLabel="Công chứng, Tem vàng, Visa, Khám SK..." cost={costs.thirdPartyFee ?? 0} />
+            <Row stt="03" label="Phí thu hộ bên thứ 3" subLabel="Công chứng, Tem vàng/tím, Visa, Khám SK, Ship, Đưa đón..." cost={costs.thirdPartyFee ?? 0} />
             <Row
               stt="04"
-              label="Phí xét duyệt hồ sơ"
-              subLabel="Phí apply trường HQ"
+              label="Phí apply trường HQ"
               cost={costs.applicationFee ?? 0}
               options={
                 <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
@@ -154,7 +142,6 @@ export default function CostBreakdownTable({
             <Row
               stt="05"
               label="Phí nhập học"
-              subLabel="Nộp thẳng cho trường"
               cost={costs.enrollmentFee ?? 2000000}
               options={
                 <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
@@ -165,24 +152,25 @@ export default function CostBreakdownTable({
 
             <Row
               stt="06"
-              label="Ký túc xá tại VN"
+              label="Ký túc xá tại Việt Nam"
               subLabel="800.000đ / tháng"
               cost={costs.dormVnCost ?? 0}
               options={
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 justify-end">
                   <button
                     onClick={() => update({ dormVnMonths: Math.max(0, selections.dormVnMonths - 1) })}
-                    className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                    className="w-6 h-6 flex items-center justify-center bg-blue-100/50 rounded hover:bg-blue-100 transition-colors"
                   >
-                    <Minus className="w-4 h-4 text-slate-500" />
+                    <Minus className="w-3 h-3 text-blue-600" />
                   </button>
-                  <span className="text-sm font-black w-4 text-center">{selections.dormVnMonths}</span>
+                  <span className="text-[13px] font-medium w-4 text-center text-slate-700">{selections.dormVnMonths}</span>
                   <button
                     onClick={() => update({ dormVnMonths: Math.min(12, selections.dormVnMonths + 1) })}
-                    className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                    className="w-6 h-6 flex items-center justify-center bg-blue-100/50 rounded hover:bg-blue-100 transition-colors"
                   >
-                    <Plus className="w-4 h-4 text-slate-500" />
+                    <Plus className="w-3 h-3 text-blue-600" />
                   </button>
+                  <span className="text-[12px] text-slate-500 ml-1 mt-0.5">tháng</span>
                 </div>
               }
             />
@@ -224,14 +212,15 @@ export default function CostBreakdownTable({
               label="Học bổng"
               subLabel={university.scholarship || "Chính sách giảm trừ của trường"}
               cost={-(costs.scholarshipAmount ?? 0)}
+              isHighlight={true}
               options={
                 <select
-                  className="text-[11px] font-bold bg-white border border-emerald-200 rounded-xl px-4 py-2 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 shadow-sm transition-all text-emerald-600"
+                  className="w-full md:w-auto px-4 py-2 bg-white border border-green-300 rounded-lg text-[13px] font-bold text-green-600 outline-none hover:bg-green-50 focus:ring-4 focus:ring-green-500/10 transition-all cursor-pointer appearance-none pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2316a34a%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[position:right_10px_center] bg-no-repeat"
                   value={selections.scholarshipPercent}
                   onChange={(e) => update({ scholarshipPercent: Number(e.target.value) })}
                 >
-                  {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((p) => (
-                    <option key={p} value={p}>{p}% Học bổng</option>
+                  {[0, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((p) => (
+                    <option key={p} value={p}>{p}%</option>
                   ))}
                 </select>
               }
@@ -239,17 +228,17 @@ export default function CostBreakdownTable({
 
             <Row
               stt="09"
-              label="KTX / Tiền nhà HQ"
-              subLabel="Dự kiến 6 tháng đầu"
+              label="Ký túc xá/ Thuê nhà tại Hàn Quốc"
+              subLabel="Dự kiến 6 tháng"
               cost={costs.dormKrCost ?? 0}
               options={
                 <select
-                  className="text-[11px] font-bold bg-white border border-slate-200 rounded-xl px-4 py-2 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-[#0f3493] shadow-sm transition-all"
+                  className="w-full md:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] font-medium text-slate-600 outline-none hover:bg-slate-100 focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer appearance-none pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23475569%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[position:right_10px_center] bg-no-repeat"
                   value={selections.dormKrIdx}
                   onChange={(e) => update({ dormKrIdx: Number(e.target.value) })}
                 >
                   {(costs.parsedDormOptions || globalConfig.dormKoreaOptions).map((opt, i) => (
-                    <option key={i} value={i}>{opt.label}</option>
+                    <option key={i} value={i}>{typeof opt === 'string' ? opt : opt.label}</option>
                   ))}
                 </select>
               }
@@ -257,17 +246,17 @@ export default function CostBreakdownTable({
 
             <Row
               stt="10"
-              label="Vé máy bay"
-              subLabel="Một chiều (Bao gồm ký gửi)"
+              label="Vé máy bay 1 chiều"
+              subLabel="Bao gồm 40kg ký gửi"
               cost={costs.flightCost ?? 0}
               options={
                 <select
-                  className="text-[11px] font-bold bg-white border border-slate-200 rounded-xl px-4 py-2 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-[#0f3493] shadow-sm transition-all"
+                  className="w-full md:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] font-medium text-slate-600 outline-none hover:bg-slate-100 focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer appearance-none pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23475569%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[position:right_10px_center] bg-no-repeat"
                   value={selections.flightIdx}
                   onChange={(e) => update({ flightIdx: Number(e.target.value) })}
                 >
                   {globalConfig.flightOptions.map((opt, i) => (
-                    <option key={i} value={i}>Gói {i + 1}: {formatVND(opt)}</option>
+                    <option key={i} value={i}>{formatVND(opt)}</option>
                   ))}
                 </select>
               }

@@ -1,13 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  MapPin, 
-  GraduationCap, 
-  Award, 
-  BookOpen, 
-  CheckCircle2, 
-  Home, 
+import {
+  ArrowLeft,
+  MapPin,
+  GraduationCap,
+  Award,
+  BookOpen,
+  CheckCircle2,
+  Home,
   Briefcase,
   User,
   Phone,
@@ -40,7 +40,7 @@ export default function DetailView({
   selections,
   onSelectionsChange
 }: DetailViewProps) {
-  
+
   const TopVisaBadge = () => {
     const colors = {
       1: 'bg-emerald-500',
@@ -48,7 +48,7 @@ export default function DetailView({
       3: 'bg-rose-500'
     };
     const color = colors[university.visaTop as keyof typeof colors] || 'bg-blue-600';
-    
+
     return (
       <div className={`${color} inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-white font-black text-[11px] uppercase tracking-wider shadow-lg`}>
         <Award className="w-3.5 h-3.5" />
@@ -90,32 +90,32 @@ export default function DetailView({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
+
         {/* Left Column: University Details (8/12) */}
         <div className="lg:col-span-8 space-y-8">
-          
+
           {/* Hero Banner Section */}
           <div className="relative rounded-[40px] overflow-hidden shadow-2xl bg-white border border-slate-100">
             <div className="h-48 md:h-64 relative">
               <img src={university.image} alt="" className="w-full h-full object-cover brightness-75" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8 md:p-12">
-                  <h1 className="text-white text-3xl md:text-5xl font-black uppercase tracking-tight leading-tight -mt-4">
-                    {university.nameKr}
-                  </h1>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8 md:p-12 pb-24 md:pb-28">
+                <h1 className="text-white text-3xl md:text-5xl font-black uppercase tracking-tight leading-tight -mt-4 drop-shadow-lg">
+                  {university.nameKr}
+                </h1>
               </div>
             </div>
 
             {/* Circular Logo & Name Bar */}
             <div className="px-8 md:px-12 py-8 flex flex-col md:flex-row items-center gap-8 bg-white relative">
               <div className="relative -mt-24 md:-mt-32">
-                 <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-full p-3 shadow-2xl border-4 border-white flex items-center justify-center overflow-hidden">
-                    <img src={university.logoUrl || university.image} alt="" className="w-full h-full object-contain rounded-full" />
-                 </div>
-                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
-                    <TopVisaBadge />
-                 </div>
+                <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-full p-3 shadow-2xl border-4 border-white flex items-center justify-center overflow-hidden">
+                  <img src={university.logoUrl || university.image} alt="" className="w-full h-full object-contain rounded-full" />
+                </div>
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
+                  <TopVisaBadge />
+                </div>
               </div>
-              
+
               <div className="flex-1 text-center md:text-left pt-4 md:pt-0">
                 <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight mb-1">{university.name}</h2>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-3">
@@ -138,7 +138,18 @@ export default function DetailView({
             <InfoCard icon={BookOpen} label="Chuyên ngành nổi bật" value={university.majors} />
             <InfoCard icon={CheckCircle2} label="Điều kiện tuyển sinh" value={university.admissionRequirements} />
             <InfoCard icon={GraduationCap} label="Học thuật & Xếp hạng" value={university.rank} />
+
+            {/* Việc làm thêm (Part-time) */}
+            <div className="md:col-span-2 bg-white px-8 py-6 rounded-[32px] border border-slate-200 shadow-none space-y-4">
+              <div className="flex items-center gap-2 text-emerald-600 font-bold uppercase text-[13px] tracking-widest">
+                <Briefcase className="w-4 h-4" /> CƠ HỘI VIỆC LÀM
+              </div>
+              <p className="text-[15px] text-slate-600 leading-relaxed whitespace-pre-line font-medium pb-2">
+                {university.jobOpportunities || "Chưa có thông tin cập nhật về việc làm thêm."}
+              </p>
+            </div>
           </div>
+
 
           {/* Fee Calculation Section */}
           <div className="space-y-6">
@@ -146,8 +157,8 @@ export default function DetailView({
               <Calculator className="w-6 h-6 text-[#0f3493]" />
               <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Dự toán chi phí & Lộ trình</h3>
             </div>
-            
-            <CostBreakdownTable 
+
+            <CostBreakdownTable
               costs={costs}
               globalConfig={globalConfig}
               selections={selections}
@@ -159,21 +170,11 @@ export default function DetailView({
             />
           </div>
 
-          {/* Additional Info Grid */}
-          <div className="grid grid-cols-1 gap-6">
-            <div className="bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 text-emerald-600 font-bold uppercase text-xs tracking-widest">
-                <Briefcase className="w-4 h-4" /> Việc làm thêm (Part-time)
-              </div>
-              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line font-medium">{university.jobOpportunities}</p>
-            </div>
-          </div>
-
         </div>
 
         {/* Right Column: Student Info & Summary (4/12) */}
         <div className="lg:col-span-4 space-y-6">
-          
+
           <div className="sticky top-28 space-y-6">
             {/* Student Profile Card */}
             <div className="bg-[#0f3493] rounded-[40px] p-8 text-white shadow-2xl relative overflow-hidden">
@@ -213,7 +214,7 @@ export default function DetailView({
                   </div>
                   <div className="space-y-1">
                     <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Chương trình / TOPIK</p>
-                    <p className="text-[15px] font-bold">{formData.visaType} - TOPIK {formData.topikLevel}</p>
+                    <p className="text-[15px] font-bold uppercase tracking-wider">{formData.visaType.toUpperCase()} - TOPIK {formData.topikLevel}</p>
                   </div>
                 </div>
               </div>
@@ -229,18 +230,11 @@ export default function DetailView({
               </div>
 
               <div className="bg-blue-50/50 p-4 rounded-2xl space-y-3">
-                 <div className="flex justify-between text-xs font-bold">
-                    <span className="text-slate-500">Phí hồ sơ & xử lý:</span>
-                    <span className="text-slate-700">{formatVND((costs.consultingFee ?? 0) + (costs.thirdPartyFee ?? 0))}</span>
-                 </div>
-                 <div className="flex justify-between text-xs font-bold">
-                    <span className="text-slate-500">Học phí & Nhập học:</span>
-                    <span className="text-slate-700">{formatVND((costs.tuitionVnd ?? 0) + (costs.enrollmentFee ?? 0))}</span>
-                 </div>
-                 <div className="flex justify-between text-xs font-bold">
-                    <span className="text-slate-500">Sinh hoạt & KTX (VN + HQ):</span>
-                    <span className="text-slate-700">{formatVND((costs.dormVnCost ?? 0) + (costs.dormKrCost ?? 0))}</span>
-                 </div>
+                <div className="flex justify-between text-xs font-bold">
+                  <span className="text-slate-500">Chi phí chưa bao gồm phí chứng minh tài chính</span>
+
+                </div>
+
               </div>
 
               <button
@@ -256,8 +250,8 @@ export default function DetailView({
 
             {/* Sidebar Footer Link */}
             <div className="bg-slate-50 p-6 rounded-[32px] border border-dashed border-slate-200 flex flex-col items-center gap-4">
-               <img src="https://tbtgroup.vn/wp-content/uploads/2023/11/logo-tbt.png" className="h-4 grayscale opacity-40" alt="" />
-               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">Hệ thống giáo dục TBT - Đồng hành cùng ước mơ của bạn</p>
+              <img src="https://tbtgroup.vn/wp-content/uploads/2023/11/logo-tbt.png" className="h-4 grayscale opacity-40" alt="" />
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">Hệ thống giáo dục TBT - Đồng hành cùng ước mơ của bạn</p>
             </div>
           </div>
 

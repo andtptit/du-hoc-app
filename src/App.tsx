@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster, toast } from 'react-hot-toast';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
@@ -170,8 +170,14 @@ export default function App() {
                 filteredUnis={filteredUnis}
               />
             ) : (
+              <motion.div
+              key="detail"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="mt-6 md:mt-8"
+            >
               <DetailView
-                key="detail"
                 university={selectedUni}
                 onBack={() => setView('form')}
                 onApply={handleRegister}
@@ -181,6 +187,7 @@ export default function App() {
                 selections={selections}
                 onSelectionsChange={setSelections}
               />
+            </motion.div>
             )}
           </AnimatePresence>
         </div>

@@ -44,16 +44,28 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
   };
 
   const handleDownloadTemplate = () => {
-    const sampleData = [{
-      id: '', name: 'Đại học Mẫu', nameKr: 'Sample University', visaTop: 1,
-      address: '123 Seoul\nHàn Quốc', rank: 'Top 1', 
-      majors: 'Kinh Tế\nTruyền thông', admissionRequirements: 'Tốt nghiệp THPT\nGPA > 6.5', 
-      tuitionD4: '1,500,000 KRW', tuitionD2_1: '1,800,000 KRW', tuitionD2_2: '2,000,000 KRW', tuitionD2_3: '3,000,000 KRW', 
-      scholarship: '30%\n50%', dormitory: '500k\n6 tháng', jobOpportunities: 'Tốt\nLàm thêm 20h/tuần', 
-      calcTuitionD4: 1500000, calcTuitionD2_1: 1800000, calcTuitionD2_2: 2000000, calcTuitionD2_3: 3000000, 
-      image: '', logoUrl: '', minGpaD4: 6.5, minGpaD2: 7.0,
-      applicationFee: 0, enrollmentFee: 2000000
-    }];
+    const sampleData = [
+      {
+        id: '(Bỏ trống để hệ thống tự tạo)', name: 'BẮT BUỘC ĐIỀN (Dòng này sẽ bị bỏ qua khi Import)', nameKr: 'BẮT BUỘC ĐIỀN', visaTop: 'Ghi số (1, 2, 3)',
+        address: 'VD: 123 Seoul (Alt+Enter xuống dòng)', rank: 'VD: Top 1', 
+        majors: 'Mỗi ngành xuống dòng (Alt+Enter)', admissionRequirements: 'Ví dụ: Tốt nghiệp THPT', 
+        tuitionD4: 'Ví dụ: 1.500.000 KRW/kỳ', tuitionD2_1: 'Ví dụ: 1.800.000 KRW/kỳ', tuitionD2_2: 'Ví dụ: 2.000.000 KRW/kỳ', tuitionD2_3: 'Ví dụ: 3.000.000 KRW/kỳ', 
+        scholarship: 'Mô tả học bổng tùy ý', dormitory: 'Phòng 2: 500k KRW; Phòng 4: 300k KRW', jobOpportunities: 'Làm thêm...', 
+        calcTuitionD4: '(Hệ thống tự động tính từ cột bên phải, vui lòng BỎ TRỐNG cột này)', calcTuitionD2_1: '(BỎ TRỐNG)', calcTuitionD2_2: '(BỎ TRỐNG)', calcTuitionD2_3: '(BỎ TRỐNG)', 
+        image: 'Link URL ảnh nền trường (nếu có)', logoUrl: 'Link URL logo trường (nếu có)', minGpaD4: 'Điểm số (ví dụ: 6.5)', minGpaD2: 'Điểm số (ví dụ: 7.0)',
+        applicationFee: '(Nhập số VND nếu muốn đổi, không thì bỏ trống)', enrollmentFee: '(Nhập số VND nếu muốn đổi, không thì bỏ trống)'
+      },
+      {
+        id: '(Bỏ trống)', name: 'Đại học Mẫu Demo', nameKr: 'Sample University', visaTop: 1,
+        address: '123 Seoul\nHàn Quốc', rank: 'Top 1', 
+        majors: 'Kinh Tế\nTruyền thông', admissionRequirements: 'Tốt nghiệp THPT\nGPA > 6.5', 
+        tuitionD4: 'Khoảng 1.500.000 KRW/kỳ', tuitionD2_1: 'Từ 1.800.000 KRW/kỳ', tuitionD2_2: '2.000.000 KRW/kỳ', tuitionD2_3: '3.000.000 KRW/kỳ', 
+        scholarship: '30%\n50%', dormitory: 'Hệ tiếng: 500.000 KRW; Hệ Đại học: 700.000 KRW', jobOpportunities: 'Tốt\nLàm thêm 20h/tuần', 
+        calcTuitionD4: '', calcTuitionD2_1: '', calcTuitionD2_2: '', calcTuitionD2_3: '', 
+        image: '', logoUrl: '', minGpaD4: 6.5, minGpaD2: 7.0,
+        applicationFee: '', enrollmentFee: ''
+      }
+    ];
     
     // Sử dụng \uFEFF BOM để Excel mở tiếng Việt không bị lỗi font UTF-8
     const csvString = Papa.unparse(sampleData);
@@ -86,6 +98,7 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
         try {
           const parsedUnis: University[] = [];
           for (const row of results.data as any[]) {
+            if (row.name?.includes('BẮT BUỘC ĐIỀN') || row.name === 'Đại học Mẫu Demo') continue; // Bỏ qua 2 dòng mẫu đầu tiên
             if (!row.name || !row.nameKr) continue; // Bỏ qua nếu dòng hỏng
             
             let docId = row.id;
