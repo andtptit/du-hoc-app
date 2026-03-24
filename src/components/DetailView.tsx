@@ -250,7 +250,7 @@ export default function DetailView({
 
             {/* Sidebar Footer Link */}
             <div className="bg-slate-50 p-6 rounded-[32px] border border-dashed border-slate-200 flex flex-col items-center gap-4">
-              <img src="https://tbtgroup.vn/wp-content/uploads/2023/11/logo-tbt.png" className="h-4 grayscale opacity-40" alt="" />
+              <img src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20TBT%20ko%20slogan-ngang.png?alt=media&token=f4175f0f-c25f-4b6b-a68e-b8e22a8ae1a2" className="h-4 grayscale opacity-40" alt="" />
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">Hệ thống giáo dục TBT - Đồng hành cùng ước mơ của bạn</p>
             </div>
           </div>

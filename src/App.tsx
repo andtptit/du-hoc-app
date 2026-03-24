@@ -19,11 +19,11 @@ import { useCosts } from './hooks/useCosts';
 import { FormData, Selections } from './types';
 import { VISA_TYPES, TOPIK_LEVELS, UNIVERSITIES as STATIC_UNIVERSITIES } from './data';
 
-const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz_pY7mUfD6L_k-HqPz3M9c_9p3Jm9l7L8v4L-6z5_f/exec";
+const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxDhzLK58bAt9Xlqa7BtiTYiP9WAKRq7zjl3QXT1SVMZ1WFrwv5kuZ42Y6mJZjBTeXH/exec";
 
 export default function App() {
   const [view, setView] = useState<'form' | 'detail'>('form');
-  
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     phone: '',
@@ -48,7 +48,7 @@ export default function App() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showUniDropdown, setShowUniDropdown] = useState(false);
-  
+
   // Admin States
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isUniversitiesOpen, setIsUniversitiesOpen] = useState(false);
@@ -63,8 +63,8 @@ export default function App() {
   );
 
   const filteredUnis = useMemo(() => {
-    return universities.filter(u => 
-      u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    return universities.filter(u =>
+      u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.nameKr.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [universities, searchQuery]);
@@ -142,7 +142,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f8fbff] flex flex-col font-sans text-slate-900">
-      <Header 
+      <Header
         isAdmin={isAdmin}
         onLoginClick={() => setIsLoginOpen(true)}
         onManageUnis={() => setIsUniversitiesOpen(true)}
@@ -150,7 +150,7 @@ export default function App() {
         onSettingsClick={() => setIsSettingsOpen(true)}
         onLogout={handleLogout}
       />
-      
+
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <AnimatePresence mode="wait">
@@ -171,23 +171,23 @@ export default function App() {
               />
             ) : (
               <motion.div
-              key="detail"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="mt-6 md:mt-8"
-            >
-              <DetailView
-                university={selectedUni}
-                onBack={() => setView('form')}
-                onApply={handleRegister}
-                formData={formData}
-                costs={costs}
-                globalConfig={globalConfig}
-                selections={selections}
-                onSelectionsChange={setSelections}
-              />
-            </motion.div>
+                key="detail"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="mt-6 md:mt-8"
+              >
+                <DetailView
+                  university={selectedUni}
+                  onBack={() => setView('form')}
+                  onApply={handleRegister}
+                  formData={formData}
+                  costs={costs}
+                  globalConfig={globalConfig}
+                  selections={selections}
+                  onSelectionsChange={setSelections}
+                />
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
@@ -200,9 +200,9 @@ export default function App() {
         {isLoginOpen && (
           <AdminLoginModal onClose={() => setIsLoginOpen(false)} />
         )}
-        
+
         {isUniversitiesOpen && (
-          <AdminUniversitiesModal 
+          <AdminUniversitiesModal
             universities={universities}
             onClose={() => setIsUniversitiesOpen(false)}
           />

@@ -6,6 +6,7 @@ import { setDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { toast } from 'react-hot-toast';
 import { extractNumbers } from '../utils/extract';
+import ImageUploadField from './ImageUploadField';
 
 const SmartTags = ({ text, onSelect }: { text: string | undefined, onSelect: (val: number) => void }) => {
   if (!text) return null;
@@ -173,14 +174,22 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                 <input type="text" value={formData.rank} onChange={e => handleChange('rank', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Top 1 Hàn Quốc, ĐHQG" />
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-bold text-slate-700 mb-2">Ảnh Wallpaper (URL)</label>
-                <input type="text" value={formData.image} onChange={e => handleChange('image', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="https://images.unsplash.com/..." />
-                {formData.image && <img src={formData.image} alt="Preview" className="mt-4 h-32 rounded-xl object-cover border" />}
+                <ImageUploadField
+                  label="Ảnh Wallpaper (URL)"
+                  value={formData.image || ''}
+                  onChange={(url) => handleChange('image', url)}
+                  folder="wallpapers"
+                  aspectRatio="video"
+                />
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-bold text-slate-700 mb-2">Ảnh LOGO Trường (URL)</label>
-                <input type="text" value={formData.logoUrl} onChange={e => handleChange('logoUrl', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="https://..." />
-                {formData.logoUrl && <img src={formData.logoUrl} alt="Logo Preview" className="mt-4 h-20 w-20 rounded-xl object-contain border bg-slate-50 p-2" />}
+                <ImageUploadField
+                  label="Ảnh LOGO Trường (URL)"
+                  value={formData.logoUrl || ''}
+                  onChange={(url) => handleChange('logoUrl', url)}
+                  folder="logos"
+                  aspectRatio="square"
+                />
               </div>
             </div>
           )}

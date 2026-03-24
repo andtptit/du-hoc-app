@@ -62,7 +62,7 @@ export default function FormView({
       {/* Main Search Section */}
       <div className="bg-white rounded-[40px] p-8 md:p-16 shadow-xl border border-slate-100 max-w-5xl mx-auto -mt-24 relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-black text-[#0f3493] uppercase tracking-tight mb-4">TRA CỨU THÔNG TIN DU HỌC</h2>
+          <h2 className="text-2xl md:text-3xl font-black text-[#0f3493] uppercase tracking-tight mb-4">TRA CỨU THÔNG TIN DU HỌC</h2>
           <p className="text-slate-500 font-medium text-lg italic">Điền thông tin để tìm thông tin chi tiết về chi phí và lộ trình du học</p>
         </div>
 
@@ -154,18 +154,18 @@ export default function FormView({
 
         {/* University Selection */}
         <div className="space-y-4 mb-12">
-            <UniversityDropdown
-              searchQuery={searchQuery}
-              onSearchChange={onSearchChange}
-              showDropdown={showUniDropdown}
-              onShowDropdown={onShowUniDropdown}
-              filteredUnis={filteredUnis}
-              onSelect={(id) => {
-                onFormChange('universityId', id);
-                onShowUniDropdown(false);
-              }}
-            />
-          
+          <UniversityDropdown
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
+            showDropdown={showUniDropdown}
+            onShowDropdown={onShowUniDropdown}
+            filteredUnis={filteredUnis}
+            onSelect={(id) => {
+              onFormChange('universityId', id);
+              onShowUniDropdown(false);
+            }}
+          />
+
           {selectedUni && (
             <div className="flex items-center gap-6 p-6 bg-[#f8fbff] rounded-[30px] border border-blue-100/50 mt-4">
               <img src={selectedUni.image} alt="" className="w-20 h-20 object-cover bg-white rounded-2xl border border-blue-100 shadow-sm" />
@@ -173,8 +173,8 @@ export default function FormView({
                 <h4 className="font-black text-blue-900 text-xl uppercase leading-tight">{selectedUni.nameKr}</h4>
                 <p className="text-[15px] text-blue-600 font-bold mt-1">{selectedUni.name}</p>
                 <div className="mt-2 flex items-center gap-2">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-black uppercase rounded-full tracking-wider italic">RANK {selectedUni.rank}</span>
-                    <span className={`px-3 py-1 ${selectedUni.visaTop === 1 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'} text-[10px] font-black uppercase rounded-full tracking-wider`}>TOP {selectedUni.visaTop} VISA</span>
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-black uppercase rounded-full tracking-wider italic">RANK {selectedUni.rank}</span>
+                  <span className={`px-3 py-1 ${selectedUni.visaTop === 1 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'} text-[10px] font-black uppercase rounded-full tracking-wider`}>TOP {selectedUni.visaTop} VISA</span>
                 </div>
               </div>
             </div>

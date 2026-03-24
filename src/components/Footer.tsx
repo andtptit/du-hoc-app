@@ -4,15 +4,15 @@ export default function Footer() {
   return (
     <footer className="bg-white border-t border-slate-100 pt-16 pb-8 px-4 mt-20">
       <div className="max-w-7xl mx-auto flex flex-col items-center">
-        <img 
-          src="https://tbtgroup.vn/wp-content/uploads/2023/11/logo-tbt.png" 
-          alt="TBT GROUP" 
+        <img
+          src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20TBT%20ko%20slogan-ngang.png?alt=media&token=f4175f0f-c25f-4b6b-a68e-b8e22a8ae1a2"
+          alt="TBT GROUP"
           className="h-12 mb-8"
           onError={(e) => {
             (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=TBT+Group&background=0f3493&color=fff';
           }}
         />
-        
+
         <div className="text-center space-y-2 mb-12">
           <p className="text-sm font-medium text-slate-500">Giấy chứng nhận đăng ký kinh doanh số 0110503947 do Sở Kế hoạch và Đầu tư TP Hà Nội cấp ngày 24/01/2026</p>
           <p className="text-sm font-medium text-slate-500">Giấy chứng nhận hoạt động đào tạo, bồi dưỡng do Sở Giáo Dục và Đào Tạo Thành Phố Hà Nội cấp ngày 27/04/2021</p>
