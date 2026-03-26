@@ -174,6 +174,7 @@ export default function FormView({
                 filteredUnis={filteredUnis}
                 onSelect={(id) => {
                   onFormChange('universityId', id);
+                  onSearchChange('');  // Clear search field here
                   onShowUniDropdown(false);
                 }}
               />

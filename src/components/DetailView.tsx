@@ -11,11 +11,11 @@ import {
   Briefcase,
   User,
   Phone,
-  LayoutDashboard,
   Calculator
 } from 'lucide-react';
 import { University, FormData, CostBreakdown, GlobalConfig, Selections } from '../types';
 import { formatVND } from '../utils/format';
+import { VISA_TYPES, TOPIK_LEVELS } from '../data';
 import { ParsedDormOption } from '../hooks/useCosts';
 import CostBreakdownTable from './CostBreakdownTable';
 
@@ -24,6 +24,7 @@ interface DetailViewProps {
   onBack: () => void;
   onApply: () => void;
   formData: FormData;
+  onFormChange: (field: keyof FormData, value: string) => void;
   costs: Partial<CostBreakdown> & { total: number; parsedDormOptions?: ParsedDormOption[] };
   globalConfig: GlobalConfig;
   selections: Selections;
@@ -35,6 +36,7 @@ export default function DetailView({
   onBack,
   onApply,
   formData,
+  onFormChange,
   costs,
   globalConfig,
   selections,
@@ -193,28 +195,72 @@ export default function DetailView({
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Họ và tên</p>
-                    <p className="text-lg font-bold">{formData.name || '---'}</p>
+                    <p className="text-[10px] font-black text-white/60 uppercase tracking-widest pl-1">Họ và tên</p>
+                    <input
+                      type="text"
+                      className="w-full bg-white/10 text-white placeholder-white/30 border border-white/20 rounded-xl px-4 py-2 text-base font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/20 transition-all font-mono"
+                      value={formData.name}
+                      onChange={(e) => onFormChange('name', e.target.value)}
+                    />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Số điện thoại</p>
-                    <p className="text-lg font-bold">{formData.phone || '---'}</p>
+                    <p className="text-[10px] font-black text-white/60 uppercase tracking-widest pl-1">Số điện thoại</p>
+                    <input
+                      type="tel"
+                      className="w-full bg-white/10 text-white placeholder-white/30 border border-white/20 rounded-xl px-4 py-2 text-base font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/20 transition-all font-mono"
+                      value={formData.phone}
+                      onChange={(e) => onFormChange('phone', e.target.value)}
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">GPA THPT</p>
-                      <p className="text-lg font-bold">{formData.gpaThpt || '---'}</p>
+                      <p className="text-[10px] font-black text-white/60 uppercase tracking-widest pl-1">GPA THPT</p>
+                      <input
+                        type="number"
+                        step="0.1"
+                        className="w-full bg-white/10 text-white placeholder-white/30 border border-white/20 rounded-xl px-4 py-2 text-base font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/20 transition-all font-mono"
+                        value={formData.gpaThpt}
+                        onChange={(e) => onFormChange('gpaThpt', e.target.value)}
+                      />
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">GPA ĐẠI HỌC</p>
-                      <p className="text-lg font-bold">{formData.gpaUni || '---'}</p>
+                      <p className="text-[10px] font-black text-white/60 uppercase tracking-widest pl-1">GPA ĐH</p>
+                      <input
+                        type="number"
+                        step="0.1"
+                        className="w-full bg-white/10 text-white placeholder-white/30 border border-white/20 rounded-xl px-4 py-2 text-base font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/20 transition-all font-mono"
+                        value={formData.gpaUni}
+                        onChange={(e) => onFormChange('gpaUni', e.target.value)}
+                      />
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Chương trình / TOPIK</p>
-                    <p className="text-[15px] font-bold uppercase tracking-wider">{formData.visaType.toUpperCase()} - TOPIK {formData.topikLevel}</p>
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-white/60 uppercase tracking-widest pl-1">Hệ Visa</p>
+                      <select
+                        className="w-full bg-white/10 text-white border border-white/20 rounded-xl px-4 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-[#1a40a5] transition-all appearance-none cursor-pointer"
+                        value={formData.visaType}
+                        onChange={(e) => onFormChange('visaType', e.target.value)}
+                      >
+                        {VISA_TYPES.map(v => (
+                          <option key={v.id} value={v.id} className="text-slate-800">{v.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-white/60 uppercase tracking-widest pl-1">TOPIK</p>
+                      <select
+                        className="w-full bg-white/10 text-white border border-white/20 rounded-xl px-4 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-[#1a40a5] transition-all appearance-none cursor-pointer"
+                        value={formData.topikLevel}
+                        onChange={(e) => onFormChange('topikLevel', e.target.value)}
+                      >
+                        {TOPIK_LEVELS.map(t => (
+                          <option key={t.id} value={t.id} className="text-slate-800">{t.label}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -79,11 +79,14 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
   };
 
   // ─── EXPORT CSV ─────────────────────────────────────────────────────────────
-  const handleExportData = (topFilter: number | 'all') => {
+  const handleExportData = (topFilter: number | 'all' | 'selected') => {
     setShowExportMenu(false);
-    const filtered = topFilter === 'all'
-      ? universities
-      : universities.filter(u => u.visaTop === topFilter);
+    let filtered = universities;
+    if (topFilter === 'selected') {
+      filtered = universities.filter(u => selectedIds.has(u.id));
+    } else if (topFilter !== 'all') {
+      filtered = universities.filter(u => u.visaTop === topFilter);
+    }
 
     if (filtered.length === 0) {
       toast.error('Không có trường nào khớp với bộ lọc!');
@@ -124,13 +127,13 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    const suffix = topFilter === 'all' ? 'TatCa' : `TOP${topFilter}`;
+    const suffix = topFilter === 'selected' ? 'DaChon' : (topFilter === 'all' ? 'TatCa' : `TOP${topFilter}`);
     link.setAttribute('download', `DuHoc_DuLieuTruong_${suffix}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.success(`Đã xuất ${filtered.length} trường${topFilter !== 'all' ? ` TOP ${topFilter}` : ''}!`);
+    toast.success(`Đã xuất ${filtered.length} trường${topFilter === 'selected' ? ' đã chọn' : (topFilter !== 'all' ? ` TOP ${topFilter}` : '')}!`);
   };
 
   // ─── DOWNLOAD TEMPLATE ───────────────────────────────────────────────────────
@@ -186,23 +189,32 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
       header: true,
       skipEmptyLines: true,
       encoding: 'UTF-8',
-      transformHeader: (header) => header.trim().replace(/^\uFEFF/, ''),
+      transformHeader: (header) => {
+        let h = header.trim().replace(/^\uFEFF/, '').replace(/^ï»¿/, '');
+        if (h.toLowerCase() === 'id') return 'id'; // Force lowercase id to match our logic
+        return h;
+      },
       complete: (results) => {
         try {
           const parsedUnis: University[] = [];
           for (const row of results.data as any[]) {
             if (row.name?.includes('BẮT BUỘC ĐIỀN') || row.name === 'Đại học Mẫu Demo') continue;
-            if (!row.name || !row.nameKr) continue;
+            
+            // Ở chế độ Add, bắt buộc phải có tên trường
+            if (mode === 'add' && (!row.name || !row.nameKr)) {
+              continue;
+            }
 
-            let docId = row.id?.trim();
+            let docId = row.id?.trim() || '';
             if (!docId || docId.startsWith('(')) {
               if (mode === 'update') {
-                toast.error('Chế độ Update yêu cầu cột ID không được để trống!', { id: 'import' });
+                toast.error('Có một số dòng trống cột ID. Chế độ Update yêu cầu cột ID (id) bắt buộc điền!', { id: 'import' });
                 setIsImporting(false);
                 if (fileInputRef.current) fileInputRef.current.value = '';
                 return;
               }
-              docId = row.name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+              // Tự generate ID ở chế độ Add
+              docId = (row.name || '').toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
               if (!docId) docId = `uni-${Date.now()}-${Math.random()}`;
             }
 
@@ -363,7 +375,13 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
               </button>
               {showExportMenu && (
                 <div className="absolute right-0 top-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl py-2 min-w-[160px] z-50">
-                  {[{ label: 'Tất cả', value: 'all' as const }, { label: 'TOP 1', value: 1 }, { label: 'TOP 2', value: 2 }, { label: 'TOP 3', value: 3 }].map(opt => (
+                  {[
+                    ...(selectedIds.size > 0 ? [{ label: `Đã chọn (${selectedIds.size})`, value: 'selected' as const }] : []),
+                    { label: 'Tất cả', value: 'all' as const }, 
+                    { label: 'TOP 1', value: 1 }, 
+                    { label: 'TOP 2', value: 2 }, 
+                    { label: 'TOP 3', value: 3 }
+                  ].map(opt => (
                     <button
                       key={opt.label}
                       onClick={() => handleExportData(opt.value)}

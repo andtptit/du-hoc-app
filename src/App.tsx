@@ -156,7 +156,6 @@ export default function App() {
           <AnimatePresence mode="wait">
             {view === 'form' ? (
               <FormView
-                key="form"
                 universities={universities}
                 formData={formData}
                 onFormChange={handleFormChange}
@@ -182,6 +181,7 @@ export default function App() {
                   onBack={() => setView('form')}
                   onApply={handleRegister}
                   formData={formData}
+                  onFormChange={handleFormChange}
                   costs={costs}
                   globalConfig={globalConfig}
                   selections={selections}
