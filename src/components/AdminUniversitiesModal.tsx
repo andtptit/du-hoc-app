@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { X, GraduationCap, Edit2, Trash2, Plus, Building2, Upload, Download, RefreshCw, ChevronDown } from 'lucide-react';
+import { X, GraduationCap, Edit2, Trash2, Plus, Building2, Upload, Download, RefreshCw, ChevronDown, Images } from 'lucide-react';
 import { University } from '../types';
 import { deleteDoc, doc, writeBatch, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import Papa from 'papaparse';
 import React, { useState, useRef } from 'react';
 import UniversityFormModal from './UniversityFormModal';
+import AdminMediaModal from './AdminMediaModal';
 import { extractTuitionMin } from '../utils/extract';
 
 interface Props {
@@ -19,6 +20,7 @@ type ImportMode = 'add' | 'update';
 export default function AdminUniversitiesModal({ universities, onClose }: Props) {
   const [editingUni, setEditingUni] = useState<University | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isMediaOpen, setIsMediaOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [previewData, setPreviewData] = useState<University[] | null>(null);
   const [previewFileName, setPreviewFileName] = useState('');
@@ -426,6 +428,14 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
             <input type="file" accept=".csv" ref={fileInputUpdateRef} onChange={(e) => handleFileUpload(e, 'update')} className="hidden" />
 
             <button
+              onClick={() => setIsMediaOpen(true)}
+              className="bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 shrink-0"
+              title="Mở kho ảnh hàng loạt"
+            >
+              <Images className="w-5 h-5" /> Kho Media
+            </button>
+
+            <button
               disabled={isImporting}
               onClick={handleAddNew}
               className="bg-purple-600 text-white px-5 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-purple-700 transition-colors shadow-lg shadow-purple-200 shrink-0 disabled:opacity-50"
@@ -547,6 +557,11 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
           <UniversityFormModal
             initialData={editingUni}
             onClose={() => setIsFormOpen(false)}
+          />
+        )}
+        {isMediaOpen && (
+          <AdminMediaModal
+            onClose={() => setIsMediaOpen(false)}
           />
         )}
       </AnimatePresence>
