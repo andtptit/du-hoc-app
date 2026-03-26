@@ -74,8 +74,8 @@ const emptyUni: University = {
   logoUrl: '',
   minGpaD4: 6.0,
   minGpaD2: 6.5,
-  applicationFee: 0,
-  enrollmentFee: 2000000,
+  applicationFee: '',
+  enrollmentFee: '',
 };
 
 export default function UniversityFormModal({ initialData, onClose }: Props) {
@@ -286,14 +286,19 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                     <label className="block text-sm font-bold text-slate-700 mb-1">Tính Học Phí Thạc Sĩ D2-3 KRW (1 Kỳ)</label>
                     <input type="number" value={formData.calcTuitionD2_3} onChange={e => handleChange('calcTuitionD2_3', Number(e.target.value))} className="w-full p-3 border rounded-xl" />
                   </div>
-                  <div className="flex gap-4 border-t border-amber-200/50 pt-4">
-                    <div className="flex-1">
-                      <label className="block text-sm font-bold text-slate-700 mb-1">Phí Apply (VND)</label>
-                      <input type="number" value={formData.applicationFee} onChange={e => handleChange('applicationFee', Number(e.target.value))} className="w-full p-3 border rounded-xl" placeholder="0" />
+                  <div className="col-span-2 border-t border-amber-200/50 pt-4 space-y-3">
+                    <div className="bg-amber-100/60 p-3 rounded-lg">
+                      <p className="text-[11px] text-amber-700 font-bold">💡 Định dạng phí theo Visa:</p>
+                      <p className="text-[10px] text-amber-600 mt-0.5 font-mono">D4-1:100000 KRW;D2-2:150000 KRW;D2-3:70000 KRW</p>
+                      <p className="text-[10px] text-amber-600">Hoặc để trống (= 0đ). Hệ thống tự nhận diện loại vis đang chọn.</p>
                     </div>
-                    <div className="flex-1">
-                      <label className="block text-sm font-bold text-slate-700 mb-1">Phí Nhập Học (VND)</label>
-                      <input type="number" value={formData.enrollmentFee} onChange={e => handleChange('enrollmentFee', Number(e.target.value))} className="w-full p-3 border rounded-xl" placeholder="2000000" />
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1">Phí Apply hồ sơ (theo Visa)</label>
+                      <input type="text" value={formData.applicationFee as string || ''} onChange={e => handleChange('applicationFee', e.target.value)} className="w-full p-3 border rounded-xl font-mono text-sm" placeholder="D4-1:100000 KRW;D2-2:150000 KRW" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1">Phí Nhập Học (theo Visa)</label>
+                      <input type="text" value={formData.enrollmentFee as string || ''} onChange={e => handleChange('enrollmentFee', e.target.value)} className="w-full p-3 border rounded-xl font-mono text-sm" placeholder="D2-3:900000 KRW" />
                     </div>
                   </div>
                 </div>

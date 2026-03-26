@@ -28,8 +28,8 @@ export interface University {
   minGpaD4: number;
   minGpaD2: number;
   logoUrl?: string;
-  applicationFee?: number;
-  enrollmentFee?: number;
+  applicationFee?: string | number;
+  enrollmentFee?: string | number;
 }
 
 export interface GlobalConfig {

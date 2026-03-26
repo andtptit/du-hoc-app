@@ -131,6 +131,7 @@ export default function CostBreakdownTable({
             <Row
               stt="04"
               label="Phí apply trường HQ"
+              subLabel={university.applicationFee ? `${String(university.applicationFee)} (hệ ${selectedVisa.label})` : 'Theo cấu hình chung'}
               cost={costs.applicationFee ?? 0}
               options={
                 <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
@@ -142,6 +143,7 @@ export default function CostBreakdownTable({
             <Row
               stt="05"
               label="Phí nhập học"
+              subLabel={university.enrollmentFee ? `${String(university.enrollmentFee)} (hệ ${selectedVisa.label})` : 'Theo cấu hình chung'}
               cost={costs.enrollmentFee ?? 2000000}
               options={
                 <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">

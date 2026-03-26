@@ -3,6 +3,44 @@ import { University, GlobalConfig, Selections, CostBreakdown } from '../types';
 import { VISA_TYPES } from '../data';
 import { extractTuitionMin } from '../utils/extract';
 
+/**
+ * Parse phí cố định (Apply/Nhập học) theo từng hệ Visa.
+ * Hỗ trợ 2 format:
+ *   - Số thuần: 2000000  → trả về 2000000 (backward compat)
+ *   - Chuỗi đa visa: "D4-1:100000 KRW;D2-2:150000 KRW;D2-3:70000 KRW"
+ *     → tìm entry khớp visaId, extract số KRW nhỏ nhất
+ *     → nếu không tìm thấy visa → trả về 0 (trường không áp dụng loại phí này)
+ */
+function parseVisaSpecificCost(
+  raw: string | number | undefined,
+  visaId: string,
+  exchangeRate: number
+): number {
+  if (raw === undefined || raw === null || raw === '') return 0;
+  if (typeof raw === 'number') return raw;
+
+  // Thử parse như số thuần
+  const asNumber = Number(raw);
+  if (!isNaN(asNumber) && asNumber > 0) return asNumber;
+
+  // Parse chuỗi đa visa, ví dụ: "D4-1:100000 KRW;D2-2:150000 KRW"
+  const segments = raw.split(';').map(s => s.trim()).filter(Boolean);
+  for (const seg of segments) {
+    const colonIdx = seg.indexOf(':');
+    if (colonIdx === -1) continue;
+    const key = seg.substring(0, colonIdx).trim().toLowerCase().replace(/[\s-]/g, '-');
+    const normalizedVisaId = visaId.toLowerCase().replace(/[\s-]/g, '-');
+    if (key === normalizedVisaId) {
+      const valueStr = seg.substring(colonIdx + 1);
+      const extracted = extractTuitionMin(valueStr);
+      if (extracted > 0) return extracted * exchangeRate;
+      return 0;
+    }
+  }
+  return 0;
+}
+
+
 export interface ParsedDormOption {
   label: string;
   priceKrw: number;
@@ -40,8 +78,8 @@ export function useCosts({
     const koreanLangCost = typeof opt === 'object' ? opt.price : (opt || 0);
     const consultingFee = globalConfig.consultingFee;
     const thirdPartyFee = globalConfig.thirdPartyFee;
-    const applicationFee = selectedUni.applicationFee ?? globalConfig.applicationFee ?? 0;
-    const enrollmentFee = selectedUni.enrollmentFee ?? globalConfig.enrollmentFee ?? 2000000;
+    const applicationFee = parseVisaSpecificCost(selectedUni.applicationFee, visaTypeId, exchangeRate);
+    const enrollmentFee = parseVisaSpecificCost(selectedUni.enrollmentFee, visaTypeId, exchangeRate);
     const dormVnCost = selections.dormVnMonths * globalConfig.dormVietnamPricePerMonth;
 
     const baseTuitionKrw = selectedUni[visaField] || 0;
