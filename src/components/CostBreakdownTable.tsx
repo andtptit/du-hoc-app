@@ -57,7 +57,8 @@ export default function CostBreakdownTable({
               </p>
               {hasLongDescription && (
                 <button
-                  onClick={() => setIsExpanded(!isExpanded)}
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsExpanded(!isExpanded); }}
                   className={`text-[10px] font-black uppercase tracking-widest mt-1 flex items-center gap-1 ${isHighlight ? 'text-green-600 hover:text-green-700' : 'text-blue-500 hover:text-blue-700'}`}
                 >
                   {isExpanded ? (
@@ -160,14 +161,16 @@ export default function CostBreakdownTable({
               options={
                 <div className="flex items-center gap-2 justify-end">
                   <button
-                    onClick={() => update({ dormVnMonths: Math.max(0, selections.dormVnMonths - 1) })}
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); update({ dormVnMonths: Math.max(0, selections.dormVnMonths - 1) }); }}
                     className="w-6 h-6 flex items-center justify-center bg-blue-100/50 rounded hover:bg-blue-100 transition-colors"
                   >
                     <Minus className="w-3 h-3 text-blue-600" />
                   </button>
                   <span className="text-[13px] font-medium w-4 text-center text-slate-700">{selections.dormVnMonths}</span>
                   <button
-                    onClick={() => update({ dormVnMonths: Math.min(12, selections.dormVnMonths + 1) })}
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); update({ dormVnMonths: Math.min(12, selections.dormVnMonths + 1) }); }}
                     className="w-6 h-6 flex items-center justify-center bg-blue-100/50 rounded hover:bg-blue-100 transition-colors"
                   >
                     <Plus className="w-3 h-3 text-blue-600" />

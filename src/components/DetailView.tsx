@@ -81,7 +81,8 @@ export default function DetailView({
       {/* Header Controls */}
       <div className="flex items-center justify-between mb-8 px-2">
         <button
-          onClick={onBack}
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onBack(); }}
           className="flex items-center gap-2 text-slate-500 hover:text-[#0f3493] font-bold transition-all group"
         >
           <div className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center group-hover:border-[#0f3493] group-hover:bg-blue-50 transition-all">
@@ -284,7 +285,8 @@ export default function DetailView({
               </div>
 
               <button
-                onClick={onApply}
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onApply(); }}
                 className="w-full bg-[#ef4444] text-white py-5 rounded-full font-black text-lg uppercase tracking-widest shadow-xl shadow-red-200 hover:bg-red-600 transition-all active:scale-[0.98]"
               >
                 Đăng ký ngay
