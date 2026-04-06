@@ -240,7 +240,7 @@ export default function DetailView({
                     <div className="space-y-1">
                       <p className="text-[10px] font-black text-white/60 uppercase tracking-widest pl-1">Hệ Visa</p>
                       <select
-                        className="w-full bg-white/10 text-white border border-white/20 rounded-xl px-4 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-[#1a40a5] transition-all appearance-none cursor-pointer"
+                        className="w-full bg-white/10 text-white border border-white/20 rounded-xl px-4 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-white focus:text-[#0f3493] transition-all appearance-none cursor-pointer"
                         value={formData.visaType}
                         onChange={(e) => onFormChange('visaType', e.target.value)}
                       >
@@ -252,7 +252,7 @@ export default function DetailView({
                     <div className="space-y-1">
                       <p className="text-[10px] font-black text-white/60 uppercase tracking-widest pl-1">TOPIK</p>
                       <select
-                        className="w-full bg-white/10 text-white border border-white/20 rounded-xl px-4 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-[#1a40a5] transition-all appearance-none cursor-pointer"
+                        className="w-full bg-white/10 text-white border border-white/20 rounded-xl px-4 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-white/50 focus:bg-white focus:text-[#0f3493] transition-all appearance-none cursor-pointer"
                         value={formData.topikLevel}
                         onChange={(e) => onFormChange('topikLevel', e.target.value)}
                       >

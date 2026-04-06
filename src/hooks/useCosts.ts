@@ -83,8 +83,7 @@ export function useCosts({
     const dormVnCost = selections.dormVnMonths * globalConfig.dormVietnamPricePerMonth;
 
     const baseTuitionKrw = selectedUni[visaField] || 0;
-    const defaultTerms = visaTypeId === 'd4-1' ? 4 : 1;
-    const tuitionTerms = selections.tuitionTerms ?? defaultTerms;
+    const tuitionTerms = visaTypeId === 'd4-1' ? 4 : 1;
     const tuitionVnd = baseTuitionKrw * exchangeRate * tuitionTerms;
     const scholarshipAmount = tuitionVnd * (selections.scholarshipPercent / 100);
     const finalTuitionVnd = tuitionVnd - scholarshipAmount;

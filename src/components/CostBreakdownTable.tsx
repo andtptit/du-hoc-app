@@ -180,32 +180,12 @@ export default function CostBreakdownTable({
             <Row
               stt="07"
               label="Học phí trường HQ"
-              subLabel={`Dự kiến ${selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1)} kỳ, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`}
+              subLabel={`Dự kiến ${visaId === 'd4-1' ? 4 : 1} kỳ, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`}
               cost={costs.tuitionVnd ?? 0}
               options={
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      const currentTerms = selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1);
-                      update({ tuitionTerms: Math.max(1, currentTerms - 1) });
-                    }}
-                    className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
-                  >
-                    <Minus className="w-4 h-4 text-slate-500" />
-                  </button>
-                  <span className="text-sm font-black w-4 text-center">
-                    {selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1)}
-                  </span>
-                  <button
-                    onClick={() => {
-                      const currentTerms = selections.tuitionTerms ?? (visaId === 'd4-1' ? 4 : 1);
-                      update({ tuitionTerms: Math.min(8, currentTerms + 1) });
-                    }}
-                    className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
-                  >
-                    <Plus className="w-4 h-4 text-slate-500" />
-                  </button>
-                </div>
+                <span className="text-[13px] font-bold bg-blue-50 text-blue-600 px-4 py-1.5 rounded-lg border border-blue-100">
+                  {visaId === 'd4-1' ? 4 : 1} kỳ
+                </span>
               }
             />
 
