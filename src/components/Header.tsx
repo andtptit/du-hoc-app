@@ -24,7 +24,7 @@ export default function Header({
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.reload()}>
             <img
-              src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20TBT%20ko%20slogan-ngang.png?alt=media&token=f4175f0f-c25f-4b6b-a68e-b8e22a8ae1a2https://tbtgroup.vn/wp-content/uploads/2023/11/logo-tbt.png"
+              src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20ko%20slogan-ngang_min.png?alt=media&token=e2693105-c036-432f-8b43-b0c32e18c5ab"
               alt="TBT GROUP"
               className="h-10 object-contain"
               onError={(e) => {

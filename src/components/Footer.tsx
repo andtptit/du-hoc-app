@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-white border-t border-slate-100 pt-16 pb-8 px-4 mt-20">
       <div className="max-w-7xl mx-auto flex flex-col items-center">
         <img
-          src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20TBT%20ko%20slogan-ngang.png?alt=media&token=f4175f0f-c25f-4b6b-a68e-b8e22a8ae1a2"
+          src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20ko%20slogan-ngang_min.png?alt=media&token=e2693105-c036-432f-8b43-b0c32e18c5ab"
           alt="TBT GROUP"
           className="h-12 mb-8"
           onError={(e) => {
