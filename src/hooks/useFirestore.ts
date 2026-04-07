@@ -22,10 +22,11 @@ const DEFAULT_CONFIG: GlobalConfig = {
   ],
   dormVietnamPricePerMonth: 800000,
   dormKoreaOptions: [
+    { label: 'Tự thuê / Không ở KTX (0đ)', price: 0 },
     { label: 'Phòng 4 người (14M/6 tháng)', price: 14000000 },
     { label: 'Phòng 2 người (24M/6 tháng)', price: 24000000 },
   ],
-  flightOptions: [5000000, 8000000, 10000000, 13000000, 17000000],
+  flightOptions: [0, 5000000, 8000000, 10000000, 13000000, 17000000],
   defaultTuitionKrw: 120000000 / DEFAULT_KRW_TO_VND,
   exchangeRate: 18.5,
 };

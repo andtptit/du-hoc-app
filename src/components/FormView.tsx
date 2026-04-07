@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, User, Phone, Award, Globe, GraduationCap } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { University, FormData } from '../types';
 import { VISA_TYPES, TOPIK_LEVELS } from '../data';
 import UniversityDropdown from './UniversityDropdown';
@@ -34,14 +35,21 @@ export default function FormView({
   onShowUniDropdown,
   filteredUnis
 }: FormViewProps) {
-  const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean }>({});
+  const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; university?: boolean }>({});
 
   const validateAndProceed = () => {
     const newErrors = {
       name: !formData.name.trim(),
       phone: !formData.phone.trim(),
+      university: !formData.universityId,
     };
     setErrors(newErrors);
+
+    if (newErrors.university) {
+      toast.error('Vui lòng chọn trường mong muốn');
+      return;
+    }
+
     if (!newErrors.name && !newErrors.phone) {
       onViewDetail();
     }

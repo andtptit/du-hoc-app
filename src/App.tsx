@@ -29,16 +29,16 @@ export default function App() {
     phone: '',
     visaType: VISA_TYPES[2].id,
     topikLevel: TOPIK_LEVELS[0].id,
-    universityId: STATIC_UNIVERSITIES[0]?.id || '',
+    universityId: '',
     gpaThpt: '',
     gpaUni: '',
   });
 
   const [selections, setSelections] = useState<Selections>(() => ({
-    koreanLangIdx: 1,
-    dormVnMonths: 6,
+    koreanLangIdx: 0,
+    dormVnMonths: 0,
     dormKrIdx: 0,
-    flightIdx: 1,
+    flightIdx: 0,
     scholarshipPercent: 0,
   }));
 
@@ -58,7 +58,7 @@ export default function App() {
   const { universities, globalConfig, isAdmin, defaultUniversityId } = useFirestore();
 
   const selectedUni = useMemo(
-    () => universities.find((u) => u.id === formData.universityId) || universities[0],
+    () => universities.find((u) => u.id === formData.universityId),
     [formData.universityId, universities]
   );
 
@@ -78,12 +78,6 @@ export default function App() {
     exchangeRate: globalConfig.exchangeRate,
   });
 
-  // Sync universityId when universities are loaded
-  useEffect(() => {
-    if (defaultUniversityId && (!formData.universityId || formData.universityId === 'ajou')) {
-      setFormData(prev => ({ ...prev, universityId: defaultUniversityId }));
-    }
-  }, [defaultUniversityId]);
 
   // Fetch Banners from Firestore
   useEffect(() => {

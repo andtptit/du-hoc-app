@@ -12,10 +12,10 @@ const SmartTags = ({ text, onSelect }: { text: string | undefined, onSelect: (va
   if (!text) return null;
   const nums = extractNumbers(text);
   if (nums.length === 0) return null;
-  
+
   if (nums.length === 1) {
     return (
-      <button 
+      <button
         type="button"
         onClick={() => onSelect(nums[0])}
         className="mt-1 flex items-center gap-1 text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md hover:bg-blue-100 transition-colors w-fit"
@@ -24,17 +24,17 @@ const SmartTags = ({ text, onSelect }: { text: string | undefined, onSelect: (va
       </button>
     );
   }
-  
+
   return (
     <div className="mt-1 flex flex-wrap gap-2">
-      <button 
+      <button
         type="button"
         onClick={() => onSelect(nums[0])}
         className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md hover:bg-emerald-100 transition-colors w-fit"
       >
         👇 Gán Min: {nums[0].toLocaleString('vi-VN')}
       </button>
-      <button 
+      <button
         type="button"
         onClick={() => onSelect(nums[nums.length - 1])}
         className="flex items-center gap-1 text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-md hover:bg-rose-100 transition-colors w-fit"
@@ -92,13 +92,13 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
       toast.error('Thiếu các trường thông tin cơ bản thiết yếu!');
       return;
     }
-    
+
     // Tự sinh ID nếu là tạo mới
     let finalId = formData.id;
     if (!initialData && !finalId) {
       finalId = formData.name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
       if (!finalId) finalId = `uni-${Date.now()}`;
-      setFormData(prev => ({...prev, id: finalId}));
+      setFormData(prev => ({ ...prev, id: finalId }));
     }
 
     setLoading(true);
@@ -213,7 +213,7 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                 <textarea rows={3} value={formData.admissionRequirements} onChange={e => handleChange('admissionRequirements', e.target.value)} className="w-full p-3 border rounded-xl" />
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-bold text-slate-700 mb-2">Cơ Hội Việc Làm</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Điểm Nổi Bật</label>
                 <textarea rows={2} value={formData.jobOpportunities} onChange={e => handleChange('jobOpportunities', e.target.value)} className="w-full p-3 border rounded-xl" />
               </div>
               <div>
@@ -312,9 +312,9 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
           <button onClick={onClose} className="px-6 py-3 font-bold text-slate-500 hover:bg-slate-200 rounded-xl transition-colors">
             Hủy Bỏ
           </button>
-          <button 
+          <button
             disabled={loading}
-            onClick={handleSave} 
+            onClick={handleSave}
             className="bg-purple-600 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 disabled:opacity-70"
           >
             {loading ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-5 h-5" />}

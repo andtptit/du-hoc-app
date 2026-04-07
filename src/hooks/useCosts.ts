@@ -63,7 +63,7 @@ export function useCosts({
   exchangeRate,
   globalConfig,
   selections,
-}: UseCostsParams): Partial<CostBreakdown> & { total: number; parsedDormOptions: ParsedDormOption[] } {
+}: UseCostsParams): Partial<CostBreakdown> & { total: number; parsedDormOptions: ParsedDormOption[]; flightOptions: number[] } {
   const selectedVisa = useMemo(
     () => VISA_TYPES.find((v) => v.id === visaTypeId) || VISA_TYPES[2],
     [visaTypeId]
@@ -111,8 +111,21 @@ export function useCosts({
       }));
     }
 
-    const dormKrCost = parsedDormOptions[selections.dormKrIdx]?.priceVnd || parsedDormOptions[0]?.priceVnd || 0;
-    const flightCost = globalConfig.flightOptions[selections.flightIdx] || 0;
+    // Luôn thêm tùy chọn "Không ở KTX" vào đầu danh sách
+    const noneDorm: ParsedDormOption = {
+      label: 'Tự thuê / Không ở KTX (0đ)',
+      priceKrw: 0,
+      priceVnd: 0,
+    };
+    parsedDormOptions = [noneDorm, ...parsedDormOptions];
+
+    const dormKrCost = parsedDormOptions[selections.dormKrIdx]?.priceVnd || 0;
+
+    // Đảm bảo có tùy chọn 0đ cho Vé máy bay
+    const flightOpts = globalConfig.flightOptions.includes(0) 
+      ? globalConfig.flightOptions 
+      : [0, ...globalConfig.flightOptions];
+    const flightCost = flightOpts[selections.flightIdx] || 0;
 
     const total =
       koreanLangCost +
@@ -138,6 +151,7 @@ export function useCosts({
       flightCost,
       total,
       parsedDormOptions,
+      flightOptions: flightOpts,
     };
   }, [selectedUni, visaTypeId, topikLevelId, selections, globalConfig, exchangeRate, selectedVisa]);
 }

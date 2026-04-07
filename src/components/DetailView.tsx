@@ -145,7 +145,7 @@ export default function DetailView({
             {/* Việc làm thêm (Part-time) */}
             <div className="md:col-span-2 bg-white px-8 py-6 rounded-[32px] border border-slate-200 shadow-none space-y-4">
               <div className="flex items-center gap-2 text-emerald-600 font-bold uppercase text-[13px] tracking-widest">
-                <Briefcase className="w-4 h-4" /> CƠ HỘI VIỆC LÀM
+                <Briefcase className="w-4 h-4" /> ĐIỂM NỔI BẬT
               </div>
               <p className="text-[15px] text-slate-600 leading-relaxed whitespace-pre-line font-medium pb-2">
                 {university.jobOpportunities || "Chưa có thông tin cập nhật về việc làm thêm."}

@@ -7,7 +7,11 @@ import { ParsedDormOption } from '../hooks/useCosts';
 import { VISA_TYPES } from '../data';
 
 interface CostBreakdownTableProps {
-  costs: Partial<CostBreakdown> & { total: number; parsedDormOptions?: ParsedDormOption[] };
+  costs: Partial<CostBreakdown> & { 
+    total: number; 
+    parsedDormOptions?: ParsedDormOption[]; 
+    flightOptions?: number[];
+  };
   globalConfig: GlobalConfig;
   selections: Selections;
   onSelectionsChange: (s: Selections) => void;
@@ -240,7 +244,7 @@ export default function CostBreakdownTable({
                   value={selections.flightIdx}
                   onChange={(e) => update({ flightIdx: Number(e.target.value) })}
                 >
-                  {globalConfig.flightOptions.map((opt, i) => (
+                  {(costs.flightOptions || globalConfig.flightOptions).map((opt, i) => (
                     <option key={i} value={i}>{formatVND(opt)}</option>
                   ))}
                 </select>
