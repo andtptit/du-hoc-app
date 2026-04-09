@@ -7,9 +7,9 @@ import { ParsedDormOption } from '../hooks/useCosts';
 import { VISA_TYPES } from '../data';
 
 interface CostBreakdownTableProps {
-  costs: Partial<CostBreakdown> & { 
-    total: number; 
-    parsedDormOptions?: ParsedDormOption[]; 
+  costs: Partial<CostBreakdown> & {
+    total: number;
+    parsedDormOptions?: ParsedDormOption[];
     flightOptions?: number[];
   };
   globalConfig: GlobalConfig;
@@ -160,7 +160,7 @@ export default function CostBreakdownTable({
             <Row
               stt="06"
               label="Ký túc xá tại Việt Nam"
-              subLabel="800.000đ / tháng"
+              subLabel="880.000đ / tháng"
               cost={costs.dormVnCost ?? 0}
               options={
                 <div className="flex items-center gap-2 justify-end">

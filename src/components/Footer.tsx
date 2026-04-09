@@ -14,8 +14,8 @@ export default function Footer() {
         />
 
         <div className="text-center space-y-2 mb-12">
-          <p className="text-sm font-medium text-slate-500">Giấy chứng nhận đăng ký kinh doanh số 0110503947 do Sở Kế hoạch và Đầu tư TP Hà Nội cấp ngày 24/01/2026</p>
-          <p className="text-sm font-medium text-slate-500">Giấy chứng nhận hoạt động đào tạo, bồi dưỡng do Sở Giáo Dục và Đào Tạo Thành Phố Hà Nội cấp ngày 27/04/2021</p>
+          {/* <p className="text-sm font-medium text-slate-500">Giấy chứng nhận đăng ký kinh doanh số 0110503947 do Sở Kế hoạch và Đầu tư TP Hà Nội cấp ngày 24/01/2026</p> */}
+          {/* <p className="text-sm font-medium text-slate-500">Giấy chứng nhận hoạt động đào tạo, bồi dưỡng do Sở Giáo Dục và Đào Tạo Thành Phố Hà Nội cấp ngày 27/04/2021</p> */}
         </div>
 
         <div className="w-full h-px bg-slate-100 mb-8" />

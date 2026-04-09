@@ -20,7 +20,7 @@ const DEFAULT_CONFIG: GlobalConfig = {
     { label: 'Từ 0 đến TOPIK 2: 13.000.000 đ', price: 13000000 },
     { label: 'Từ 0 đến TOPIK 4: 26.000.000 đ', price: 26000000 }
   ],
-  dormVietnamPricePerMonth: 800000,
+  dormVietnamPricePerMonth: 880000,
   dormKoreaOptions: [
     { label: 'Tự thuê / Không ở KTX (0đ)', price: 0 },
     { label: 'Phòng 4 người (14M/6 tháng)', price: 14000000 },

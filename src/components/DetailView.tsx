@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -11,7 +11,9 @@ import {
   Briefcase,
   User,
   Phone,
-  Calculator
+  Calculator,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { University, FormData, CostBreakdown, GlobalConfig, Selections } from '../types';
 import { formatVND } from '../utils/format';
@@ -42,6 +44,7 @@ export default function DetailView({
   selections,
   onSelectionsChange
 }: DetailViewProps) {
+  const [showAddress, setShowAddress] = useState(false);
 
   const TopVisaBadge = () => {
     const colors = {
@@ -59,14 +62,28 @@ export default function DetailView({
     );
   };
 
-  const InfoCard = ({ icon: Icon, label, value }: { icon: any, label: string, value: string }) => (
+  const InfoCard = ({ icon: Icon, label, value, isMasked, onToggle }: { icon: any, label: string, value: string, isMasked?: boolean, onToggle?: () => void }) => (
     <div className="flex gap-4 p-5 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
       <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 h-fit">
         <Icon className="w-5 h-5" />
       </div>
-      <div>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-        <p className="text-sm font-bold text-slate-700 leading-relaxed whitespace-pre-line">{value}</p>
+      <div className="flex-1">
+        <div className="flex justify-between items-start">
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+          {onToggle && (
+            <button
+              type="button"
+              onClick={onToggle}
+              className="p-1 hover:bg-blue-50 rounded-lg text-slate-400 hover:text-blue-600 transition-colors"
+              title={isMasked ? "Hiện địa chỉ" : "Ẩn địa chỉ"}
+            >
+              {isMasked ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+            </button>
+          )}
+        </div>
+        <p className="text-sm font-bold text-slate-700 leading-relaxed whitespace-pre-line leading-relaxed">
+          {isMasked ? '*******' : value}
+        </p>
       </div>
     </div>
   );
@@ -137,7 +154,13 @@ export default function DetailView({
 
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InfoCard icon={MapPin} label="Địa chỉ" value={university.address} />
+            <InfoCard 
+              icon={MapPin} 
+              label="Địa chỉ" 
+              value={university.address} 
+              isMasked={!showAddress}
+              onToggle={() => setShowAddress(!showAddress)}
+            />
             <InfoCard icon={BookOpen} label="Chuyên ngành nổi bật" value={university.majors} />
             <InfoCard icon={CheckCircle2} label="Điều kiện tuyển sinh" value={university.admissionRequirements} />
             <InfoCard icon={GraduationCap} label="Học thuật & Xếp hạng" value={university.rank} />
