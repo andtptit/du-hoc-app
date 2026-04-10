@@ -117,7 +117,7 @@ export default function DetailView({
           {/* Hero Banner Section */}
           <div className="relative rounded-[40px] overflow-hidden shadow-2xl bg-white border border-slate-100">
             <div className="h-48 md:h-64 relative">
-              <img src={university.image} alt="" className="w-full h-full object-cover brightness-75" />
+              <img src={university.image || undefined} alt="" className="w-full h-full object-cover brightness-75" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8 md:p-12 pb-24 md:pb-28">
                 <h1 className="text-white text-3xl md:text-5xl font-black uppercase tracking-tight leading-tight -mt-4 drop-shadow-lg">
                   {university.nameKr}
@@ -129,7 +129,7 @@ export default function DetailView({
             <div className="px-8 md:px-12 py-8 flex flex-col md:flex-row items-center gap-8 bg-white relative">
               <div className="relative -mt-24 md:-mt-32">
                 <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-full p-3 shadow-2xl border-4 border-white flex items-center justify-center overflow-hidden">
-                  <img src={university.logoUrl || university.image} alt="" className="w-full h-full object-contain rounded-full" />
+                  <img src={university.logoUrl || university.image || undefined} alt="" className="w-full h-full object-contain rounded-full" />
                 </div>
                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
                   <TopVisaBadge />

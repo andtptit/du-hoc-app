@@ -189,7 +189,7 @@ export default function FormView({
 
               {selectedUni && (
                 <div className="flex items-center gap-6 p-6 bg-[#f8fbff] rounded-[30px] border border-blue-100/50 mt-4">
-                  <img src={selectedUni.image} alt="" className="w-20 h-20 object-cover bg-white rounded-2xl border border-blue-100 shadow-sm" />
+                  <img src={selectedUni.image || undefined} alt="" className="w-20 h-20 object-cover bg-white rounded-2xl border border-blue-100 shadow-sm" />
                   <div>
                     <h4 className="font-black text-blue-900 text-xl uppercase leading-tight">{selectedUni.nameKr}</h4>
                     <p className="text-[15px] text-blue-600 font-bold mt-1">{selectedUni.name}</p>

@@ -35,6 +35,7 @@ export default function App() {
   });
 
   const [selections, setSelections] = useState<Selections>(() => ({
+    consultingIdx: 0,
     koreanLangIdx: 0,
     dormVnMonths: 0,
     dormKrIdx: 0,

@@ -33,7 +33,7 @@ export interface University {
 }
 
 export interface GlobalConfig {
-  consultingFee: number;
+  consultingOptions: number[];
   thirdPartyFee: number;
   applicationFee: number;
   enrollmentFee: number;
@@ -46,6 +46,7 @@ export interface GlobalConfig {
 }
 
 export interface Selections {
+  consultingIdx: number;
   koreanLangIdx: number;
   dormVnMonths: number;
   tuitionTerms?: number;

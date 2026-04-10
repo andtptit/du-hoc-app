@@ -76,7 +76,10 @@ export function useCosts({
 
     const opt = globalConfig.koreanLanguageOptions[selections.koreanLangIdx];
     const koreanLangCost = typeof opt === 'object' ? opt.price : (opt || 0);
-    const consultingFee = globalConfig.consultingFee;
+    const consultingOptions = globalConfig.consultingOptions || [39000000];
+    const consultingFee = (consultingOptions[selections.consultingIdx] !== undefined)
+      ? consultingOptions[selections.consultingIdx]
+      : consultingOptions[0];
     const thirdPartyFee = globalConfig.thirdPartyFee;
     const applicationFee = parseVisaSpecificCost(selectedUni.applicationFee, visaTypeId, exchangeRate);
     const enrollmentFee = parseVisaSpecificCost(selectedUni.enrollmentFee, visaTypeId, exchangeRate);

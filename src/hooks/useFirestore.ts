@@ -11,7 +11,7 @@ import { University, GlobalConfig } from '../types';
 import { UNIVERSITIES as STATIC_UNIVERSITIES, KRW_TO_VND as DEFAULT_KRW_TO_VND } from '../data';
 
 const DEFAULT_CONFIG: GlobalConfig = {
-  consultingFee: 39000000,
+  consultingOptions: [39000000, 49000000],
   thirdPartyFee: 11000000,
   applicationFee: 0,
   enrollmentFee: 2000000,
@@ -77,7 +77,15 @@ export function useFirestore(): UseFirestoreReturn {
     const unsubscribe = onSnapshot(
       doc(db, 'settings', 'costs'),
       (docSnap) => {
-        if (docSnap.exists()) setGlobalConfig(docSnap.data() as GlobalConfig);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          // Backward compatibility: Convert old consultingFee to consultingOptions
+          const merged = { ...DEFAULT_CONFIG, ...data };
+          if (!merged.consultingOptions && (data as any).consultingFee) {
+            merged.consultingOptions = [(data as any).consultingFee];
+          }
+          setGlobalConfig(merged as GlobalConfig);
+        }
       },
       (error) => console.error('Config Error:', error)
     );

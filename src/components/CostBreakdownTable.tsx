@@ -131,7 +131,23 @@ export default function CostBreakdownTable({
                 </select>
               }
             />
-            <Row stt="02" label="Phí tư vấn & Xử lý hồ sơ" subLabel="Trọn gói xây dựng hồ sơ" cost={costs.consultingFee ?? 0} />
+            <Row
+              stt="02"
+              label="Phí tư vấn & Xử lý hồ sơ"
+              subLabel="Trọn gói xây dựng hồ sơ"
+              cost={costs.consultingFee ?? 0}
+              options={
+                <select
+                  value={selections.consultingIdx}
+                  onChange={(e) => update({ consultingIdx: Number(e.target.value) })}
+                  className="w-full md:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] font-medium text-slate-600 outline-none hover:bg-slate-100 focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer appearance-none pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23475569%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[position:right_10px_center] bg-no-repeat"
+                >
+                  {(globalConfig.consultingOptions || []).map((opt, i) => (
+                    <option key={i} value={i}>{formatVND(opt)}</option>
+                  ))}
+                </select>
+              }
+            />
             <Row stt="03" label="Phí thu hộ bên thứ 3" subLabel="Phí công chứng, Tem vàng, Tem tím, Xin visa, Khám sức khoẻ, Phí ship hồ sơ qua các đơn vị tại Việt Nam, Phí ship hồ sơ sang trường, Phí đưa đón Hàn Quốc, Phí tìm ký túc xá" cost={costs.thirdPartyFee ?? 0} />
             <Row
               stt="04"
