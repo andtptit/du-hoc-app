@@ -19,6 +19,7 @@ export interface University {
   image: string;
   minGpaD4: number;
   minGpaD2: number;
+  admissionTime?: string;
 }
 
 export const KRW_TO_VND = 18.5;

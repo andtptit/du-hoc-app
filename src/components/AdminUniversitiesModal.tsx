@@ -122,6 +122,7 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
       minGpaD2: u.minGpaD2,
       applicationFee: u.applicationFee || '',
       enrollmentFee: u.enrollmentFee || '',
+      admissionTime: u.admissionTime || '',
     }));
 
     const csvString = Papa.unparse(rows);
@@ -151,6 +152,7 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
         image: 'Link URL ảnh nền trường (nếu có)', logoUrl: 'Link URL logo trường (nếu có)', minGpaD4: 'Điểm số (ví dụ: 6.5)', minGpaD2: 'Điểm số (ví dụ: 7.0)',
         applicationFee: 'Định dạng: D4-1:100000 KRW;D2-2:150000 KRW (hoặc để trống)',
         enrollmentFee: 'Định dạng: D2-3:900000 KRW (hoặc để trống)',
+        admissionTime: 'Ví dụ: Kỳ tháng 4: Từ 01/10 ~ 30/11',
       },
       {
         id: '(Bỏ trống)', name: 'Đại học Mẫu Demo', nameKr: 'Sample University', visaTop: 1,
@@ -162,6 +164,7 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
         image: '', logoUrl: '', minGpaD4: 6.5, minGpaD2: 7.0,
         applicationFee: 'D4-1:100000 KRW;D2-2:150000 KRW',
         enrollmentFee: 'D2-3:900000 KRW',
+        admissionTime: 'Kỳ tháng 3: 01/09 ~ 30/11; Kỳ tháng 9: 01/03 ~ 30/05',
       }
     ];
 
@@ -247,6 +250,7 @@ export default function AdminUniversitiesModal({ universities, onClose }: Props)
               minGpaD2: Number(row.minGpaD2) || 0,
               applicationFee: row.applicationFee || '',
               enrollmentFee: row.enrollmentFee || '',
+              admissionTime: row.admissionTime || '',
             };
             parsedUnis.push(uniData);
           }

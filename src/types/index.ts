@@ -30,6 +30,7 @@ export interface University {
   logoUrl?: string;
   applicationFee?: string | number;
   enrollmentFee?: string | number;
+  admissionTime?: string;
 }
 
 export interface GlobalConfig {

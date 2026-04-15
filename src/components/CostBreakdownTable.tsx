@@ -34,16 +34,17 @@ export default function CostBreakdownTable({
   const visaField = selectedVisa.field as 'calcTuitionD4' | 'calcTuitionD2_1' | 'calcTuitionD2_2' | 'calcTuitionD2_3';
   const baseTuitionKrw = university[visaField] || 0;
 
-  const Row = ({ stt, label, subLabel, cost, options, isHighlight = false }: {
+  const Row = ({ stt, label, subLabel, cost, options, isHighlight = false, showNote = false }: {
     stt: string,
     label: string,
     subLabel?: string,
     cost: number,
     options?: React.ReactNode,
-    isHighlight?: boolean
+    isHighlight?: boolean,
+    showNote?: boolean
   }) => {
     const [isExpanded, setIsExpanded] = React.useState(false);
-    const hasLongDescription = subLabel && subLabel.length > 40;
+    const hasLongDescription = (subLabel && subLabel.length > 40) || showNote;
 
     return (
       <tr className={`border-b border-blue-50/50 last:border-0 ${isHighlight ? 'bg-green-50/50' : 'bg-white'} transition-colors group`}>
@@ -56,9 +57,13 @@ export default function CostBreakdownTable({
           <p className={`text-[15px] font-bold ${isHighlight ? 'text-green-600' : 'text-slate-800'}`}>{label}</p>
           {subLabel && (
             <div className="mt-1">
-              <p className={`text-[12px] italic ${isHighlight ? 'text-green-600/70' : 'text-slate-400 font-medium'} ${!isExpanded && hasLongDescription ? 'line-clamp-1' : ''}`}>
-                {subLabel}
-              </p>
+              <div className={`${!isExpanded && hasLongDescription ? 'line-clamp-1' : ''}`}>
+                {subLabel.split(';').map((part, idx, arr) => (
+                  <p key={idx} className={`text-[12px] italic ${isHighlight ? 'text-green-600/70' : 'text-slate-400 font-medium'}`}>
+                    {part.trim()}{idx < arr.length - 1 ? ';' : ''}
+                  </p>
+                ))}
+              </div>
               {hasLongDescription && (
                 <button
                   type="button"
@@ -71,6 +76,11 @@ export default function CostBreakdownTable({
                     <><ChevronDown className="w-3 h-3" /> Xem thêm</>
                   )}
                 </button>
+              )}
+              {showNote && isExpanded && (
+                <p className="text-[10px] font-bold text-slate-400 italic mt-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                  Note: Chi phí có thể thay đổi theo từng kỳ bay
+                </p>
               )}
             </div>
           )}
@@ -154,6 +164,7 @@ export default function CostBreakdownTable({
               label="Phí apply trường HQ"
               subLabel={university.applicationFee ? `${String(university.applicationFee)}` : 'Theo cấu hình chung'}
               cost={costs.applicationFee ?? 0}
+              showNote={true}
               options={
                 <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
                   CỐ ĐỊNH
@@ -166,6 +177,7 @@ export default function CostBreakdownTable({
               label="Phí nhập học"
               subLabel={university.enrollmentFee ? `${String(university.enrollmentFee)}` : 'Theo cấu hình chung'}
               cost={costs.enrollmentFee ?? 2000000}
+              showNote={true}
               options={
                 <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
                   CỐ ĐỊNH
@@ -203,8 +215,11 @@ export default function CostBreakdownTable({
             <Row
               stt="07"
               label="Học phí trường HQ"
-              subLabel={`Dự kiến ${visaId === 'd4-1' ? 4 : 1} kỳ, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`}
+              subLabel={visaId === 'd4-1'
+                ? `D4: Một năm học phí gồm 4 kỳ, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`
+                : `D2: Một kỳ học phí, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`}
               cost={costs.tuitionVnd ?? 0}
+              showNote={true}
               options={
                 <span className="text-[13px] font-bold bg-blue-50 text-blue-600 px-4 py-1.5 rounded-lg border border-blue-100">
                   {visaId === 'd4-1' ? 4 : 1} kỳ
@@ -234,7 +249,7 @@ export default function CostBreakdownTable({
             <Row
               stt="09"
               label="Ký túc xá/ Thuê nhà tại Hàn Quốc"
-              subLabel="Dự kiến 6 tháng"
+              subLabel="Chi phí có thể thay đổi theo từng kỳ"
               cost={costs.dormKrCost ?? 0}
               options={
                 <select

@@ -13,7 +13,8 @@ import {
   Phone,
   Calculator,
   Eye,
-  EyeOff
+  EyeOff,
+  Clock
 } from 'lucide-react';
 import { University, FormData, CostBreakdown, GlobalConfig, Selections } from '../types';
 import { formatVND } from '../utils/format';
@@ -154,26 +155,38 @@ export default function DetailView({
 
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InfoCard 
-              icon={MapPin} 
-              label="Địa chỉ" 
-              value={university.address} 
+            <InfoCard
+              icon={MapPin}
+              label="Địa chỉ"
+              value={university.address}
               isMasked={!showAddress}
               onToggle={() => setShowAddress(!showAddress)}
             />
             <InfoCard icon={BookOpen} label="Chuyên ngành nổi bật" value={university.majors} />
             <InfoCard icon={CheckCircle2} label="Điều kiện tuyển sinh" value={university.admissionRequirements} />
-            <InfoCard icon={GraduationCap} label="Học thuật & Xếp hạng" value={university.rank} />
+            {formData.visaType === 'd4-1' && (
+              <InfoCard icon={GraduationCap} label="Điều kiện và chứng minh tài chính" value={university.rank} />
+            )}
 
             {/* Việc làm thêm (Part-time) */}
-            <div className="md:col-span-2 bg-white px-8 py-6 rounded-[32px] border border-slate-200 shadow-none space-y-4">
-              <div className="flex items-center gap-2 text-emerald-600 font-bold uppercase text-[13px] tracking-widest">
-                <Briefcase className="w-4 h-4" /> ĐIỂM NỔI BẬT
+              <div className="md:col-span-2 bg-white px-8 py-6 rounded-[32px] border border-slate-200 shadow-none space-y-4">
+                <div className="flex items-center gap-2 text-emerald-600 font-bold uppercase text-[13px] tracking-widest">
+                  <Briefcase className="w-4 h-4" /> ĐIỂM NỔI BẬT
+                </div>
+                <p className="text-[15px] text-slate-600 leading-relaxed whitespace-pre-line font-medium pb-2">
+                  {university.jobOpportunities || "Chưa có thông tin cập nhật về việc làm thêm."}
+                </p>
               </div>
-              <p className="text-[15px] text-slate-600 leading-relaxed whitespace-pre-line font-medium pb-2">
-                {university.jobOpportunities || "Chưa có thông tin cập nhật về việc làm thêm."}
-              </p>
-            </div>
+
+              {/* Thời gian tuyển sinh */}
+              <div className="md:col-span-2 bg-indigo-50/50 px-8 py-6 rounded-[32px] border border-indigo-100 shadow-none space-y-4">
+                <div className="flex items-center gap-2 text-indigo-600 font-bold uppercase text-[13px] tracking-widest">
+                  <Clock className="w-4 h-4" /> THỜI GIAN TUYỂN SINH
+                </div>
+                <p className="text-[15px] text-slate-700 leading-relaxed whitespace-pre-line font-bold">
+                  {university.admissionTime || "Thông tin đang được cập nhật..."}
+                </p>
+              </div>
           </div>
 
 

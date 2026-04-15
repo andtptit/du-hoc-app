@@ -76,6 +76,7 @@ const emptyUni: University = {
   minGpaD2: 6.5,
   applicationFee: '',
   enrollmentFee: '',
+  admissionTime: '',
 };
 
 export default function UniversityFormModal({ initialData, onClose }: Props) {
@@ -215,6 +216,10 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
               <div className="col-span-2">
                 <label className="block text-sm font-bold text-slate-700 mb-2">Điểm Nổi Bật</label>
                 <textarea rows={2} value={formData.jobOpportunities} onChange={e => handleChange('jobOpportunities', e.target.value)} className="w-full p-3 border rounded-xl" />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-bold text-slate-700 mb-2">Thời gian tuyển sinh</label>
+                <textarea rows={2} value={formData.admissionTime || ''} onChange={e => handleChange('admissionTime', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Ví dụ: Kỳ tháng 3: Tuyển từ tháng 9 ~ 11; Kỳ tháng 9: Tuyển từ tháng 3 ~ 5..." />
               </div>
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">GPA Cần Có D4</label>
