@@ -77,6 +77,7 @@ const emptyUni: University = {
   applicationFee: '',
   enrollmentFee: '',
   admissionTime: '',
+  financialProof: '',
 };
 
 export default function UniversityFormModal({ initialData, onClose }: Props) {
@@ -220,6 +221,10 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
               <div className="col-span-2">
                 <label className="block text-sm font-bold text-slate-700 mb-2">Thời gian tuyển sinh</label>
                 <textarea rows={2} value={formData.admissionTime || ''} onChange={e => handleChange('admissionTime', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Ví dụ: Kỳ tháng 3: Tuyển từ tháng 9 ~ 11; Kỳ tháng 9: Tuyển từ tháng 3 ~ 5..." />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-bold text-slate-700 mb-2">Điều kiện và chứng minh tài chính (D4)</label>
+                <textarea rows={2} value={formData.financialProof || ''} onChange={e => handleChange('financialProof', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="Ví dụ: Sổ ngân hàng 10.000 USD gửi trước 6 tháng..." />
               </div>
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">GPA Cần Có D4</label>

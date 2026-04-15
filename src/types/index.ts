@@ -31,6 +31,7 @@ export interface University {
   applicationFee?: string | number;
   enrollmentFee?: string | number;
   admissionTime?: string;
+  financialProof?: string;
 }
 
 export interface GlobalConfig {

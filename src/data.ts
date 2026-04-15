@@ -20,6 +20,7 @@ export interface University {
   minGpaD4: number;
   minGpaD2: number;
   admissionTime?: string;
+  financialProof?: string;
 }
 
 export const KRW_TO_VND = 18.5;

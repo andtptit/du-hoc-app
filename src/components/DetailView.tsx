@@ -165,7 +165,7 @@ export default function DetailView({
             <InfoCard icon={BookOpen} label="Chuyên ngành nổi bật" value={university.majors} />
             <InfoCard icon={CheckCircle2} label="Điều kiện tuyển sinh" value={university.admissionRequirements} />
             {formData.visaType === 'd4-1' && (
-              <InfoCard icon={GraduationCap} label="Điều kiện và chứng minh tài chính" value={university.rank} />
+              <InfoCard icon={GraduationCap} label="Điều kiện và chứng minh tài chính" value={university.financialProof || "Thông tin đang cập nhật..."} />
             )}
 
             {/* Việc làm thêm (Part-time) */}
