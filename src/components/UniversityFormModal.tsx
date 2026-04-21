@@ -63,6 +63,8 @@ const emptyUni: University = {
   tuitionD2_1: '0 KRW',
   tuitionD2_2: '0 KRW',
   tuitionD2_3: '0 KRW',
+  tuitionD2_3_no_topik: '0 KRW',
+  tuitionD2_6: '0 KRW',
   scholarship: '',
   dormitory: '',
   jobOpportunities: '',
@@ -70,6 +72,8 @@ const emptyUni: University = {
   calcTuitionD2_1: 0,
   calcTuitionD2_2: 0,
   calcTuitionD2_3: 0,
+  calcTuitionD2_3_no_topik: 0,
+  calcTuitionD2_6: 0,
   image: '',
   logoUrl: '',
   minGpaD4: 6.0,
@@ -265,6 +269,18 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                       <SmartTags text={formData.tuitionD2_3} onSelect={(val) => handleChange('calcTuitionD2_3', val)} />
                     </div>
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex-1">
+                      <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D2-3 Nợ TOPIK</label>
+                      <input type="text" value={formData.tuitionD2_3_no_topik || ''} onChange={e => handleChange('tuitionD2_3_no_topik', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="D2-3 Nợ TOPIK" />
+                      <SmartTags text={formData.tuitionD2_3_no_topik} onSelect={(val) => handleChange('calcTuitionD2_3_no_topik', val)} />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm font-bold text-slate-700 mb-1">Text Học phí D2-6</label>
+                      <input type="text" value={formData.tuitionD2_6 || ''} onChange={e => handleChange('tuitionD2_6', e.target.value)} className="w-full p-3 border rounded-xl" placeholder="D2-6 Trao đổi" />
+                      <SmartTags text={formData.tuitionD2_6} onSelect={(val) => handleChange('calcTuitionD2_6', val)} />
+                    </div>
+                  </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-1">Text KTX</label>
                     <input type="text" value={formData.dormitory} onChange={e => handleChange('dormitory', e.target.value)} className="w-full p-3 border rounded-xl" />
@@ -296,11 +312,21 @@ export default function UniversityFormModal({ initialData, onClose }: Props) {
                     <label className="block text-sm font-bold text-slate-700 mb-1">Tính Học Phí Thạc Sĩ D2-3 KRW (1 Kỳ)</label>
                     <input type="number" value={formData.calcTuitionD2_3} onChange={e => handleChange('calcTuitionD2_3', Number(e.target.value))} className="w-full p-3 border rounded-xl" />
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1">Tính HP D2-3 Nợ TOPIK KRW (1 Kỳ)</label>
+                      <input type="number" value={formData.calcTuitionD2_3_no_topik || 0} onChange={e => handleChange('calcTuitionD2_3_no_topik', Number(e.target.value))} className="w-full p-3 border rounded-xl" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1">Tính HP D2-6 KRW (1 Kỳ)</label>
+                      <input type="number" value={formData.calcTuitionD2_6 || 0} onChange={e => handleChange('calcTuitionD2_6', Number(e.target.value))} className="w-full p-3 border rounded-xl" />
+                    </div>
+                  </div>
                   <div className="col-span-2 border-t border-amber-200/50 pt-4 space-y-3">
                     <div className="bg-amber-100/60 p-3 rounded-lg">
                       <p className="text-[11px] text-amber-700 font-bold">💡 Định dạng phí theo Visa:</p>
-                      <p className="text-[10px] text-amber-600 mt-0.5 font-mono">D4-1:100000 KRW;D2-2:150000 KRW;D2-3:70000 KRW</p>
-                      <p className="text-[10px] text-amber-600">Hoặc để trống (= 0đ). Hệ thống tự nhận diện loại vis đang chọn.</p>
+                      <p className="text-[10px] text-amber-600 mt-0.5 font-mono">D4-1:100k;D2-2:200k;D2-3:150k;D2-3-no-topik:300k;D2-6:400k</p>
+                      <p className="text-[10px] text-amber-600">Hệ thống khớp mã (D4-1, D2-3-no-topik, D2-6...) để lấy phí tương ứng.</p>
                     </div>
                     <div>
                       <label className="block text-sm font-bold text-slate-700 mb-1">Phí Apply hồ sơ (theo Visa)</label>

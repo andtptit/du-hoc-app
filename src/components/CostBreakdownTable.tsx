@@ -31,7 +31,7 @@ export default function CostBreakdownTable({
     onSelectionsChange({ ...selections, ...patch });
 
   const selectedVisa = VISA_TYPES.find(v => v.id === visaId) || VISA_TYPES[2];
-  const visaField = selectedVisa.field as 'calcTuitionD4' | 'calcTuitionD2_1' | 'calcTuitionD2_2' | 'calcTuitionD2_3';
+  const visaField = selectedVisa.field as 'calcTuitionD4' | 'calcTuitionD2_1' | 'calcTuitionD2_2' | 'calcTuitionD2_3' | 'calcTuitionD2_3_no_topik' | 'calcTuitionD2_6';
   const baseTuitionKrw = university[visaField] || 0;
 
   const Row = ({ stt, label, subLabel, cost, options, isHighlight = false, showNote = false }: {
@@ -216,8 +216,8 @@ export default function CostBreakdownTable({
               stt="07"
               label="Học phí trường HQ"
               subLabel={visaId === 'd4-1'
-                ? `D4: Một năm học phí gồm 4 kỳ, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`
-                : `D2: Một kỳ học phí, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`}
+                ? `${selectedVisa.label.replace(':', '')}: Một năm học phí gồm 4 kỳ, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`
+                : `${selectedVisa.label.replace(':', '')}: Một năm học phí gồm 1 kỳ, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`}
               cost={costs.tuitionVnd ?? 0}
               showNote={true}
               options={

@@ -17,6 +17,8 @@ export interface University {
   tuitionD2_1?: string;
   tuitionD2_2: string;
   tuitionD2_3: string;
+  tuitionD2_3_no_topik?: string;
+  tuitionD2_6?: string;
   scholarship: string;
   dormitory: string;
   jobOpportunities: string;
@@ -24,6 +26,8 @@ export interface University {
   calcTuitionD2_1?: number;
   calcTuitionD2_2: number;
   calcTuitionD2_3: number;
+  calcTuitionD2_3_no_topik?: number;
+  calcTuitionD2_6?: number;
   image: string;
   minGpaD4: number;
   minGpaD2: number;

@@ -1,22 +1,22 @@
 export function extractNumbers(text: string): number[] {
   if (!text) return [];
 
-  // Regex tìm các cụm số có phân tách ngàn (phẩy hoặc chấm) hoặc số liền
-  // VD: 1,500,000 | 1.500.000 | 1500000
-  const regex = /\b\d{1,3}(?:[.,]\d{3})*\b|\b\d+\b/g;
+  // Hỗ trợ cả dấu cách làm phân cách ngàn, ví dụ: "1 500 000"
+  // Regex tìm các cụm số có phân tách (phẩy, chấm hoặc cách) hoặc số liền
+  const regex = /\b\d{1,3}(?:[.,\s]\d{3})*\b|\b\d+\b/g;
   const matches = text.match(regex);
   
   if (!matches) return [];
 
   const numbers = matches.map(m => {
-    // Xóa bỏ tất cả dấu phẩy và chấm để ép về số nguyên
-    const cleanStr = m.replace(/[.,]/g, '');
+    // Xóa bỏ tất cả dấu phẩy, chấm và khoảng trắng để ép về số nguyên
+    const cleanStr = m.replace(/[.,\s]/g, '');
     return parseInt(cleanStr, 10);
   });
 
-  // Lọc lấy các số liệu lớn (loại bỏ các số nhỏ như "1 kỳ", "6 tháng"...)
-  // Giả định học phí tối thiểu là 10.000 KRW
-  const validNumbers = numbers.filter(n => !isNaN(n) && n >= 10000);
+  // Lọc lấy các số liệu lớn (loại bỏ các số nhỏ như "1 kỳ", "4 kỵ"...)
+  // Giảm ngưỡng xuống 100 KRW để cho phép các phí nhỏ hơn nếu cần
+  const validNumbers = numbers.filter(n => !isNaN(n) && n >= 100);
   
   // Lọc trùng lặp và sắp xếp tăng dần
   const uniqueNumbers = Array.from(new Set(validNumbers)).sort((a, b) => a - b);

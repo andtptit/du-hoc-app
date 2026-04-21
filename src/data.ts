@@ -7,15 +7,20 @@ export interface University {
   rank: string;
   majors: string;
   admissionRequirements: string;
-  tuitionD4: string;
+  tuitionD2_1?: string;
   tuitionD2_2: string;
   tuitionD2_3: string;
+  tuitionD2_3_no_topik?: string;
+  tuitionD2_6?: string;
   scholarship: string;
   dormitory: string;
   jobOpportunities: string;
   calcTuitionD4: number;
+  calcTuitionD2_1?: number;
   calcTuitionD2_2: number;
   calcTuitionD2_3: number;
+  calcTuitionD2_3_no_topik?: number;
+  calcTuitionD2_6?: number;
   image: string;
   minGpaD4: number;
   minGpaD2: number;
@@ -32,6 +37,8 @@ export const VISA_TYPES = [
   { id: 'd2-1', label: 'D2-1: Hệ Cao Đẳng', multiplier: 1.0, field: 'calcTuitionD2_1' },
   { id: 'd2-2', label: 'D2-2: Hệ Đại Học', multiplier: 1.0, field: 'calcTuitionD2_2' },
   { id: 'd2-3', label: 'D2-3: Hệ Thạc Sĩ', multiplier: 1.0, field: 'calcTuitionD2_3' },
+  { id: 'd2-3-no-topik', label: 'D2-3: Nợ TOPIK', multiplier: 1.0, field: 'calcTuitionD2_3_no_topik' },
+  { id: 'd2-6', label: 'D2-6: Hệ trao đổi', multiplier: 1.0, field: 'calcTuitionD2_6' },
 ];
 
 export const TOPIK_LEVELS = [

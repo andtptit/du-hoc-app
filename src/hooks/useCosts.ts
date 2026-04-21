@@ -72,7 +72,7 @@ export function useCosts({
   return useMemo(() => {
     if (!selectedUni || !globalConfig) return { total: 0, parsedDormOptions: [] };
 
-    const visaField = selectedVisa.field as 'calcTuitionD4' | 'calcTuitionD2_1' | 'calcTuitionD2_2' | 'calcTuitionD2_3';
+    const visaField = selectedVisa.field as 'calcTuitionD4' | 'calcTuitionD2_1' | 'calcTuitionD2_2' | 'calcTuitionD2_3' | 'calcTuitionD2_3_no_topik' | 'calcTuitionD2_6';
 
     const opt = globalConfig.koreanLanguageOptions[selections.koreanLangIdx];
     const koreanLangCost = typeof opt === 'object' ? opt.price : (opt || 0);
