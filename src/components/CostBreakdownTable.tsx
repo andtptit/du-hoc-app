@@ -158,7 +158,7 @@ export default function CostBreakdownTable({
                 </select>
               }
             />
-            <Row stt="03" label="Phí thu hộ bên thứ 3" subLabel="Phí công chứng, Tem vàng, Tem tím, Xin visa, Khám sức khoẻ, Phí ship hồ sơ qua các đơn vị tại Việt Nam, Phí ship hồ sơ sang trường, Phí đưa đón Hàn Quốc, Phí tìm ký túc xá" cost={costs.thirdPartyFee ?? 0} />
+            <Row stt="03" label="Phí thu hộ bên thứ 3" subLabel="Lệ phí công chứng, dịch thuật hồ sơ; Lệ phí tem xác nhận dịch thuật (&quot;tem vàng&quot;); Phí gửi hồ sơ bản cứng sang Trường Hàn Quốc; Hỗ trợ Du học sinh đăng ký ký túc xá của Trường Hàn Quốc hoặc tìm phòng ở tại Hàn Quốc; Phối hợp cùng Trường Hàn Quốc đón Du học sinh tại sân bay Hàn Quốc về ký túc xá/nhà ở tại Hàn Quốc; Hỗ trợ hồ sơ lên chuyên ngành đối với hệ D4-1 (bao gồm hồ sơ tem vàng, công chứng dịch thuật)." cost={costs.thirdPartyFee ?? 0} />
             <Row
               stt="04"
               label="Phí apply trường HQ"

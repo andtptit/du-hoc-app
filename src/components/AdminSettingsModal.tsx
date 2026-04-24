@@ -13,6 +13,7 @@ interface Props {
 
 export default function AdminSettingsModal({ config, onClose }: Props) {
   const [exchangeRate, setExchangeRate] = useState(config.exchangeRate || 18.5);
+  const [thirdPartyFee, setThirdPartyFee] = useState(config.thirdPartyFee || 0);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -20,7 +21,8 @@ export default function AdminSettingsModal({ config, onClose }: Props) {
     try {
       const newConfig = {
         ...config,
-        exchangeRate: Number(exchangeRate)
+        exchangeRate: Number(exchangeRate),
+        thirdPartyFee: Number(thirdPartyFee)
       };
       await setDoc(doc(db, 'settings', 'costs'), newConfig);
       toast.success('Cập nhật tỷ giá thành công!');
@@ -86,6 +88,24 @@ export default function AdminSettingsModal({ config, onClose }: Props) {
                 <p className="mt-2 text-xs text-slate-400 italic">
                   * Tỷ giá này sẽ ảnh hưởng trực tiếp đến việc tính toán học phí trên toàn bộ hệ thống.
                 </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1.5 ml-1">
+                  Phí thu hộ bên thứ 3 (VNĐ)
+                </label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <DollarSign className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="number"
+                    value={thirdPartyFee}
+                    onChange={(e) => setThirdPartyFee(Number(e.target.value))}
+                    className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-bold text-lg"
+                    placeholder="7000000"
+                  />
+                </div>
               </div>
             </div>
           </div>

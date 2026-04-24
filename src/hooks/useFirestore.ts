@@ -12,7 +12,7 @@ import { UNIVERSITIES as STATIC_UNIVERSITIES, KRW_TO_VND as DEFAULT_KRW_TO_VND }
 
 const DEFAULT_CONFIG: GlobalConfig = {
   consultingOptions: [39000000, 49000000],
-  thirdPartyFee: 11000000,
+  thirdPartyFee: 7000000,
   applicationFee: 0,
   enrollmentFee: 2000000,
   koreanLanguageOptions: [
