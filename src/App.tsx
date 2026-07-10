@@ -200,12 +200,12 @@ export default function App() {
       };
 
       // Gửi Webhook Sheets
-      await fetch(GOOGLE_WEBHOOK_URL, {
+      fetch(GOOGLE_WEBHOOK_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sheetData),
-      });
+      }).catch(e => console.error("Sheets Error (Lượt 2):", e));
 
       // Bắn sự kiện Lead sang Meta Pixel
       if (typeof window !== 'undefined' && (window as any).fbq) {
