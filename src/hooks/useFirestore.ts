@@ -10,6 +10,9 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { University, GlobalConfig } from '../types';
 import { UNIVERSITIES as STATIC_UNIVERSITIES, KRW_TO_VND as DEFAULT_KRW_TO_VND } from '../data';
 
+// Phải khớp với danh sách trong firestore.rules (hàm isAdmin)
+const ADMIN_EMAILS = ['andtptit@gmail.com', 'mktteamthtt@gmail.com'];
+
 const DEFAULT_CONFIG: GlobalConfig = {
   consultingOptions: [39000000, 49000000],
   thirdPartyFee: 7000000,
@@ -49,10 +52,12 @@ export function useFirestore(): UseFirestoreReturn {
   const [isAdmin, setIsAdmin] = useState(false);
 
   // Auth listener
+  // Lưu ý: đây chỉ là check phía client để hiện/ẩn UI admin.
+  // Quyền thật sự được kiểm soát bởi firestore.rules (danh sách email + email_verified).
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
-      setIsAdmin(u !== null); // Mọi user đăng nhập thành công là Admin (bởi vì Client ko cần thẻ Auth)
+      setIsAdmin(u !== null && !!u.email && ADMIN_EMAILS.includes(u.email));
     });
     return () => unsubscribe();
   }, []);

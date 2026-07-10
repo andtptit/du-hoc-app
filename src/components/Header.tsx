@@ -24,11 +24,11 @@ export default function Header({
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.reload()}>
             <img
-              src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20ko%20slogan-ngang_min.png?alt=media&token=e2693105-c036-432f-8b43-b0c32e18c5ab"
-              alt="TBT GROUP"
+              src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20TH%20va%20DH-ngang.png?alt=media&token=5acd9018-e5a4-4878-a737-0839cfc9d4b2"
+              alt="Tiếng Hàn và Du Học Thầy Tư"
               className="h-10 object-contain"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=TBT+Group&background=0f3493&color=fff';
+                (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=Tieng+Han+va+Du+Hoc+Thay+Tu&background=0f3493&color=fff';
               }}
             />
           </div>
@@ -79,14 +79,6 @@ export default function Header({
               <UserLock className="w-5 h-5" />
             </button>
           )}
-
-          <div className="h-6 w-px bg-slate-100 mx-1 hidden sm:block" />
-
-          <button className="bg-[#0f3493] text-white px-5 py-2.5 rounded-full font-bold text-[13px] flex items-center gap-2 hover:bg-blue-800 transition-all shadow-md active:scale-95 whitespace-nowrap">
-            <PhoneCall className="w-4 h-4" />
-            <span className="hidden sm:inline">Nhận tư vấn du học</span>
-            <span className="sm:hidden">Tư vấn</span>
-          </button>
         </div>
       </div>
     </header>

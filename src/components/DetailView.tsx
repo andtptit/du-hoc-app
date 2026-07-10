@@ -334,8 +334,8 @@ export default function DetailView({
 
             {/* Sidebar Footer Link */}
             <div className="bg-slate-50 p-6 rounded-[32px] border border-dashed border-slate-200 flex flex-col items-center gap-4">
-              <img src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20ko%20slogan-ngang_min.png?alt=media&token=e2693105-c036-432f-8b43-b0c32e18c5ab" className="h-4 grayscale opacity-40" alt="" />
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">Hệ thống giáo dục TBT - Đồng hành cùng ước mơ của bạn</p>
+              <img src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20TH%20va%20DH-ngang.png?alt=media&token=5acd9018-e5a4-4878-a737-0839cfc9d4b2" className="h-4 grayscale opacity-40" alt="" />
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">Tiếng Hàn và Du Học Thầy Tư - Đồng hành cùng ước mơ của bạn</p>
             </div>
           </div>
 

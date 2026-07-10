@@ -1,60 +1,22 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ===============================================================
-    // Assumed Data Model
-    // ===============================================================
-    //
-    // Collection: universities
-    // Document ID: universityId
-    // Fields:
-    //   - id: string (required)
-    //   - name: string (required)
-    //   - nameKr: string (required)
-    //   - visaTop: number (required)
-    //   - address: string (required)
-    //   - rank: string (required)
-    //   - majors: string (required)
-    //   - admissionRequirements: string (required)
-    //   - tuitionD4: string (required)
-    //   - tuitionD2_2: string (required)
-    //   - tuitionD2_3: string (required)
-    //   - scholarship: string (required)
-    //   - dormitory: string (required)
-    //   - jobOpportunities: string (required)
-    //   - calcTuitionD4: number (required)
-    //   - calcTuitionD2_2: number (required)
-    //   - calcTuitionD2_3: number (required)
-    //   - image: string (required)
-    //   - minGpaD4: number (required)
-    //   - minGpaD2: number (required)
-    //
-    // Collection: settings
-    // Document ID: costs
-    // Fields:
-    //   - consultingFee: number
-    //   - thirdPartyFee: number
-    //   - applicationFee: number
-    //   - enrollmentFee: number
-    //   - koreanLanguageOptions: list of numbers
-    //   - dormVietnamPricePerMonth: number
-    //   - dormKoreaOptions: list of objects {label, price}
-    //   - flightOptions: list of numbers
-    //   - defaultTuitionKrw: number
-    //
-    // ===============================================================
 
     // ===============================================================
     // Helper Functions
     // ===============================================================
+
     function isAuthenticated() {
       return request.auth != null;
     }
 
+    // Admin = có doc users/{uid} với role 'admin', HOẶC email nằm trong
+    // danh sách admin và đã xác thực email.
     function isAdmin() {
       return isAuthenticated() &&
         (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-          (request.auth.token.email == "mktteamthtt@gmail.com" && request.auth.token.email_verified == true));
+          (request.auth.token.email in ['andtptit@gmail.com', 'mktteamthtt@gmail.com'] &&
+            request.auth.token.email_verified == true));
     }
 
     function isValidUniversity(data) {
@@ -78,12 +40,26 @@ service cloud.firestore {
              data.calcTuitionD2_3 is number &&
              data.image is string &&
              data.minGpaD4 is number &&
-             data.minGpaD2 is number;
+             data.minGpaD2 is number &&
+             // Các trường tùy chọn (schema mở rộng)
+             (!('region' in data) || data.region is string) &&
+             (!('tuitionD2_1' in data) || data.tuitionD2_1 is string) &&
+             (!('tuitionD2_3_no_topik' in data) || data.tuitionD2_3_no_topik is string) &&
+             (!('tuitionD2_6' in data) || data.tuitionD2_6 is string) &&
+             (!('calcTuitionD2_1' in data) || data.calcTuitionD2_1 is number) &&
+             (!('calcTuitionD2_3_no_topik' in data) || data.calcTuitionD2_3_no_topik is number) &&
+             (!('calcTuitionD2_6' in data) || data.calcTuitionD2_6 is number) &&
+             (!('logoUrl' in data) || data.logoUrl is string) &&
+             (!('applicationFee' in data) || data.applicationFee is string || data.applicationFee is number) &&
+             (!('enrollmentFee' in data) || data.enrollmentFee is string || data.enrollmentFee is number) &&
+             (!('admissionTime' in data) || data.admissionTime is string) &&
+             (!('financialProof' in data) || data.financialProof is string);
     }
 
+    // Khớp với interface GlobalConfig trong src/types/index.ts
     function isValidGlobalConfig(data) {
-      return data.keys().hasAll(['consultingFee', 'thirdPartyFee', 'applicationFee', 'enrollmentFee', 'koreanLanguageOptions', 'dormVietnamPricePerMonth', 'dormKoreaOptions', 'flightOptions', 'defaultTuitionKrw']) &&
-             data.consultingFee is number &&
+      return data.keys().hasAll(['consultingOptions', 'thirdPartyFee', 'applicationFee', 'enrollmentFee', 'koreanLanguageOptions', 'dormVietnamPricePerMonth', 'dormKoreaOptions', 'flightOptions', 'defaultTuitionKrw', 'exchangeRate']) &&
+             data.consultingOptions is list &&
              data.thirdPartyFee is number &&
              data.applicationFee is number &&
              data.enrollmentFee is number &&
@@ -91,7 +67,25 @@ service cloud.firestore {
              data.dormVietnamPricePerMonth is number &&
              data.dormKoreaOptions is list &&
              data.flightOptions is list &&
-             data.defaultTuitionKrw is number;
+             data.defaultTuitionKrw is number &&
+             data.exchangeRate is number && data.exchangeRate > 0;
+    }
+
+    // Khớp với regData trong src/App.tsx (FormData + metadata)
+    function isValidRegistration(data) {
+      return data.keys().hasOnly(['name', 'phone', 'visaType', 'topikLevel', 'universityId', 'gpaThpt', 'gpaUni', 'createdAt', 'universityName', 'costsTotal', 'type']) &&
+             data.keys().hasAll(['name', 'phone', 'visaType', 'topikLevel', 'universityId', 'createdAt', 'universityName', 'costsTotal', 'type']) &&
+             data.name is string && data.name.size() <= 200 &&
+             data.phone is string && data.phone.size() <= 20 &&
+             data.visaType is string && data.visaType.size() <= 50 &&
+             data.topikLevel is string && data.topikLevel.size() <= 10 &&
+             data.universityId is string && data.universityId.size() <= 100 &&
+             data.createdAt is string && data.createdAt.size() <= 40 &&
+             data.universityName is string && data.universityName.size() <= 200 &&
+             data.costsTotal is number &&
+             data.type in ['tra_cuu', 'dang_ky'] &&
+             (!('gpaThpt' in data) || (data.gpaThpt is string && data.gpaThpt.size() <= 10)) &&
+             (!('gpaUni' in data) || (data.gpaUni is string && data.gpaUni.size() <= 10));
     }
 
     // ===============================================================
@@ -99,27 +93,48 @@ service cloud.firestore {
     // ===============================================================
 
     match /universities/{universityId} {
-      // Allow public read for university directory
+      // Public đọc danh bạ trường
       allow read: if true;
-      
-      // Only admins can create or update university data
+
+      // Chỉ admin được tạo/sửa/xóa
       allow create: if isAdmin() && isValidUniversity(request.resource.data);
       allow update: if isAdmin() && isValidUniversity(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /settings/{settingId} {
-      // Allow public read for global costs
+      // Public đọc cấu hình chi phí
       allow read: if true;
-      
-      // Only admins can update global costs
+
+      // Chỉ admin được ghi
       allow write: if isAdmin() && (settingId != 'costs' || isValidGlobalConfig(request.resource.data));
+    }
+
+    match /registrations/{registrationId} {
+      // Khách vãng lai (không đăng nhập) tạo bản ghi tra cứu / đăng ký
+      allow create: if isValidRegistration(request.resource.data);
+
+      // Flow 2 bước: cho phép nâng cấp bản ghi 'tra_cuu' thành 'dang_ky'.
+      // Bản ghi đã 'dang_ky' thì khách không sửa được nữa; admin sửa được tất cả.
+      allow update: if isAdmin() ||
+        (isValidRegistration(request.resource.data) && resource.data.type == 'tra_cuu');
+
+      // Chỉ admin đọc & xóa (bảo vệ tên + SĐT khách hàng)
+      allow read, delete: if isAdmin();
+    }
+
+    match /banners/{bannerId} {
+      // Public đọc banner trang chủ
+      allow read: if true;
+
+      // Chỉ admin quản lý banner
+      allow write: if isAdmin();
     }
 
     match /users/{userId} {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
       allow create: if isAuthenticated() && request.auth.uid == userId && request.resource.data.role == 'user';
-      allow update: if isAuthenticated() && (request.auth.uid == userId && request.resource.data.role == resource.data.role) || isAdmin();
+      allow update: if isAuthenticated() && ((request.auth.uid == userId && request.resource.data.role == resource.data.role) || isAdmin());
     }
   }
 }

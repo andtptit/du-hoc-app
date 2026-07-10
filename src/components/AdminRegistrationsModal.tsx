@@ -93,6 +93,7 @@ export default function AdminRegistrationsModal({ onClose }: Props) {
                 <tr>
                   <th className="px-4 py-4 rounded-tl-xl">Thời gian</th>
                   <th className="px-4 py-4">Khách hàng</th>
+                  <th className="px-4 py-4">Phân loại</th>
                   <th className="px-4 py-4">Trường nguyện vọng</th>
                   <th className="px-4 py-4">Hồ sơ</th>
                   <th className="px-4 py-4">Chi phí dự tính</th>
@@ -108,6 +109,17 @@ export default function AdminRegistrationsModal({ onClose }: Props) {
                     <td className="px-4 py-4">
                       <p className="font-bold text-slate-800 text-base">{reg.name}</p>
                       <p className="text-blue-600 font-medium">{reg.phone}</p>
+                    </td>
+                    <td className="px-4 py-4">
+                      {reg.type === 'dang_ky' ? (
+                        <span className="px-3 py-1 text-xs font-black bg-rose-100 text-rose-700 rounded-full uppercase tracking-wider whitespace-nowrap shadow-sm border border-rose-200">
+                          🔥 Đăng ký ngay
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 text-xs font-black bg-blue-100 text-blue-700 rounded-full uppercase tracking-wider whitespace-nowrap shadow-sm border border-blue-200">
+                          🔍 Tra cứu
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-4">
                       {reg.universityName || 'Không xác định'}

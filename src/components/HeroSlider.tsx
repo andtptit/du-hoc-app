@@ -53,7 +53,7 @@ export default function HeroSlider({ bannerImages }: Props) {
             className="w-full h-full object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              const fallback = 'https://firebasestorage.googleapis.com/v0/b/du-hoc-test.appspot.com/o/banners%2Fkb-scholarship.png?alt=media';
+              const fallback = 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Herro%20banner.jpg?alt=media&token=4b17a97d-708a-4eef-88b9-1124e42c4dc1';
               if (target.src !== fallback) {
                 target.src = fallback;
               }

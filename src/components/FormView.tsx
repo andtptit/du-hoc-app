@@ -38,9 +38,10 @@ export default function FormView({
   const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; university?: boolean }>({});
 
   const validateAndProceed = () => {
+    const isPhoneValid = /^(0|\+84|84)(3|5|7|8|9)[0-9]{8}$/.test(formData.phone.trim());
     const newErrors = {
       name: !formData.name.trim(),
-      phone: !formData.phone.trim(),
+      phone: !formData.phone.trim() || !isPhoneValid,
       university: !formData.universityId,
     };
     setErrors(newErrors);
@@ -50,9 +51,22 @@ export default function FormView({
       return;
     }
 
-    if (!newErrors.name && !newErrors.phone) {
-      onViewDetail();
+    if (newErrors.name) {
+      toast.error('Vui lòng nhập họ và tên');
+      return;
     }
+
+    if (!formData.phone.trim()) {
+      toast.error('Vui lòng nhập số điện thoại');
+      return;
+    }
+
+    if (!isPhoneValid) {
+      toast.error('Số điện thoại không đúng định dạng (VD: 0987654321)');
+      return;
+    }
+
+    onViewDetail();
   };
 
   return (

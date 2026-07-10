@@ -5,11 +5,11 @@ export default function Footer() {
     <footer className="bg-white border-t border-slate-100 pt-16 pb-8 px-4 mt-20">
       <div className="max-w-7xl mx-auto flex flex-col items-center">
         <img
-          src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20ko%20slogan-ngang_min.png?alt=media&token=e2693105-c036-432f-8b43-b0c32e18c5ab"
-          alt="TBT GROUP"
+          src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0255597007.firebasestorage.app/o/Logo%20TH%20va%20DH-ngang.png?alt=media&token=5acd9018-e5a4-4878-a737-0839cfc9d4b2"
+          alt="Tiếng Hàn và Du Học Thầy Tư"
           className="h-12 mb-8"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=TBT+Group&background=0f3493&color=fff';
+            (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=Tieng+Han+va+Du+Hoc+Thay+Tu&background=0f3493&color=fff';
           }}
         />
 
@@ -21,7 +21,7 @@ export default function Footer() {
         <div className="w-full h-px bg-slate-100 mb-8" />
 
         <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 text-[13px] text-slate-400 font-medium">
-          <p>© Bản quyền của Công Ty Cổ Phần Quốc Tế TBT GROUP</p>
+          <p>© Bản quyền của Tiếng Hàn và Du Học Thầy Tư</p>
           <div className="flex gap-8">
             <a href="#" className="hover:text-blue-600 transition-colors">Về chúng tôi</a>
             <a href="#" className="hover:text-blue-600 transition-colors">Tuyển dụng</a>
