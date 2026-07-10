@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster, toast } from 'react-hot-toast';
-import { collection, onSnapshot, query, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, addDoc, doc, setDoc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { db, auth } from './firebase';
 
@@ -184,7 +184,7 @@ export default function App() {
       if (currentRegistrationId) {
         // Cập nhật lại bản ghi cũ thay vì tạo mới
         const docRef = doc(db, 'registrations', currentRegistrationId);
-        await updateDoc(docRef, regData);
+        await setDoc(docRef, regData);
       } else {
         // Fallback tạo mới nếu không có ID lượt 1 trước đó
         const docRef = await addDoc(collection(db, 'registrations'), regData);
