@@ -83,7 +83,8 @@ export function useCosts({
     const thirdPartyFee = globalConfig.thirdPartyFee;
     const applicationFee = parseVisaSpecificCost(selectedUni.applicationFee, visaTypeId, exchangeRate);
     const enrollmentFee = parseVisaSpecificCost(selectedUni.enrollmentFee, visaTypeId, exchangeRate);
-    const dormVnCost = selections.dormVnMonths * globalConfig.dormVietnamPricePerMonth;
+    // const dormVnCost = selections.dormVnMonths * globalConfig.dormVietnamPricePerMonth;
+    const dormVnCost = 0;
 
     const baseTuitionKrw = selectedUni[visaField] || 0;
     const tuitionTerms = visaTypeId === 'd4-1' ? 4 : 1;

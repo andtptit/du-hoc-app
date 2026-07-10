@@ -20,7 +20,7 @@ import { useCosts } from './hooks/useCosts';
 import { FormData, Selections } from './types';
 import { VISA_TYPES, TOPIK_LEVELS, UNIVERSITIES as STATIC_UNIVERSITIES } from './data';
 
-const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxDhzLK58bAt9Xlqa7BtiTYiP9WAKRq7zjl3QXT1SVMZ1WFrwv5kuZ42Y6mJZjBTeXH/exec";
+const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby2KObaL-ev4jBf1TqZBWli2H4y1aitQyaCCnMG_KWTRD3B6KEttx5JHqng6dHn3i17/exec";
 
 export default function App() {
   const [view, setView] = useState<'form' | 'detail'>('form');
@@ -130,12 +130,20 @@ export default function App() {
       const docRef = await addDoc(collection(db, 'registrations'), regData);
       setCurrentRegistrationId(docRef.id);
 
+      // Payload gửi lên Google Sheets bổ sung các biến tương thích
+      const sheetData = {
+        ...regData,
+        classification: 'Tra cứu',
+        phanLoai: 'Tra cứu',
+        typeLabel: 'Tra cứu'
+      };
+
       // Gửi Webhook Sheets
       fetch(GOOGLE_WEBHOOK_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(regData),
+        body: JSON.stringify(sheetData),
       }).catch(e => console.error("Sheets Error (Lượt 1):", e));
     } catch (error) {
       console.error("Lỗi lưu data lượt 1:", error);
@@ -174,13 +182,30 @@ export default function App() {
         setCurrentRegistrationId(docRef.id);
       }
 
+      // Payload gửi lên Google Sheets bổ sung các biến tương thích
+      const sheetData = {
+        ...regData,
+        classification: 'Đăng ký ngay',
+        phanLoai: 'Đăng ký ngay',
+        typeLabel: 'Đăng ký ngay'
+      };
+
       // Gửi Webhook Sheets
       await fetch(GOOGLE_WEBHOOK_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(regData),
+        body: JSON.stringify(sheetData),
       });
+
+      // Bắn sự kiện Lead sang Meta Pixel
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'Lead', {
+          content_name: sheetData.universityName,
+          value: sheetData.costsTotal,
+          currency: 'VND'
+        });
+      }
 
       toast.success('Đăng ký nhận tư vấn thành công! Tiếng Hàn và Du Học Thầy Tư sẽ liên hệ bạn sớm.');
       setCurrentRegistrationId(null);

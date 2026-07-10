@@ -185,6 +185,7 @@ export default function CostBreakdownTable({
               }
             />
 
+            {/* Ẩn tạm thời theo yêu cầu
             <Row
               stt="06"
               label="Ký túc xá tại Việt Nam"
@@ -211,9 +212,10 @@ export default function CostBreakdownTable({
                 </div>
               }
             />
+            */}
 
             <Row
-              stt="07"
+              stt="06"
               label="Học phí trường HQ"
               subLabel={visaId === 'd4-1'
                 ? `${selectedVisa.label.replace(':', '')}: Một năm học phí gồm 4 kỳ, mỗi kỳ ${baseTuitionKrw.toLocaleString('vi-VN')} KRW`
@@ -228,7 +230,7 @@ export default function CostBreakdownTable({
             />
 
             <Row
-              stt="08"
+              stt="07"
               label="Học bổng"
               subLabel={university.scholarship || "Chính sách giảm trừ của trường"}
               cost={-(costs.scholarshipAmount ?? 0)}
@@ -247,7 +249,7 @@ export default function CostBreakdownTable({
             />
 
             <Row
-              stt="09"
+              stt="08"
               label="Ký túc xá/ Thuê nhà tại Hàn Quốc"
               subLabel="Chi phí có thể thay đổi theo từng kỳ"
               cost={costs.dormKrCost ?? 0}
@@ -265,7 +267,7 @@ export default function CostBreakdownTable({
             />
 
             <Row
-              stt="10"
+              stt="09"
               label="Vé máy bay 1 chiều"
               subLabel="Bao gồm 40kg ký gửi"
               cost={costs.flightCost ?? 0}
