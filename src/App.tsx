@@ -145,6 +145,15 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sheetData),
       }).catch(e => console.error("Sheets Error (Lượt 1):", e));
+
+      // Bắn sự kiện Subscribe sang Meta Pixel cho Lượt 1: Tra cứu
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'Subscribe', {
+          content_name: sheetData.universityName,
+          value: sheetData.costsTotal,
+          currency: 'VND'
+        });
+      }
     } catch (error) {
       console.error("Lỗi lưu data lượt 1:", error);
     }
