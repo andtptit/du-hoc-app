@@ -14,7 +14,7 @@ import { UNIVERSITIES as STATIC_UNIVERSITIES, KRW_TO_VND as DEFAULT_KRW_TO_VND }
 const ADMIN_EMAILS = ['andtptit@gmail.com', 'mktteamthtt@gmail.com'];
 
 const DEFAULT_CONFIG: GlobalConfig = {
-  consultingOptions: [39000000, 49000000],
+  consultingOptions: [39000000, 49000000, 60000000],
   thirdPartyFee: 7000000,
   applicationFee: 0,
   enrollmentFee: 2000000,
@@ -88,6 +88,10 @@ export function useFirestore(): UseFirestoreReturn {
           const merged = { ...DEFAULT_CONFIG, ...data };
           if (!merged.consultingOptions && (data as any).consultingFee) {
             merged.consultingOptions = [(data as any).consultingFee];
+          }
+          // Đảm bảo luôn có tùy chọn 60 triệu trong danh sách cấu hình hồ sơ
+          if (merged.consultingOptions && !merged.consultingOptions.includes(60000000)) {
+            merged.consultingOptions = [...merged.consultingOptions, 60000000].sort((a, b) => a - b);
           }
           setGlobalConfig(merged as GlobalConfig);
         }
