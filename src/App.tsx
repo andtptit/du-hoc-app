@@ -20,9 +20,12 @@ import { useCosts } from './hooks/useCosts';
 import { FormData, Selections } from './types';
 import { VISA_TYPES, TOPIK_LEVELS, UNIVERSITIES as STATIC_UNIVERSITIES } from './data';
 
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import EmbedPricing from './components/EmbedPricing';
+
 const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby2KObaL-ev4jBf1TqZBWli2H4y1aitQyaCCnMG_KWTRD3B6KEttx5JHqng6dHn3i17/exec";
 
-export default function App() {
+function MainApp() {
   const [view, setView] = useState<'form' | 'detail'>('form');
 
   const [formData, setFormData] = useState<FormData>({
@@ -313,5 +316,16 @@ export default function App() {
       <ContactWidgets />
       <Toaster position="top-right" />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainApp />} />
+        <Route path="/embed/:universityId" element={<EmbedPricing />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
