@@ -214,7 +214,7 @@ export default function OverviewLanding() {
         </section>
 
         <section id="lo-trinh" className="overview-intro overview-wrap">
-          <div><span className="overview-section-tag">KHÔNG CHỈ MỘT CON SỐ TỔNG</span><h2>Biết mình trả tiền cho ai, vào dịch vụ gì</h2></div>
+          <div><span className="overview-section-tag">KHÔNG CHỈ MỘT CON SỐ TỔNG</span><h2><span>Biết mình trả tiền</span><span>cho ai, vào dịch vụ gì</span></h2></div>
           <aside><strong>Minh bạch từ đầu</strong><p>Trung tâm chỉ thu phí xử lý hồ sơ, và chi phí học tiếng Hàn (nếu có), các chi phí còn lại như xin tem vàng, tem tím, học phí của trường Hàn Quốc, trung tâm sẽ hướng dẫn các bạn tự thanh toán</p></aside>
         </section>
 
