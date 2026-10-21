@@ -6,6 +6,7 @@ import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { db } from '../firebase';
 import { useFirestore } from '../hooks/useFirestore';
 import { useCosts } from '../hooks/useCosts';
+import SiteFooter from './SiteFooter';
 import { VISA_TYPES } from '../data';
 import type { Selections } from '../types';
 import '@fontsource/be-vietnam-pro/400.css';
@@ -158,8 +159,11 @@ export default function OverviewLanding() {
       (window as Window & { fbq?: (...args: unknown[]) => void }).fbq?.('track', 'Lead', {
         content_name: kind === 'quote_pdf' ? selectedUniversity?.name ?? 'Trang du học Hàn Quốc' : documentUniversity?.name ?? 'Gợi ý trường',
       });
-      if (kind !== 'quote_pdf') { setPdfSubmitted(true); setPdfPhone(''); setPdfConsent(false); }
-      else { setQuoteSubmitted(true); setQuotePhone(''); setQuoteConsent(false); }
+      sessionStorage.setItem('thankYouRequest', JSON.stringify({
+        universityName: registration.universityName,
+        isSuggestion: kind === 'school_suggestions',
+      }));
+      window.location.assign('/thank-you');
     } catch (error) {
       console.error('Overview lead error:', error);
       toast.error('Chưa gửi được yêu cầu. Vui lòng thử lại.');
@@ -199,6 +203,7 @@ export default function OverviewLanding() {
           <form className="overview-pdf-form" onSubmit={(event) => submitLead(event, documentKind)}>
             {pdfSubmitted ? <div className="overview-pdf-success" role="status"><strong>Đã nhận yêu cầu.</strong><p>Đội ngũ sẽ liên hệ qua Zalo để gửi {documentUniversity ? `thông tin về ${documentUniversity.name}` : 'gợi ý trường và chi phí'}.</p><button type="button" onClick={() => setPdfSubmitted(false)}>Gửi yêu cầu khác</button></div> : <><label htmlFor="overview-document-school">TRƯỜNG BẠN QUAN TÂM</label><select id="overview-document-school" value={documentSchool} onChange={(event) => setDocumentSchool(event.target.value)}><option value="">Chưa chọn trường — nhờ gợi ý</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select><label htmlFor="overview-document-visa">HỆ HỌC</label><select id="overview-document-visa" value={documentVisa} onChange={(event) => setDocumentVisa(event.target.value)}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select>{!documentSchool && <><label htmlFor="overview-document-budget">NGÂN SÁCH DỰ KIẾN (KHÔNG BẮT BUỘC)</label><select id="overview-document-budget" value={documentBudget} onChange={(event) => setDocumentBudget(event.target.value)}><option value="">Chưa xác định</option><option value="duoi-150-trieu">Dưới 150 triệu</option><option value="150-250-trieu">150–250 triệu</option><option value="tren-250-trieu">Trên 250 triệu</option></select></>}<label htmlFor="overview-pdf-phone">SỐ ZALO NHẬN TÀI LIỆU</label><div className="overview-pdf-input"><input id="overview-pdf-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="09xx xxx xxx" value={pdfPhone} onChange={(event) => setPdfPhone(event.target.value)} required /><button type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : documentSchool ? 'Nhận hồ sơ trường này' : 'Nhận gợi ý trường'} <ArrowUpRight size={17} /></button></div><label className="overview-consent"><input type="checkbox" checked={pdfConsent} onChange={(event) => setPdfConsent(event.target.checked)} required /><span>Tôi đồng ý để Thầy Tư dùng số này gửi tài liệu và liên hệ về yêu cầu của tôi.</span></label><small>Đội ngũ chuẩn bị và gửi thông tin qua Zalo sau khi nhận yêu cầu.</small></>}
           </form>
+          <p className="overview-form-privacy">Xem cách chúng tôi sử dụng thông tin của bạn trong <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link>.</p>
           <figure className="overview-pdf-example" aria-label="Mô phỏng tin nhắn Zalo và các trang trong bảng giá PDF">
             <div className="overview-pdf-example-head"><span>BẢN XEM TRƯỚC</span><p>{documentUniversity ? `Thông tin chi phí và tuyển sinh ${documentUniversity.name}, hệ ${VISA_TYPES.find((item) => item.id === documentVisa)?.label}.` : 'Ví dụ trang chi phí Ajou và cách đội ngũ gửi thông tin qua Zalo.'}</p></div>
             <div className="overview-pdf-example-stage">
@@ -237,12 +242,13 @@ export default function OverviewLanding() {
           </div>
           <div className="overview-quote-next"><div><h3>Thấy phương án này phù hợp?</h3><p>Xem báo giá không cần số điện thoại. Bạn có thể nhận bản chi tiết qua Zalo hoặc trao đổi trực tiếp về phương án vừa chọn.</p></div><div className="overview-quote-actions"><button type="button" disabled={!selectedUniversity || !hasTuition} onClick={() => { setQuoteIntent('quote_pdf'); setQuoteSubmitted(false); }}>Nhận báo giá này qua Zalo <ArrowUpRight size={17} /></button><a href="https://zalo.me/0967593548" target="_blank" rel="noopener noreferrer">Tư vấn Phương án này <ArrowUpRight size={17} /></a></div></div>
           {quoteIntent && <form className="overview-quote-lead" onSubmit={(event) => submitLead(event, quoteIntent)}>{quoteSubmitted ? <div role="status"><strong>Đã nhận yêu cầu của bạn.</strong><p>Đội ngũ sẽ liên hệ qua Zalo về phương án {selectedUniversity?.name} vừa xem.</p></div> : <><div><strong>{quoteIntent === 'quote_pdf' ? 'Nhận bản báo giá qua Zalo' : 'Nhờ tư vấn về phương án này'}</strong><p>Phương án {selectedUniversity?.name} và các lựa chọn vừa xem sẽ được gửi kèm yêu cầu.</p></div><label htmlFor="overview-quote-phone">SỐ ĐIỆN THOẠI / ZALO</label><input id="overview-quote-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="09xx xxx xxx" value={quotePhone} onChange={(event) => setQuotePhone(event.target.value)} required /><label className="overview-consent"><input type="checkbox" checked={quoteConsent} onChange={(event) => setQuoteConsent(event.target.checked)} required /><span>Tôi đồng ý để Thầy Tư liên hệ về phương án này qua số đã cung cấp.</span></label><button type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : 'Gửi yêu cầu'} <ArrowUpRight size={16} /></button></>}</form>}
+          {quoteIntent && <p className="overview-form-privacy">Xem <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link> trước khi gửi yêu cầu.</p>}
         </section>
 
         <section id="truong-hoc" className="overview-proof overview-wrap"><div className="overview-proof-lead"><div className="overview-proof-number">HƠN 100 TRƯỜNG<span>Để so sánh</span></div><ol className="overview-proof-steps"><li><span>01</span>Chọn trường và hệ học</li><li><span>02</span>Xem từng khoản chi, biết nộp cho ai</li><li><span>03</span>Nhận bảng giá chi tiết qua Zalo</li></ol><a className="overview-proof-action" href="#xem-bao-gia">Tự xem báo giá <ArrowUpRight size={17} /></a></div><div><p><strong>Không cần đọc 100 bảng giá cùng lúc.</strong> Chọn trường bạn quan tâm, hoặc cho biết hệ học và ngân sách; đội ngũ sẽ gửi bảng chi phí cùng thông tin tuyển sinh phù hợp để bạn dễ đối chiếu.</p><small>Dữ liệu trường, chi phí và điều kiện được cập nhật theo từng kỳ tuyển sinh.</small><Link to="/boc-tach">Xem danh sách trường đang có <ArrowUpRight size={17} /></Link><figure className="overview-proof-photo"><img src="/images/center/airport-960.webp" srcSet="/images/center/airport-480.webp 480w, /images/center/airport-960.webp 960w, /images/center/airport-1440.webp 1440w" sizes="(max-width: 700px) 100vw, 600px" alt="Học viên và gia đình tại sân bay trước chuyến đi Hàn Quốc" loading="lazy" /><figcaption>Học viên và gia đình tại sân bay</figcaption></figure></div></section>
 
       </main>
-      <footer className="overview-footer"><div className="overview-wrap"><div className="overview-footer-brand"><img src="/images/brand-logo.png" alt="" width="34" height="34" /><strong>TIẾNG HÀN & DU HỌC THẦY TƯ</strong></div><span>Chi phí thực tế phụ thuộc trường và thời điểm.</span></div></footer>
+      <SiteFooter />
       <Toaster position="top-right" />
     </div>
   );

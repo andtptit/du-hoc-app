@@ -23,6 +23,8 @@ import { VISA_TYPES, TOPIK_LEVELS, UNIVERSITIES as STATIC_UNIVERSITIES } from '.
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import EmbedPricing from './components/EmbedPricing';
 import OverviewLanding from './components/OverviewLanding';
+import ThankYou from './components/ThankYou';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby2KObaL-ev4jBf1TqZBWli2H4y1aitQyaCCnMG_KWTRD3B6KEttx5JHqng6dHn3i17/exec";
 
@@ -326,6 +328,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<OverviewLanding />} />
         <Route path="/du-hoc-han-quoc" element={<OverviewLanding />} />
+        <Route path="/thank-you" element={<ThankYou />} />
+        <Route path="/chinh-sach-bao-mat" element={<PrivacyPolicy />} />
         <Route path="/boc-tach" element={<MainApp />} />
         <Route path="/embed/:universityId" element={<EmbedPricing />} />
       </Routes>
