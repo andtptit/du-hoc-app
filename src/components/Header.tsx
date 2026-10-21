@@ -1,5 +1,5 @@
 import React from 'react';
-import { PhoneCall, Settings, List, LogOut, UserLock } from 'lucide-react';
+import { PhoneCall, Settings, List, LogOut, UserLock, FileDown } from 'lucide-react';
 
 interface HeaderProps {
   isAdmin: boolean;
@@ -36,6 +36,7 @@ export default function Header({
           {/* Admin Quick Actions */}
           {isAdmin && (
             <div className="hidden md:flex items-center gap-1 bg-slate-50 p-1 rounded-2xl border border-slate-100">
+              <a href="/xuat-bao-gia" className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-white hover:text-[#0f3493] rounded-xl transition-all hover:shadow-sm"><FileDown className="w-3.5 h-3.5" />Xuất báo giá</a>
               <button
                 onClick={onManageUnis}
                 className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-white hover:text-[#0f3493] rounded-xl transition-all hover:shadow-sm"
