@@ -114,6 +114,8 @@
 .overview-pdf-heading h2,.overview-quote-head h2{font-size:clamp(39px,4.2vw,58px);line-height:1.1;letter-spacing:-.06em;margin:0;font-weight:800}
 .overview-pdf-heading p{max-width:630px;color:var(--ov-muted);font-size:15px;line-height:1.65;margin:22px 0 0}
 .overview-pdf-form{background:#e7eeeb;padding:28px 30px;align-self:end}
+.overview-document-points{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}.overview-document-points span{border:1px solid #b9cad1;padding:9px 11px;color:var(--ov-blue-dark);font-size:11px;font-weight:750}.overview-pdf-form>select{width:100%;min-height:45px;border:1px solid #adbfc7;border-radius:0;background:#fff;color:var(--ov-ink);font:inherit;font-size:13px;padding:10px 11px;margin:0 0 17px;cursor:pointer}
+@media(max-width:700px){.overview-hero .overview-primary{white-space:normal;line-height:1.4}.overview-document-points{margin-top:20px}.overview-document-points span{font-size:10px}.overview-pdf-form>select{font-size:16px}}
 .overview-pdf-form>label:not(.overview-consent),.overview-quote-options>label,.overview-quote-lead>label:not(.overview-consent){font-size:10px;font-weight:800;letter-spacing:.11em;color:var(--ov-blue-dark);display:block;margin:0 0 9px}
 .overview-pdf-input{display:flex;gap:8px}
 .overview-pdf-input input,.overview-quote-lead>input{min-width:0;width:100%;background:#fff;border:1px solid #adbfc7;border-radius:0;padding:13px 12px;font-size:15px;color:var(--ov-ink)}

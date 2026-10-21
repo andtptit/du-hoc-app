@@ -18,7 +18,7 @@ import './overview-landing.css';
 const GOOGLE_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby2KObaL-ev4jBf1TqZBWli2H4y1aitQyaCCnMG_KWTRD3B6KEttx5JHqng6dHn3i17/exec';
 const formatVnd = (value: number) => `${new Intl.NumberFormat('vi-VN').format(Math.round(value))} ₫`;
 const phonePattern = /^(0|\+84|84)(3|5|7|8|9)[0-9]{8}$/;
-type LeadKind = 'pdf_all' | 'quote_pdf';
+type LeadKind = 'school_profile' | 'school_suggestions' | 'quote_pdf';
 
 const costGroups = [
   {
@@ -49,6 +49,9 @@ export default function OverviewLanding() {
   const [pdfPhone, setPdfPhone] = useState('');
   const [pdfConsent, setPdfConsent] = useState(false);
   const [pdfSubmitted, setPdfSubmitted] = useState(false);
+  const [documentSchool, setDocumentSchool] = useState('');
+  const [documentVisa, setDocumentVisa] = useState('d4-1');
+  const [documentBudget, setDocumentBudget] = useState('');
   const [quotePhone, setQuotePhone] = useState('');
   const [quoteConsent, setQuoteConsent] = useState(false);
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
@@ -71,6 +74,8 @@ export default function OverviewLanding() {
     return { label, price };
   }), [globalConfig.koreanLanguageOptions]);
   const selectedUniversity = universities.find((university) => university.id === school);
+  const documentUniversity = universities.find((university) => university.id === documentSchool);
+  const documentKind: LeadKind = documentSchool ? 'school_profile' : 'school_suggestions';
   const selections: Selections = useMemo(() => ({ consultingIdx: 0, koreanLangIdx: languageIndex, dormVnMonths: 0, dormKrIdx: 0, flightIdx: 0, scholarshipPercent: 0 }), [languageIndex]);
   const costs = useCosts({ selectedUni: selectedUniversity, visaTypeId: visaType, topikLevelId: topik, exchangeRate: globalConfig.exchangeRate, globalConfig, selections });
   const visaField = VISA_TYPES.find((item) => item.id === visaType)?.field as keyof NonNullable<typeof selectedUniversity> | undefined;
@@ -107,32 +112,33 @@ export default function OverviewLanding() {
   const submitLead = async (event: React.FormEvent<HTMLFormElement>, kind: LeadKind) => {
     event.preventDefault();
     if (submitting) return;
-    const cleanPhone = (kind === 'pdf_all' ? pdfPhone : quotePhone).replace(/[\s.-]/g, '').trim();
+    const cleanPhone = (kind !== 'quote_pdf' ? pdfPhone : quotePhone).replace(/[\s.-]/g, '').trim();
     if (!phonePattern.test(cleanPhone)) {
       toast.error('Vui lòng nhập số điện thoại hợp lệ');
       return;
     }
-    if (!(kind === 'pdf_all' ? pdfConsent : quoteConsent)) {
+    if (!(kind !== 'quote_pdf' ? pdfConsent : quoteConsent)) {
       toast.error('Vui lòng đồng ý để chúng tôi liên hệ');
       return;
     }
 
-    const classification = kind === 'pdf_all' ? 'Nhận PDF bảng giá 100+ trường qua Zalo' : 'Nhận PDF báo giá đã xem qua Zalo';
+    const classification = kind === 'school_profile' ? `Nhận hồ sơ chi phí ${documentUniversity?.name ?? ''} qua Zalo` : kind === 'school_suggestions' ? 'Nhận gợi ý trường và chi phí qua Zalo' : 'Nhận PDF báo giá đã xem qua Zalo';
     const registration = {
       name: '',
       phone: cleanPhone,
-      visaType: kind === 'pdf_all' ? '' : visaType,
-      topikLevel: kind === 'pdf_all' ? '' : topik,
-      universityId: kind === 'pdf_all' ? '' : selectedUniversity?.id ?? '',
+      visaType: kind === 'quote_pdf' ? visaType : documentVisa,
+      topikLevel: kind === 'quote_pdf' ? topik : '',
+      universityId: kind === 'quote_pdf' ? selectedUniversity?.id ?? '' : documentUniversity?.id ?? '',
       gpaThpt: '',
       gpaUni: '',
       createdAt: new Date().toISOString(),
-      universityName: kind === 'pdf_all' ? '' : selectedUniversity?.name ?? '',
-      costsTotal: kind === 'pdf_all' ? 0 : costs.total,
+      universityName: kind === 'quote_pdf' ? selectedUniversity?.name ?? '' : documentUniversity?.name ?? '',
+      costsTotal: kind === 'quote_pdf' ? costs.total : 0,
       type: 'dang_ky',
       leadSource: 'du-hoc-han-quoc',
       leadIntent: kind,
-      koreanLanguageOption: kind === 'pdf_all' ? '' : languageOptions[languageIndex]?.label ?? '',
+      budgetRange: kind === 'school_suggestions' ? documentBudget : '',
+      koreanLanguageOption: kind === 'quote_pdf' ? languageOptions[languageIndex]?.label ?? '' : '',
     };
 
     setSubmitting(true);
@@ -150,9 +156,9 @@ export default function OverviewLanding() {
         }),
       }).catch((error) => console.error('Google Sheets error:', error));
       (window as Window & { fbq?: (...args: unknown[]) => void }).fbq?.('track', 'Lead', {
-        content_name: kind === 'pdf_all' ? 'PDF 100+ trường' : selectedUniversity?.name ?? 'Trang du học Hàn Quốc',
+        content_name: kind === 'quote_pdf' ? selectedUniversity?.name ?? 'Trang du học Hàn Quốc' : documentUniversity?.name ?? 'Gợi ý trường',
       });
-      if (kind === 'pdf_all') { setPdfSubmitted(true); setPdfPhone(''); setPdfConsent(false); }
+      if (kind !== 'quote_pdf') { setPdfSubmitted(true); setPdfPhone(''); setPdfConsent(false); }
       else { setQuoteSubmitted(true); setQuotePhone(''); setQuoteConsent(false); }
     } catch (error) {
       console.error('Overview lead error:', error);
@@ -183,27 +189,27 @@ export default function OverviewLanding() {
             <span className="overview-eyebrow">DU HỌC HÀN QUỐC</span>
             <h1 id="overview-title">Minh Bạch<br />toàn bộ chi phí<br /><span>DU HỌC</span></h1>
             <p>Chúng tôi sẽ gửi đến cho bạn toàn bộ chi phí minh bạch từ lúc nhập học, đến khi đặt chân sang Hàn Quốc, để bạn nắm rõ toàn bộ lộ trình. Không phát sinh chi phí ẩn, tất cả khoản phí đều được công khai.</p>
-            <div className="overview-hero-actions"><a className="overview-primary" href="#nhan-pdf">Nhận bảng giá qua Zalo <ArrowUpRight size={18} /></a><a className="overview-underlink" href="#xem-bao-gia">Tự xem báo giá</a></div>
+            <div className="overview-hero-actions"><a className="overview-primary" href="#nhan-pdf">Nhận hồ sơ chi phí theo trường <ArrowUpRight size={18} /></a><a className="overview-underlink" href="#xem-bao-gia">Tự xem báo giá</a></div>
           </div>
           <div className="overview-hero-photo"><img src="/images/local/san bay 2.jpg" alt="Học viên Thầy Tư và gia đình tại sân bay trước chuyến đi Hàn Quốc" fetchPriority="high" /><div className="overview-photo-label">HỌC VIÊN THẦY TƯ TẠI SÂN BAY</div><span className="overview-vertical">TIẾNG HÀN · DU HỌC THẦY TƯ</span></div>
         </section>
 
         <section id="nhan-pdf" className="overview-pdf overview-wrap" aria-labelledby="overview-pdf-title">
-          <div className="overview-pdf-heading"><span className="overview-section-tag">01 / NHẬN TÀI LIỆU QUA ZALO</span><h2 id="overview-pdf-title">Bảng giá hơn 100 trường,<br />để bạn tự so sánh.</h2><p>Gồm học phí theo hệ học, phí trung tâm thu và những khoản học viên tự nộp. Phù hợp khi bạn chưa chọn trường.</p></div>
-          <form className="overview-pdf-form" onSubmit={(event) => submitLead(event, 'pdf_all')}>
-            {pdfSubmitted ? <div className="overview-pdf-success" role="status"><strong>Đã nhận yêu cầu.</strong><p>Đội ngũ sẽ gửi bảng giá qua Zalo theo số bạn cung cấp.</p><button type="button" onClick={() => setPdfSubmitted(false)}>Gửi yêu cầu khác</button></div> : <><label htmlFor="overview-pdf-phone">SỐ ZALO NHẬN BẢNG GIÁ</label><div className="overview-pdf-input"><input id="overview-pdf-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="09xx xxx xxx" value={pdfPhone} onChange={(event) => setPdfPhone(event.target.value)} required /><button type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : 'Yêu cầu gửi PDF qua Zalo'} <ArrowUpRight size={17} /></button></div><label className="overview-consent"><input type="checkbox" checked={pdfConsent} onChange={(event) => setPdfConsent(event.target.checked)} required /><span>Tôi đồng ý để Thầy Tư dùng số này gửi tài liệu và liên hệ về yêu cầu của tôi.</span></label><small>Đội ngũ gửi tài liệu qua Zalo sau khi nhận yêu cầu. Không cần chọn trường ở bước này.</small></>}
+          <div className="overview-pdf-heading"><span className="overview-section-tag">01 / NHẬN TÀI LIỆU QUA ZALO</span><h2 id="overview-pdf-title">Một trường bạn chọn.<br />Từng khoản cần biết.</h2><p>Chọn trường và hệ học bạn quan tâm. Đội ngũ sẽ gửi thông tin chi phí, nơi nộp từng khoản và điều kiện tuyển sinh phù hợp qua Zalo.</p><div className="overview-document-points"><span>Học phí theo hệ</span><span>Phí hồ sơ & bên thứ ba</span><span>Mốc thanh toán</span></div></div>
+          <form className="overview-pdf-form" onSubmit={(event) => submitLead(event, documentKind)}>
+            {pdfSubmitted ? <div className="overview-pdf-success" role="status"><strong>Đã nhận yêu cầu.</strong><p>Đội ngũ sẽ liên hệ qua Zalo để gửi {documentUniversity ? `thông tin về ${documentUniversity.name}` : 'gợi ý trường và chi phí'}.</p><button type="button" onClick={() => setPdfSubmitted(false)}>Gửi yêu cầu khác</button></div> : <><label htmlFor="overview-document-school">TRƯỜNG BẠN QUAN TÂM</label><select id="overview-document-school" value={documentSchool} onChange={(event) => setDocumentSchool(event.target.value)}><option value="">Chưa chọn trường — nhờ gợi ý</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select><label htmlFor="overview-document-visa">HỆ HỌC</label><select id="overview-document-visa" value={documentVisa} onChange={(event) => setDocumentVisa(event.target.value)}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select>{!documentSchool && <><label htmlFor="overview-document-budget">NGÂN SÁCH DỰ KIẾN (KHÔNG BẮT BUỘC)</label><select id="overview-document-budget" value={documentBudget} onChange={(event) => setDocumentBudget(event.target.value)}><option value="">Chưa xác định</option><option value="duoi-150-trieu">Dưới 150 triệu</option><option value="150-250-trieu">150–250 triệu</option><option value="tren-250-trieu">Trên 250 triệu</option></select></>}<label htmlFor="overview-pdf-phone">SỐ ZALO NHẬN TÀI LIỆU</label><div className="overview-pdf-input"><input id="overview-pdf-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="09xx xxx xxx" value={pdfPhone} onChange={(event) => setPdfPhone(event.target.value)} required /><button type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : documentSchool ? 'Nhận hồ sơ trường này' : 'Nhận gợi ý trường'} <ArrowUpRight size={17} /></button></div><label className="overview-consent"><input type="checkbox" checked={pdfConsent} onChange={(event) => setPdfConsent(event.target.checked)} required /><span>Tôi đồng ý để Thầy Tư dùng số này gửi tài liệu và liên hệ về yêu cầu của tôi.</span></label><small>Đội ngũ chuẩn bị và gửi thông tin qua Zalo sau khi nhận yêu cầu.</small></>}
           </form>
           <figure className="overview-pdf-example" aria-label="Mô phỏng tin nhắn Zalo và các trang trong bảng giá PDF">
-            <div className="overview-pdf-example-head"><span>TRONG TÀI LIỆU BẠN SẼ NHẬN</span><p>Tin nhắn Zalo kèm PDF bóc tách chi phí theo trường.</p></div>
+            <div className="overview-pdf-example-head"><span>BẢN XEM TRƯỚC</span><p>{documentUniversity ? `Thông tin chi phí và tuyển sinh ${documentUniversity.name}, hệ ${VISA_TYPES.find((item) => item.id === documentVisa)?.label}.` : 'Ví dụ trang chi phí Ajou và cách đội ngũ gửi thông tin qua Zalo.'}</p></div>
             <div className="overview-pdf-example-stage">
               <div className="overview-zalo-chat">
                 <div className="overview-zalo-bar"><strong>Zalo</strong><span>MÔ PHỎNG TIN NHẮN</span></div>
                 <div className="overview-zalo-contact"><img src="/images/brand-logo.png" alt="" /><div><strong>Du Học Thầy Tư</strong><small>Gửi tài liệu theo yêu cầu của bạn</small></div></div>
-                <div className="overview-zalo-body"><div className="overview-zalo-bubble">Chào bạn, Thầy Tư gửi bạn <strong>bảng giá du học Hàn Quốc</strong> để tham khảo. Trong file có học phí theo trường và từng khoản phí được ghi rõ nơi nộp.</div><div className="overview-zalo-file"><span>PDF</span><div><strong>Bang-gia-du-hoc-Han-Quoc.pdf</strong><small>Bảng giá và thông tin trường</small></div></div><p>Bạn có thể so sánh các phương án và nhắn lại nếu cần đội ngũ giải thích khoản chi nào.</p></div>
+                <div className="overview-zalo-body"><div className="overview-zalo-bubble">Chào bạn, Thầy Tư gửi bạn thông tin <strong>{documentUniversity?.name ?? 'trường phù hợp với hệ học của bạn'}</strong>. Từng khoản chi được ghi rõ nơi nộp và thời điểm dự kiến.</div><div className="overview-zalo-file"><span>PDF</span><div><strong>Hồ sơ chi phí theo trường</strong><small>{documentUniversity?.name ?? 'Trường phù hợp'} · {VISA_TYPES.find((item) => item.id === documentVisa)?.label}</small></div></div><p>Bạn có thể nhắn lại nếu cần đội ngũ giải thích khoản chi nào.</p></div>
               </div>
-              <div className="overview-pdf-pages" aria-hidden="true"><div className="overview-pdf-sheet overview-pdf-sheet-back"><img src="/images/brand-logo.png" alt="" /><span>DU HỌC THẦY TƯ</span><strong>BẢNG GIÁ<br />DU HỌC HÀN QUỐC</strong><small>Thông tin trường · Học phí · Chi phí hồ sơ</small></div><div className="overview-pdf-sheet overview-pdf-sheet-middle"><img src="/images/brand-logo.png" alt="" /><span>DANH MỤC TRƯỜNG</span><strong>Hơn 100 trường<br />để bạn so sánh.</strong><p>Đại học Ajou</p><p>Đại học Sejong</p><p>Đại học Konkuk</p><p>Đại học Inha</p></div><div className="overview-pdf-sheet overview-pdf-sheet-front" /></div>
+              <div className="overview-pdf-pages" aria-hidden="true"><div className="overview-pdf-sheet overview-pdf-sheet-back"><img src="/images/brand-logo.png" alt="" /><span>DU HỌC THẦY TƯ</span><strong>HỒ SƠ<br />CHI PHÍ DU HỌC</strong><small>Thông tin trường · Học phí · Chi phí hồ sơ</small></div><div className="overview-pdf-sheet overview-pdf-sheet-middle"><img src="/images/brand-logo.png" alt="" /><span>NỘI DUNG TÀI LIỆU</span><strong>{documentUniversity?.name ?? 'Trường bạn quan tâm'}</strong><p>Học phí theo hệ học</p><p>Chi phí nộp cho từng bên</p><p>Điều kiện tuyển sinh</p><p>Mốc thanh toán dự kiến</p></div><div className="overview-pdf-sheet overview-pdf-sheet-front" /></div>
             </div>
-            <figcaption>Ảnh mô phỏng cách nhận tài liệu. Trang Ajou là bản xem trước với số liệu minh họa, không phải báo giá cuối cùng. <a href="/images/marketing/bang-gia-mau-ajou.png" target="_blank" rel="noopener noreferrer">Xem trang mẫu ở cỡ đầy đủ <ArrowUpRight size={13} /></a></figcaption>
+            <figcaption>Ảnh Zalo và trang Ajou chỉ minh họa cách trình bày, không phải hồ sơ của trường đã chọn hoặc báo giá cuối cùng. Đội ngũ sẽ chuẩn bị thông tin theo lựa chọn của bạn. <a href="/images/marketing/bang-gia-mau-ajou.png" target="_blank" rel="noopener noreferrer">Xem trang mẫu Ajou <ArrowUpRight size={13} /></a></figcaption>
           </figure>
         </section>
 
