@@ -1,4 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import '../index.css';
+import '@fontsource/be-vietnam-pro/400.css';
+import '@fontsource/be-vietnam-pro/700.css';
 import 'iframe-resizer/js/iframeResizer.contentWindow';
 import { useParams } from 'react-router-dom';
 import { useFirestore } from '../hooks/useFirestore';

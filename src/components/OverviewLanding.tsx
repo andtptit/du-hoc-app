@@ -1,19 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { addDoc, collection } from 'firebase/firestore';
 import { Toaster, toast } from 'react-hot-toast';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
-import { db } from '../firebase';
-import { useFirestore } from '../hooks/useFirestore';
+import { useLandingData } from '../hooks/useLandingData';
 import { useCosts } from '../hooks/useCosts';
 import SiteFooter from './SiteFooter';
 import { VISA_TYPES } from '../data';
 import type { Selections } from '../types';
 import '@fontsource/be-vietnam-pro/400.css';
-import '@fontsource/be-vietnam-pro/600.css';
 import '@fontsource/be-vietnam-pro/700.css';
 import '@fontsource/be-vietnam-pro/800.css';
-import '@fontsource/be-vietnam-pro/900.css';
 import './overview-landing.css';
 
 const GOOGLE_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby2KObaL-ev4jBf1TqZBWli2H4y1aitQyaCCnMG_KWTRD3B6KEttx5JHqng6dHn3i17/exec';
@@ -45,7 +41,7 @@ const costGroups = [
 ];
 
 export default function OverviewLanding() {
-  const { universities, globalConfig } = useFirestore();
+  const { universities, globalConfig, schoolsLoading } = useLandingData();
   const [menuOpen, setMenuOpen] = useState(false);
   const [pdfPhone, setPdfPhone] = useState('');
   const [pdfConsent, setPdfConsent] = useState(false);
@@ -144,6 +140,7 @@ export default function OverviewLanding() {
 
     setSubmitting(true);
     try {
+      const [{ addDoc, collection }, { db }] = await Promise.all([import('firebase/firestore'), import('../firebasePublic')]);
       await addDoc(collection(db, 'registrations'), registration);
       fetch(GOOGLE_WEBHOOK_URL, {
         method: 'POST',
@@ -195,7 +192,7 @@ export default function OverviewLanding() {
             <p>Chúng tôi sẽ gửi đến cho bạn toàn bộ chi phí minh bạch từ lúc nhập học, đến khi đặt chân sang Hàn Quốc, để bạn nắm rõ toàn bộ lộ trình. Không phát sinh chi phí ẩn, tất cả khoản phí đều được công khai.</p>
             <div className="overview-hero-actions"><a className="overview-primary" href="#nhan-pdf">Nhận hồ sơ chi phí theo trường <ArrowUpRight size={18} /></a><a className="overview-underlink" href="#xem-bao-gia">Tự xem báo giá</a></div>
           </div>
-          <div className="overview-hero-photo"><img src="/images/local/san bay 2.jpg" alt="Học viên Thầy Tư và gia đình tại sân bay trước chuyến đi Hàn Quốc" fetchPriority="high" /><div className="overview-photo-label">HỌC VIÊN THẦY TƯ TẠI SÂN BAY</div><span className="overview-vertical">TIẾNG HÀN · DU HỌC THẦY TƯ</span></div>
+          <div className="overview-hero-photo"><img src="/images/marketing/hero-san-bay-1280.webp" srcSet="/images/marketing/hero-san-bay-640.webp 640w, /images/marketing/hero-san-bay-1280.webp 1280w" sizes="(max-width: 700px) 100vw, 48vw" width="1280" height="853" alt="Học viên Thầy Tư và gia đình tại sân bay trước chuyến đi Hàn Quốc" fetchPriority="high" /><div className="overview-photo-label">HỌC VIÊN THẦY TƯ TẠI SÂN BAY</div><span className="overview-vertical">TIẾNG HÀN · DU HỌC THẦY TƯ</span></div>
         </section>
 
         <section id="nhan-pdf" className="overview-pdf overview-wrap" aria-labelledby="overview-pdf-title">
@@ -236,6 +233,7 @@ export default function OverviewLanding() {
 
         <section id="xem-bao-gia" className="overview-quote overview-wrap" aria-labelledby="overview-quote-title">
           <div className="overview-quote-head"><div><span className="overview-section-tag">02 / TỰ XEM BÁO GIÁ CHI TIẾT</span><h2 id="overview-quote-title">Chi phí theo lựa chọn của bạn.</h2></div><p>Chọn trường, hệ học và TOPIK. Xem các khoản ngay trên trang, chưa cần để lại số điện thoại.</p></div>
+          {schoolsLoading && <p role="status" style={{ fontSize: 13, color: '#5c6b79' }}>Đang tải danh sách trường...</p>}
           <div className="overview-quote-grid">
             <div className="overview-quote-options"><h3>Thông tin dự kiến</h3><p>Bạn có thể đổi lựa chọn để so sánh.</p><label htmlFor="overview-quote-school">TRƯỜNG DỰ KIẾN</label><select id="overview-quote-school" value={school} onChange={(event) => { setSchool(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="">Chọn một trường</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select><label htmlFor="overview-quote-visa">HỆ HỌC</label><select id="overview-quote-visa" value={visaType} onChange={(event) => { setVisaType(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select><label htmlFor="overview-quote-topik">TRÌNH ĐỘ TOPIK</label><select id="overview-quote-topik" value={topik} onChange={(event) => { setTopik(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="0">Chưa có chứng chỉ</option><option value="1">TOPIK 1</option><option value="2">TOPIK 2</option><option value="3">TOPIK 3</option><option value="4">TOPIK 4</option><option value="5">TOPIK 5</option><option value="6">TOPIK 6</option></select><label htmlFor="overview-quote-language">HỌC TIẾNG TẠI TRUNG TÂM</label><select id="overview-quote-language" value={languageIndex} onChange={(event) => { setLanguageIndex(Number(event.target.value)); setQuoteIntent(null); setQuoteSubmitted(false); }}>{languageOptions.map((item, index) => <option key={`${item.label}-${index}`} value={index}>{item.label}</option>)}</select><small>TOPIK được lưu để tư vấn điều kiện và học bổng; bảng dự tính này chưa tự trừ học bổng.</small></div>
             <div className="overview-quote-preview" aria-live="polite">{!selectedUniversity ? <div className="overview-quote-empty"><span>↗</span><h3>Chọn trường để bắt đầu.</h3><p>Bảng chi phí chi tiết sẽ xuất hiện ở đây ngay sau khi bạn chọn trường.</p></div> : !hasTuition ? <div className="overview-quote-empty"><h3>Trường này chưa có học phí cho hệ đã chọn.</h3><p>Hãy chọn hệ khác hoặc yêu cầu đội ngũ kiểm tra bảng giá mới nhất.</p></div> : <><div className="overview-quote-preview-head"><div><span>BÁO GIÁ DỰ TÍNH · {selectedUniversity.name.toUpperCase()}</span><h3>{VISA_TYPES.find((item) => item.id === visaType)?.label}</h3><p>Đã tách theo nơi nhận tiền · Tỷ giá: {new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(globalConfig.exchangeRate)} ₫/KRW</p></div><strong>CHI PHÍ THAM KHẢO</strong></div><div className="overview-quote-rows">{quoteRows.map((row) => <div className="overview-quote-row" key={row.label}><b>{row.label}</b><span>{row.payer}</span><strong>{formatVnd(row.value)}</strong></div>)}</div><div className="overview-quote-total"><span>TỔNG CHI PHÍ DỰ TÍNH</span><strong>{formatVnd(costs.total)}</strong></div><p className="overview-quote-note">Chưa gồm ký túc xá, vé máy bay, sinh hoạt và chứng minh tài chính. Tổng dùng mức phí tư vấn đầu tiên trong cấu hình. Chi phí thực tế có thể thay đổi theo kỳ nhập học, tỷ giá và lựa chọn hồ sơ.</p></>}</div>
