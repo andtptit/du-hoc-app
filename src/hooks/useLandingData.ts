@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import type { GlobalConfig, University } from '../types';
 import { DEFAULT_CONFIG } from '../defaultConfig';
 
-export function useLandingData() {
+export function useLandingData(enabled = true) {
   const [universities, setUniversities] = useState<University[]>([]);
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(DEFAULT_CONFIG);
   const [schoolsLoading, setSchoolsLoading] = useState(true);
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
     let unsubscribeUniversities: (() => void) | undefined;
     let unsubscribeConfig: (() => void) | undefined;
@@ -43,7 +44,7 @@ export function useLandingData() {
       unsubscribeUniversities?.();
       unsubscribeConfig?.();
     };
-  }, []);
+  }, [enabled]);
 
   return { universities, globalConfig, schoolsLoading };
 }

@@ -41,7 +41,8 @@ const costGroups = [
 ];
 
 export default function OverviewLanding() {
-  const { universities, globalConfig, schoolsLoading } = useLandingData();
+  const [loadSchoolData, setLoadSchoolData] = useState(false);
+  const { universities, globalConfig, schoolsLoading } = useLandingData(loadSchoolData);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pdfPhone, setPdfPhone] = useState('');
   const [pdfConsent, setPdfConsent] = useState(false);
@@ -58,6 +59,18 @@ export default function OverviewLanding() {
   const [topik, setTopik] = useState('0');
   const [languageIndex, setLanguageIndex] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (loadSchoolData) return;
+    const startLoading = () => setLoadSchoolData(true);
+    window.addEventListener('scroll', startLoading, { passive: true, once: true });
+    window.addEventListener('pointerdown', startLoading, { once: true });
+    if (window.location.hash || window.scrollY > 0) startLoading();
+    return () => {
+      window.removeEventListener('scroll', startLoading);
+      window.removeEventListener('pointerdown', startLoading);
+    };
+  }, [loadSchoolData]);
 
   const sortedUniversities = useMemo(
     () => [...universities].sort((a, b) => a.name.localeCompare(b.name, 'vi')),
@@ -198,6 +211,7 @@ export default function OverviewLanding() {
         <section id="nhan-pdf" className="overview-pdf overview-wrap" aria-labelledby="overview-pdf-title">
           <div className="overview-pdf-heading"><span className="overview-section-tag">01 / NHẬN TÀI LIỆU QUA ZALO</span><h2 id="overview-pdf-title">Một trường bạn chọn.<br />Từng khoản cần biết.</h2><p>Chọn trường và hệ học bạn quan tâm. Đội ngũ sẽ gửi thông tin chi phí, nơi nộp từng khoản và điều kiện tuyển sinh phù hợp qua Zalo.</p><div className="overview-document-points"><span>Học phí theo hệ</span><span>Phí hồ sơ & bên thứ ba</span><span>Mốc thanh toán</span></div></div>
           <form className="overview-pdf-form" onSubmit={(event) => submitLead(event, documentKind)}>
+            {loadSchoolData && schoolsLoading && <p role="status">Đang tải danh sách trường...</p>}
             {pdfSubmitted ? <div className="overview-pdf-success" role="status"><strong>Đã nhận yêu cầu.</strong><p>Đội ngũ sẽ liên hệ qua Zalo để gửi {documentUniversity ? `thông tin về ${documentUniversity.name}` : 'gợi ý trường và chi phí'}.</p><button type="button" onClick={() => setPdfSubmitted(false)}>Gửi yêu cầu khác</button></div> : <><label htmlFor="overview-document-school">TRƯỜNG BẠN QUAN TÂM</label><select id="overview-document-school" value={documentSchool} onChange={(event) => setDocumentSchool(event.target.value)}><option value="">Chưa chọn trường — nhờ gợi ý</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select><label htmlFor="overview-document-visa">HỆ HỌC</label><select id="overview-document-visa" value={documentVisa} onChange={(event) => setDocumentVisa(event.target.value)}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select>{!documentSchool && <><label htmlFor="overview-document-budget">NGÂN SÁCH DỰ KIẾN (KHÔNG BẮT BUỘC)</label><select id="overview-document-budget" value={documentBudget} onChange={(event) => setDocumentBudget(event.target.value)}><option value="">Chưa xác định</option><option value="duoi-150-trieu">Dưới 150 triệu</option><option value="150-250-trieu">150–250 triệu</option><option value="tren-250-trieu">Trên 250 triệu</option></select></>}<label htmlFor="overview-pdf-phone">SỐ ZALO NHẬN TÀI LIỆU</label><div className="overview-pdf-input"><input id="overview-pdf-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="09xx xxx xxx" value={pdfPhone} onChange={(event) => setPdfPhone(event.target.value)} required /><button type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : documentSchool ? 'Nhận hồ sơ trường này' : 'Nhận gợi ý trường'} <ArrowUpRight size={17} /></button></div><label className="overview-consent"><input type="checkbox" checked={pdfConsent} onChange={(event) => setPdfConsent(event.target.checked)} required /><span>Tôi đồng ý để Thầy Tư dùng số này gửi tài liệu và liên hệ về yêu cầu của tôi.</span></label><small>Đội ngũ chuẩn bị và gửi thông tin qua Zalo sau khi nhận yêu cầu.</small></>}
           </form>
           <p className="overview-form-privacy">Xem cách chúng tôi sử dụng thông tin của bạn trong <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link>.</p>
