@@ -192,7 +192,7 @@ export default function OverviewLanding() {
             <p>Chúng tôi sẽ gửi đến cho bạn toàn bộ chi phí minh bạch từ lúc nhập học, đến khi đặt chân sang Hàn Quốc, để bạn nắm rõ toàn bộ lộ trình. Không phát sinh chi phí ẩn, tất cả khoản phí đều được công khai.</p>
             <div className="overview-hero-actions"><a className="overview-primary" href="#nhan-pdf">Nhận hồ sơ chi phí theo trường <ArrowUpRight size={18} /></a><a className="overview-underlink" href="#xem-bao-gia">Tự xem báo giá</a></div>
           </div>
-          <div className="overview-hero-photo"><img src="/images/marketing/hero-san-bay-1280.webp" srcSet="/images/marketing/hero-san-bay-640.webp 640w, /images/marketing/hero-san-bay-1280.webp 1280w" sizes="(max-width: 700px) 100vw, 48vw" width="1280" height="853" alt="Học viên Thầy Tư và gia đình tại sân bay trước chuyến đi Hàn Quốc" fetchPriority="high" /><div className="overview-photo-label">HỌC VIÊN THẦY TƯ TẠI SÂN BAY</div><span className="overview-vertical">TIẾNG HÀN · DU HỌC THẦY TƯ</span></div>
+          <div className="overview-hero-photo"><picture><source media="(max-width: 700px)" srcSet="/images/marketing/hero-san-bay-640.webp" /><img src="/images/marketing/hero-san-bay-1280.webp" width="1280" height="853" alt="Học viên Thầy Tư và gia đình tại sân bay trước chuyến đi Hàn Quốc" fetchPriority="high" /></picture><div className="overview-photo-label">HỌC VIÊN THẦY TƯ TẠI SÂN BAY</div><span className="overview-vertical">TIẾNG HÀN · DU HỌC THẦY TƯ</span></div>
         </section>
 
         <section id="nhan-pdf" className="overview-pdf overview-wrap" aria-labelledby="overview-pdf-title">
