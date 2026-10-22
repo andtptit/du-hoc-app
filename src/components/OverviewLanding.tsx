@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
@@ -6,7 +7,7 @@ import { useLandingData } from '../hooks/useLandingData';
 import { useCosts } from '../hooks/useCosts';
 import SiteFooter from './SiteFooter';
 import { VISA_TYPES } from '../data';
-import type { Selections } from '../types';
+import type { Selections, University } from '../types';
 import '@fontsource/be-vietnam-pro/400.css';
 import '@fontsource/be-vietnam-pro/700.css';
 import '@fontsource/be-vietnam-pro/800.css';
@@ -39,6 +40,63 @@ const costGroups = [
     payer: 'THEO LỰA CHỌN',
   },
 ];
+
+function normalizeSchoolName(value: string) {
+  return value.toLocaleLowerCase('vi').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+}
+
+function SchoolPicker({ id, label, value, universities, onChange, loading, error, onRetry, onOpen }: {
+  id: string;
+  label: string;
+  value: string;
+  universities: University[];
+  onChange: (value: string) => void;
+  loading: boolean;
+  error: boolean;
+  onRetry: () => void;
+  onOpen: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const selected = universities.find((university) => university.id === value);
+  const normalizedQuery = normalizeSchoolName(query.trim());
+  const matches = normalizedQuery
+    ? universities.filter((university) => normalizeSchoolName(university.name).includes(normalizedQuery))
+    : universities;
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    searchRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+      triggerRef.current?.focus();
+    };
+  }, [open]);
+
+  return <>
+    <label htmlFor={id}>{label}</label>
+    <button id={id} ref={triggerRef} type="button" className="overview-school-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={() => { onOpen(); setQuery(''); setOpen(true); }}>
+      <span>{selected?.name ?? (loading ? 'Chọn trường · đang tải danh sách' : 'Chọn một trường')}</span><span aria-hidden="true">⌄</span>
+    </button>
+    {open && createPortal(<div className="overview-school-overlay" onClick={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
+      <div className="overview-school-dialog" role="dialog" aria-modal="true" aria-label={label}>
+        <div className="overview-school-dialog-head"><div><small>CHỌN TRƯỜNG</small><h3>{label}</h3></div><button type="button" aria-label="Đóng danh sách trường" onClick={() => setOpen(false)}><X size={21} /></button></div>
+        <input ref={searchRef} type="search" aria-label="Tìm trường theo tên" placeholder="Nhập tên trường để tìm nhanh" value={query} onChange={(event) => setQuery(event.target.value)} />
+        <div className="overview-school-results" aria-label="Danh sách trường">{loading ? <p role="status">Đang tải danh sách trường, vui lòng chờ trong giây lát...</p> : error ? <div className="overview-school-error" role="alert"><p>Chưa tải được danh sách trường.</p><button type="button" onClick={onRetry}>Thử tải lại</button></div> : matches.length ? matches.map((university) => <button type="button" aria-pressed={value === university.id} key={university.id} onClick={() => { onChange(university.id); setOpen(false); }}>{university.name}</button>) : <p>Không tìm thấy trường phù hợp.</p>}</div>
+        {!loading && !error && <small className="overview-school-count">{matches.length} trường</small>}
+      </div>
+    </div>, document.body)}
+  </>;
+}
 
 export default function OverviewLanding() {
   const [loadSchoolData, setLoadSchoolData] = useState(false);
@@ -225,7 +283,7 @@ export default function OverviewLanding() {
           <div className="overview-pdf-heading"><span className="overview-section-tag">01 / XEM BẢN RÚT GỌN</span><h2 id="overview-pdf-title">Chi phí của trường bạn quan tâm.</h2><p>Chọn trường và hệ học để xem trước từng khoản ngay trên trang. Chưa cần nhập số điện thoại.</p><div className="overview-document-points"><span>Trung tâm thu</span><span>Học viên tự nộp</span><span>Nộp cho trường</span></div></div>
           <div className="overview-pdf-form">
             {schoolsLoading && <p role="status">Đang tải danh sách trường...</p>}{schoolsError && <p role="alert">Không tải được danh sách trường. <button type="button" onClick={retrySchools}>Thử lại</button></p>}
-            <label htmlFor="overview-document-school">TRƯỜNG MUỐN XEM</label><select id="overview-document-school" disabled={schoolsLoading || schoolsError} value={documentSchool} onChange={(event) => { setDocumentSchool(event.target.value); setDocumentPreviewOpen(false); }}><option value="">Chọn một trường</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select>
+            <SchoolPicker id="overview-document-school" label="TRƯỜNG MUỐN XEM" loading={schoolsLoading} error={schoolsError} onRetry={retrySchools} onOpen={() => setLoadSchoolData(true)} value={documentSchool} universities={sortedUniversities} onChange={(id) => { setDocumentSchool(id); setDocumentPreviewOpen(false); }} />
             <label htmlFor="overview-document-visa">HỆ HỌC</label><select id="overview-document-visa" value={documentVisa} onChange={(event) => { setDocumentVisa(event.target.value); setDocumentPreviewOpen(false); }}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select>
             <button className="overview-preview-button" type="button" disabled={!documentUniversity || schoolsLoading || !!schoolsError} onClick={() => setDocumentPreviewOpen(true)}>Xem chi phí dự tính <ArrowUpRight size={17} /></button><small>Có hơn 100 trường trong danh sách để bạn so sánh.</small>
           </div>
@@ -279,7 +337,7 @@ export default function OverviewLanding() {
           <div className="overview-quote-head"><div><span className="overview-section-tag">THỬ THÊM PHƯƠNG ÁN KHÁC</span><h2 id="overview-quote-title">Chi phí theo lựa chọn của bạn.</h2></div><p>Đổi trường, hệ học, TOPIK và lựa chọn học tiếng để so sánh từng khoản. Chưa cần để lại số điện thoại.</p></div>
           {schoolsLoading && <p role="status" style={{ fontSize: 13, color: '#5c6b79' }}>Đang tải danh sách trường...</p>}{schoolsError && <p role="alert">Không tải được danh sách trường. <button type="button" onClick={retrySchools}>Thử lại</button></p>}
           <div className="overview-quote-grid">
-            <div className="overview-quote-options"><h3>Thông tin dự kiến</h3><p>Bạn có thể đổi lựa chọn để so sánh.</p><label htmlFor="overview-quote-school">TRƯỜNG DỰ KIẾN</label><select id="overview-quote-school" disabled={schoolsLoading || schoolsError} value={school} onChange={(event) => { setSchool(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="">Chọn một trường</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select><label htmlFor="overview-quote-visa">HỆ HỌC</label><select id="overview-quote-visa" value={visaType} onChange={(event) => { setVisaType(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select><label htmlFor="overview-quote-topik">TRÌNH ĐỘ TOPIK</label><select id="overview-quote-topik" value={topik} onChange={(event) => { setTopik(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="0">Chưa có chứng chỉ</option><option value="1">TOPIK 1</option><option value="2">TOPIK 2</option><option value="3">TOPIK 3</option><option value="4">TOPIK 4</option><option value="5">TOPIK 5</option><option value="6">TOPIK 6</option></select><label htmlFor="overview-quote-language">HỌC TIẾNG TẠI TRUNG TÂM</label><select id="overview-quote-language" value={languageIndex} onChange={(event) => { setLanguageIndex(Number(event.target.value)); setQuoteIntent(null); setQuoteSubmitted(false); }}>{languageOptions.map((item, index) => <option key={`${item.label}-${index}`} value={index}>{item.label}</option>)}</select><small>TOPIK được lưu để tư vấn điều kiện và học bổng; bảng dự tính này chưa tự trừ học bổng.</small></div>
+            <div className="overview-quote-options"><h3>Thông tin dự kiến</h3><p>Bạn có thể đổi lựa chọn để so sánh.</p><SchoolPicker id="overview-quote-school" label="TRƯỜNG DỰ KIẾN" loading={schoolsLoading} error={schoolsError} onRetry={retrySchools} onOpen={() => setLoadSchoolData(true)} value={school} universities={sortedUniversities} onChange={(id) => { setSchool(id); setQuoteIntent(null); setQuoteSubmitted(false); }} /><label htmlFor="overview-quote-visa">HỆ HỌC</label><select id="overview-quote-visa" value={visaType} onChange={(event) => { setVisaType(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select><label htmlFor="overview-quote-topik">TRÌNH ĐỘ TOPIK</label><select id="overview-quote-topik" value={topik} onChange={(event) => { setTopik(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="0">Chưa có chứng chỉ</option><option value="1">TOPIK 1</option><option value="2">TOPIK 2</option><option value="3">TOPIK 3</option><option value="4">TOPIK 4</option><option value="5">TOPIK 5</option><option value="6">TOPIK 6</option></select><label htmlFor="overview-quote-language">HỌC TIẾNG TẠI TRUNG TÂM</label><select id="overview-quote-language" value={languageIndex} onChange={(event) => { setLanguageIndex(Number(event.target.value)); setQuoteIntent(null); setQuoteSubmitted(false); }}>{languageOptions.map((item, index) => <option key={`${item.label}-${index}`} value={index}>{item.label}</option>)}</select><small>TOPIK được lưu để tư vấn điều kiện và học bổng; bảng dự tính này chưa tự trừ học bổng.</small></div>
             <div className="overview-quote-preview" aria-live="polite">{!selectedUniversity ? <div className="overview-quote-empty"><span>↗</span><h3>Chọn trường để bắt đầu.</h3><p>Bảng chi phí chi tiết sẽ xuất hiện ở đây ngay sau khi bạn chọn trường.</p></div> : !hasTuition ? <div className="overview-quote-empty"><h3>Trường này chưa có học phí cho hệ đã chọn.</h3><p>Hãy chọn hệ khác hoặc yêu cầu đội ngũ kiểm tra bảng giá mới nhất.</p></div> : <><div className="overview-quote-preview-head"><div><span>BÁO GIÁ DỰ TÍNH · {selectedUniversity.name.toUpperCase()}</span><h3>{VISA_TYPES.find((item) => item.id === visaType)?.label}</h3><p>Đã tách theo nơi nhận tiền · Tỷ giá: {new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(globalConfig.exchangeRate)} ₫/KRW</p></div><strong>CHI PHÍ THAM KHẢO</strong></div><div className="overview-quote-rows">{quoteRows.map((row) => <div className="overview-quote-row" key={row.label}><b>{row.label}</b><span>{row.payer}</span><strong>{formatVnd(row.value)}</strong></div>)}</div><div className="overview-quote-total"><span>TỔNG CHI PHÍ DỰ TÍNH</span><strong>{formatVnd(costs.total)}</strong></div><p className="overview-quote-note">Chưa gồm ký túc xá, vé máy bay, sinh hoạt và chứng minh tài chính. Tổng dùng mức phí tư vấn đầu tiên trong cấu hình. Chi phí thực tế có thể thay đổi theo kỳ nhập học, tỷ giá và lựa chọn hồ sơ.</p></>}</div>
           </div>
           <div className="overview-quote-next"><div><h3>Thấy phương án này phù hợp?</h3><p>Xem báo giá không cần số điện thoại. Bạn có thể nhận bản chi tiết qua Zalo hoặc trao đổi trực tiếp về phương án vừa chọn.</p></div><div className="overview-quote-actions"><button type="button" disabled={!selectedUniversity || !hasTuition} onClick={() => { setQuoteIntent('quote_pdf'); setQuoteSubmitted(false); }}>Nhận báo giá này qua Zalo <ArrowUpRight size={17} /></button><a href="https://zalo.me/0967593548" target="_blank" rel="noopener noreferrer">Tư vấn Phương án này <ArrowUpRight size={17} /></a></div></div>
