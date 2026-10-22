@@ -42,14 +42,13 @@ const costGroups = [
 
 export default function OverviewLanding() {
   const [loadSchoolData, setLoadSchoolData] = useState(false);
-  const { universities, globalConfig, schoolsLoading } = useLandingData(loadSchoolData);
+  const { universities, globalConfig, schoolsLoading, schoolsError, retrySchools } = useLandingData(loadSchoolData);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pdfPhone, setPdfPhone] = useState('');
   const [pdfConsent, setPdfConsent] = useState(false);
-  const [pdfSubmitted, setPdfSubmitted] = useState(false);
   const [documentSchool, setDocumentSchool] = useState('');
   const [documentVisa, setDocumentVisa] = useState('d4-1');
-  const [documentBudget, setDocumentBudget] = useState('');
+  const [documentPreviewOpen, setDocumentPreviewOpen] = useState(false);
   const [quotePhone, setQuotePhone] = useState('');
   const [quoteConsent, setQuoteConsent] = useState(false);
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
@@ -63,13 +62,15 @@ export default function OverviewLanding() {
   useEffect(() => {
     if (loadSchoolData) return;
     const startLoading = () => setLoadSchoolData(true);
-    window.addEventListener('scroll', startLoading, { passive: true, once: true });
-    window.addEventListener('pointerdown', startLoading, { once: true });
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) startLoading();
+    });
+    const documentSection = document.getElementById('nhan-pdf');
+    const quoteSection = document.getElementById('xem-bao-gia');
+    if (documentSection) observer.observe(documentSection);
+    if (quoteSection) observer.observe(quoteSection);
     if (window.location.hash || window.scrollY > 0) startLoading();
-    return () => {
-      window.removeEventListener('scroll', startLoading);
-      window.removeEventListener('pointerdown', startLoading);
-    };
+    return () => observer.disconnect();
   }, [loadSchoolData]);
 
   const sortedUniversities = useMemo(
@@ -88,6 +89,17 @@ export default function OverviewLanding() {
   const documentKind: LeadKind = documentSchool ? 'school_profile' : 'school_suggestions';
   const selections: Selections = useMemo(() => ({ consultingIdx: 0, koreanLangIdx: languageIndex, dormVnMonths: 0, dormKrIdx: 0, flightIdx: 0, scholarshipPercent: 0 }), [languageIndex]);
   const costs = useCosts({ selectedUni: selectedUniversity, visaTypeId: visaType, topikLevelId: topik, exchangeRate: globalConfig.exchangeRate, globalConfig, selections });
+  const documentSelections: Selections = useMemo(() => ({ consultingIdx: 0, koreanLangIdx: 0, dormVnMonths: 0, dormKrIdx: 0, flightIdx: 0, scholarshipPercent: 0 }), []);
+  const documentCosts = useCosts({ selectedUni: documentUniversity, visaTypeId: documentVisa, topikLevelId: '0', exchangeRate: globalConfig.exchangeRate, globalConfig, selections: documentSelections });
+  const documentVisaField = VISA_TYPES.find((item) => item.id === documentVisa)?.field as keyof NonNullable<typeof documentUniversity> | undefined;
+  const documentHasTuition = !!(documentUniversity && documentVisaField && Number(documentUniversity[documentVisaField]) > 0);
+  const documentPreviewRows = [
+    { label: 'Học tiếng tại trung tâm', payer: 'Trung tâm thu', value: documentCosts.koreanLangCost ?? 0 },
+    { label: 'Tư vấn & xử lý hồ sơ', payer: 'Trung tâm thu', value: documentCosts.consultingFee ?? 0 },
+    { label: 'Phí bên thứ ba', payer: 'Học viên tự nộp', value: documentCosts.thirdPartyFee ?? 0 },
+    { label: 'Phí xét tuyển & nhập học', payer: 'Nộp cho trường', value: (documentCosts.applicationFee ?? 0) + (documentCosts.enrollmentFee ?? 0) },
+    { label: documentVisa === 'd4-1' ? 'Học phí hệ tiếng (4 kỳ)' : 'Học phí kỳ đầu', payer: 'Nộp cho trường', value: documentCosts.tuitionVnd ?? 0 },
+  ];
   const visaField = VISA_TYPES.find((item) => item.id === visaType)?.field as keyof NonNullable<typeof selectedUniversity> | undefined;
   const hasTuition = !!(selectedUniversity && visaField && Number(selectedUniversity[visaField]) > 0);
   const quoteRows = [
@@ -132,7 +144,7 @@ export default function OverviewLanding() {
       return;
     }
 
-    const classification = kind === 'school_profile' ? `Nhận hồ sơ chi phí ${documentUniversity?.name ?? ''} qua Zalo` : kind === 'school_suggestions' ? 'Nhận gợi ý trường và chi phí qua Zalo' : 'Nhận PDF báo giá đã xem qua Zalo';
+    const classification = kind === 'school_profile' ? `Nhận hồ sơ chi phí ${documentUniversity?.name ?? ''} qua Zalo · Quan tâm ưu đãi hôm nay` : kind === 'school_suggestions' ? 'Nhận gợi ý trường và chi phí qua Zalo' : 'Nhận PDF báo giá đã xem qua Zalo';
     const registration = {
       name: '',
       phone: cleanPhone,
@@ -143,12 +155,13 @@ export default function OverviewLanding() {
       gpaUni: '',
       createdAt: new Date().toISOString(),
       universityName: kind === 'quote_pdf' ? selectedUniversity?.name ?? '' : documentUniversity?.name ?? '',
-      costsTotal: kind === 'quote_pdf' ? costs.total : 0,
+      costsTotal: kind === 'quote_pdf' ? costs.total : kind === 'school_profile' ? documentCosts.total : 0,
       type: 'dang_ky',
       leadSource: 'du-hoc-han-quoc',
       leadIntent: kind,
-      budgetRange: kind === 'school_suggestions' ? documentBudget : '',
+      budgetRange: '',
       koreanLanguageOption: kind === 'quote_pdf' ? languageOptions[languageIndex]?.label ?? '' : '',
+      promotionInterest: kind === 'school_profile' ? 'Ưu đãi hôm nay' : '',
     };
 
     setSubmitting(true);
@@ -201,20 +214,37 @@ export default function OverviewLanding() {
         <section className="overview-hero" aria-labelledby="overview-title">
           <div className="overview-hero-copy">
             <span className="overview-eyebrow">DU HỌC HÀN QUỐC</span>
-            <h1 id="overview-title">Minh Bạch<br />toàn bộ chi phí<br /><span>DU HỌC</span></h1>
-            <p>Chúng tôi sẽ gửi đến cho bạn toàn bộ chi phí minh bạch từ lúc nhập học, đến khi đặt chân sang Hàn Quốc, để bạn nắm rõ toàn bộ lộ trình. Không phát sinh chi phí ẩn, tất cả khoản phí đều được công khai.</p>
-            <div className="overview-hero-actions"><a className="overview-primary" href="#nhan-pdf">Nhận hồ sơ chi phí theo trường <ArrowUpRight size={18} /></a><a className="overview-underlink" href="#xem-bao-gia">Tự xem báo giá</a></div>
+            <h1 id="overview-title">Xem trước chi phí.<br /><span>Rồi hãy quyết định.</span></h1>
+            <p>Chọn trường và hệ học để xem các khoản dự tính. Biết khoản nào nộp cho trung tâm, khoản nào tự thanh toán. <strong className="overview-hero-highlight">Chọn trường → Chọn hệ du học → Nhận bản báo giá</strong></p>
+            <div className="overview-hero-actions"><a className="overview-primary" href="#nhan-pdf">Xem thử chi phí theo trường <ArrowUpRight size={18} /></a><a className="overview-underlink" href="#chi-phi">Các khoản chi gồm gì?</a></div>
           </div>
           <div className="overview-hero-photo"><picture><source media="(max-width: 700px)" srcSet="/images/marketing/hero-san-bay-640.webp" /><img src="/images/marketing/hero-san-bay-1280.webp" width="1280" height="853" alt="Học viên Thầy Tư và gia đình tại sân bay trước chuyến đi Hàn Quốc" fetchPriority="high" /></picture><div className="overview-photo-label">HỌC VIÊN THẦY TƯ TẠI SÂN BAY</div><span className="overview-vertical">TIẾNG HÀN · DU HỌC THẦY TƯ</span></div>
         </section>
 
         <section id="nhan-pdf" className="overview-pdf overview-wrap" aria-labelledby="overview-pdf-title">
-          <div className="overview-pdf-heading"><span className="overview-section-tag">01 / NHẬN TÀI LIỆU QUA ZALO</span><h2 id="overview-pdf-title">Một trường bạn chọn.<br />Từng khoản cần biết.</h2><p>Chọn trường và hệ học bạn quan tâm. Đội ngũ sẽ gửi thông tin chi phí, nơi nộp từng khoản và điều kiện tuyển sinh phù hợp qua Zalo.</p><div className="overview-document-points"><span>Học phí theo hệ</span><span>Phí hồ sơ & bên thứ ba</span><span>Mốc thanh toán</span></div></div>
-          <form className="overview-pdf-form" onSubmit={(event) => submitLead(event, documentKind)}>
-            {loadSchoolData && schoolsLoading && <p role="status">Đang tải danh sách trường...</p>}
-            {pdfSubmitted ? <div className="overview-pdf-success" role="status"><strong>Đã nhận yêu cầu.</strong><p>Đội ngũ sẽ liên hệ qua Zalo để gửi {documentUniversity ? `thông tin về ${documentUniversity.name}` : 'gợi ý trường và chi phí'}.</p><button type="button" onClick={() => setPdfSubmitted(false)}>Gửi yêu cầu khác</button></div> : <><label htmlFor="overview-document-school">TRƯỜNG BẠN QUAN TÂM</label><select id="overview-document-school" value={documentSchool} onChange={(event) => setDocumentSchool(event.target.value)}><option value="">Chưa chọn trường — nhờ gợi ý</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select><label htmlFor="overview-document-visa">HỆ HỌC</label><select id="overview-document-visa" value={documentVisa} onChange={(event) => setDocumentVisa(event.target.value)}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select>{!documentSchool && <><label htmlFor="overview-document-budget">NGÂN SÁCH DỰ KIẾN (KHÔNG BẮT BUỘC)</label><select id="overview-document-budget" value={documentBudget} onChange={(event) => setDocumentBudget(event.target.value)}><option value="">Chưa xác định</option><option value="duoi-150-trieu">Dưới 150 triệu</option><option value="150-250-trieu">150–250 triệu</option><option value="tren-250-trieu">Trên 250 triệu</option></select></>}<label htmlFor="overview-pdf-phone">SỐ ZALO NHẬN TÀI LIỆU</label><div className="overview-pdf-input"><input id="overview-pdf-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="09xx xxx xxx" value={pdfPhone} onChange={(event) => setPdfPhone(event.target.value)} required /><button type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : documentSchool ? 'Nhận hồ sơ trường này' : 'Nhận gợi ý trường'} <ArrowUpRight size={17} /></button></div><label className="overview-consent"><input type="checkbox" checked={pdfConsent} onChange={(event) => setPdfConsent(event.target.checked)} required /><span>Tôi đồng ý để Thầy Tư dùng số này gửi tài liệu và liên hệ về yêu cầu của tôi.</span></label><small>Đội ngũ chuẩn bị và gửi thông tin qua Zalo sau khi nhận yêu cầu.</small></>}
-          </form>
-          <p className="overview-form-privacy">Xem cách chúng tôi sử dụng thông tin của bạn trong <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link>.</p>
+          <div className="overview-pdf-heading"><span className="overview-section-tag">01 / XEM BẢN RÚT GỌN</span><h2 id="overview-pdf-title">Chi phí của trường bạn quan tâm.</h2><p>Chọn trường và hệ học để xem trước từng khoản ngay trên trang. Chưa cần nhập số điện thoại.</p><div className="overview-document-points"><span>Trung tâm thu</span><span>Học viên tự nộp</span><span>Nộp cho trường</span></div></div>
+          <div className="overview-pdf-form">
+            {schoolsLoading && <p role="status">Đang tải danh sách trường...</p>}{schoolsError && <p role="alert">Không tải được danh sách trường. <button type="button" onClick={retrySchools}>Thử lại</button></p>}
+            <label htmlFor="overview-document-school">TRƯỜNG MUỐN XEM</label><select id="overview-document-school" disabled={schoolsLoading || schoolsError} value={documentSchool} onChange={(event) => { setDocumentSchool(event.target.value); setDocumentPreviewOpen(false); }}><option value="">Chọn một trường</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select>
+            <label htmlFor="overview-document-visa">HỆ HỌC</label><select id="overview-document-visa" value={documentVisa} onChange={(event) => { setDocumentVisa(event.target.value); setDocumentPreviewOpen(false); }}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select>
+            <button className="overview-preview-button" type="button" disabled={!documentUniversity || schoolsLoading || !!schoolsError} onClick={() => setDocumentPreviewOpen(true)}>Xem chi phí dự tính <ArrowUpRight size={17} /></button><small>Có hơn 100 trường trong danh sách để bạn so sánh.</small>
+          </div>
+          {documentPreviewOpen && <div className="overview-document-result" aria-live="polite">{documentHasTuition ? <><div className="overview-document-result-head"><span>BẢN XEM TRƯỚC · {documentUniversity?.name.toUpperCase()}</span><h3>Các khoản cần chuẩn bị</h3><p>{VISA_TYPES.find((item) => item.id === documentVisa)?.label}</p></div><div className="overview-document-result-rows">{documentPreviewRows.map((row) => <div className="overview-document-result-row" key={row.label}><div><strong>{row.label}</strong><small>{row.payer}</small></div><b>{formatVnd(row.value)}</b></div>)}</div><div className="overview-document-result-total"><span>TỔNG CHI PHÍ DỰ TÍNH</span><strong>{formatVnd(documentCosts.total)}</strong></div><p className="overview-document-result-note">Chưa gồm ký túc xá, vé máy bay, sinh hoạt và chứng minh tài chính. Dùng mức phí tư vấn và học tiếng đầu tiên trong cấu hình; số liệu có thể thay đổi theo kỳ nhập học và tỷ giá.</p></> : <div className="overview-document-result-empty"><h3>Hệ học này chưa có học phí trong dữ liệu.</h3><p>Chọn hệ khác để xem trước, hoặc xem bảng báo giá chi tiết ở mục bên dưới.</p></div>}</div>}
+          {documentPreviewOpen && documentHasTuition && <form className="overview-document-lead" onSubmit={(event) => submitLead(event, documentKind)}>
+            <span className="overview-section-tag">02 / NHẬN BẢN ĐẦY ĐỦ QUA ZALO</span>
+            <h3>Nhận PDF chi tiết của {documentUniversity?.name} qua Zalo</h3>
+            <p>Gồm học phí, nơi nộp từng khoản, mốc thanh toán và thông tin tuyển sinh. Đội ngũ chuẩn bị tài liệu theo phương án bạn đã chọn.</p>
+            <label htmlFor="overview-pdf-phone">SỐ ZALO CỦA BẠN</label>
+            <input id="overview-pdf-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="09xx xxx xxx" value={pdfPhone} onChange={(event) => setPdfPhone(event.target.value)} required />
+            <button type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : 'Nhận PDF chi tiết qua Zalo'} <ArrowUpRight size={17} /></button>
+            <label className="overview-consent"><input type="checkbox" checked={pdfConsent} onChange={(event) => setPdfConsent(event.target.checked)} required /><span>Tôi đồng ý để Thầy Tư dùng số này gửi tài liệu và liên hệ về yêu cầu của tôi.</span></label>
+          </form>}
+          {documentPreviewOpen && documentHasTuition && <p className="overview-form-privacy">Xem cách chúng tôi sử dụng thông tin của bạn trong <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link>.</p>}
+          {documentPreviewOpen && documentHasTuition && <aside className="overview-promotion" aria-label="Ưu đãi đăng ký hôm nay">
+            <div className="overview-promotion-copy"><span className="overview-section-tag">ƯU ĐÃI HÔM NAY</span><h3>Đăng ký hôm nay để nhận thêm ưu đãi</h3></div>
+            <ul className="overview-promotion-featured"><li>Giảm 10% khóa học tiếng Hàn</li><li>Miễn phí 3 tháng phí ký túc xá</li></ul>
+            <details className="overview-promotion-more"><summary>Xem đủ 4 ưu đãi</summary><ul><li>Hỗ trợ đi lại tới trung tâm</li><li>Miễn phí khóa học tiếng Hàn online</li></ul><p>Ưu đãi áp dụng trong hôm nay. Đội ngũ sẽ xác nhận điều kiện cụ thể khi tư vấn.</p></details>
+          </aside>}
           <figure className="overview-pdf-example" aria-label="Mô phỏng tin nhắn Zalo và các trang trong bảng giá PDF">
             <div className="overview-pdf-example-head"><span>BẢN XEM TRƯỚC</span><p>{documentUniversity ? `Thông tin chi phí và tuyển sinh ${documentUniversity.name}, hệ ${VISA_TYPES.find((item) => item.id === documentVisa)?.label}.` : 'Ví dụ trang chi phí Ajou và cách đội ngũ gửi thông tin qua Zalo.'}</p></div>
             <div className="overview-pdf-example-stage">
@@ -239,17 +269,17 @@ export default function OverviewLanding() {
             <div className="overview-cost-head"><div><span className="overview-section-tag">CẤU TRÚC CHI PHÍ</span><h2>Đây là những khoản bạn cần tính.</h2></div><p>Số tiền thực tế phụ thuộc vào trường, hệ học, trình độ tiếng và lựa chọn cá nhân.</p></div>
             <div className="overview-cost-grid">
               <div className="overview-cost-main">{costGroups.map((item) => <div className="overview-cost-row" key={item.title}><div><h3>{item.title}</h3><p>{item.description}</p></div><span>{item.payer}</span></div>)}</div>
-              <div className="overview-cost-aside"><small>ĐIỀU QUAN TRỌNG</small><h3>“Tổng chi phí” không đồng nghĩa “phí trung tâm”.</h3><p>Chúng tôi tách rõ đơn vị nhận từng khoản, để gia đình biết tiền sẽ được nộp ở đâu.</p><a href="#xem-bao-gia"><strong>Tự xem báo giá <ArrowUpRight size={21} /></strong><span>CHỌN TRƯỜNG, HỆ HỌC & TOPIK</span></a></div>
+              <div className="overview-cost-aside"><small>ĐIỀU QUAN TRỌNG</small><h3>“Tổng chi phí” không đồng nghĩa <mark>“phí trung tâm”.</mark></h3><p>Chúng tôi tách rõ đơn vị nhận từng khoản, để gia đình biết tiền sẽ được nộp ở đâu.</p><a href="#xem-bao-gia"><strong>Tự xem báo giá <ArrowUpRight size={21} /></strong><span>CHỌN TRƯỜNG, HỆ HỌC & TOPIK</span></a></div>
             </div>
             <p className="overview-cost-note">* Mức chi phí cụ thể cần đối chiếu theo trường, hệ học, TOPIK, tỷ giá và thời điểm.</p>
           </div>
         </section>
 
         <section id="xem-bao-gia" className="overview-quote overview-wrap" aria-labelledby="overview-quote-title">
-          <div className="overview-quote-head"><div><span className="overview-section-tag">02 / TỰ XEM BÁO GIÁ CHI TIẾT</span><h2 id="overview-quote-title">Chi phí theo lựa chọn của bạn.</h2></div><p>Chọn trường, hệ học và TOPIK. Xem các khoản ngay trên trang, chưa cần để lại số điện thoại.</p></div>
-          {schoolsLoading && <p role="status" style={{ fontSize: 13, color: '#5c6b79' }}>Đang tải danh sách trường...</p>}
+          <div className="overview-quote-head"><div><span className="overview-section-tag">THỬ THÊM PHƯƠNG ÁN KHÁC</span><h2 id="overview-quote-title">Chi phí theo lựa chọn của bạn.</h2></div><p>Đổi trường, hệ học, TOPIK và lựa chọn học tiếng để so sánh từng khoản. Chưa cần để lại số điện thoại.</p></div>
+          {schoolsLoading && <p role="status" style={{ fontSize: 13, color: '#5c6b79' }}>Đang tải danh sách trường...</p>}{schoolsError && <p role="alert">Không tải được danh sách trường. <button type="button" onClick={retrySchools}>Thử lại</button></p>}
           <div className="overview-quote-grid">
-            <div className="overview-quote-options"><h3>Thông tin dự kiến</h3><p>Bạn có thể đổi lựa chọn để so sánh.</p><label htmlFor="overview-quote-school">TRƯỜNG DỰ KIẾN</label><select id="overview-quote-school" value={school} onChange={(event) => { setSchool(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="">Chọn một trường</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select><label htmlFor="overview-quote-visa">HỆ HỌC</label><select id="overview-quote-visa" value={visaType} onChange={(event) => { setVisaType(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select><label htmlFor="overview-quote-topik">TRÌNH ĐỘ TOPIK</label><select id="overview-quote-topik" value={topik} onChange={(event) => { setTopik(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="0">Chưa có chứng chỉ</option><option value="1">TOPIK 1</option><option value="2">TOPIK 2</option><option value="3">TOPIK 3</option><option value="4">TOPIK 4</option><option value="5">TOPIK 5</option><option value="6">TOPIK 6</option></select><label htmlFor="overview-quote-language">HỌC TIẾNG TẠI TRUNG TÂM</label><select id="overview-quote-language" value={languageIndex} onChange={(event) => { setLanguageIndex(Number(event.target.value)); setQuoteIntent(null); setQuoteSubmitted(false); }}>{languageOptions.map((item, index) => <option key={`${item.label}-${index}`} value={index}>{item.label}</option>)}</select><small>TOPIK được lưu để tư vấn điều kiện và học bổng; bảng dự tính này chưa tự trừ học bổng.</small></div>
+            <div className="overview-quote-options"><h3>Thông tin dự kiến</h3><p>Bạn có thể đổi lựa chọn để so sánh.</p><label htmlFor="overview-quote-school">TRƯỜNG DỰ KIẾN</label><select id="overview-quote-school" disabled={schoolsLoading || schoolsError} value={school} onChange={(event) => { setSchool(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="">Chọn một trường</option>{sortedUniversities.map((university) => <option key={university.id} value={university.id}>{university.name}</option>)}</select><label htmlFor="overview-quote-visa">HỆ HỌC</label><select id="overview-quote-visa" value={visaType} onChange={(event) => { setVisaType(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select><label htmlFor="overview-quote-topik">TRÌNH ĐỘ TOPIK</label><select id="overview-quote-topik" value={topik} onChange={(event) => { setTopik(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="0">Chưa có chứng chỉ</option><option value="1">TOPIK 1</option><option value="2">TOPIK 2</option><option value="3">TOPIK 3</option><option value="4">TOPIK 4</option><option value="5">TOPIK 5</option><option value="6">TOPIK 6</option></select><label htmlFor="overview-quote-language">HỌC TIẾNG TẠI TRUNG TÂM</label><select id="overview-quote-language" value={languageIndex} onChange={(event) => { setLanguageIndex(Number(event.target.value)); setQuoteIntent(null); setQuoteSubmitted(false); }}>{languageOptions.map((item, index) => <option key={`${item.label}-${index}`} value={index}>{item.label}</option>)}</select><small>TOPIK được lưu để tư vấn điều kiện và học bổng; bảng dự tính này chưa tự trừ học bổng.</small></div>
             <div className="overview-quote-preview" aria-live="polite">{!selectedUniversity ? <div className="overview-quote-empty"><span>↗</span><h3>Chọn trường để bắt đầu.</h3><p>Bảng chi phí chi tiết sẽ xuất hiện ở đây ngay sau khi bạn chọn trường.</p></div> : !hasTuition ? <div className="overview-quote-empty"><h3>Trường này chưa có học phí cho hệ đã chọn.</h3><p>Hãy chọn hệ khác hoặc yêu cầu đội ngũ kiểm tra bảng giá mới nhất.</p></div> : <><div className="overview-quote-preview-head"><div><span>BÁO GIÁ DỰ TÍNH · {selectedUniversity.name.toUpperCase()}</span><h3>{VISA_TYPES.find((item) => item.id === visaType)?.label}</h3><p>Đã tách theo nơi nhận tiền · Tỷ giá: {new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(globalConfig.exchangeRate)} ₫/KRW</p></div><strong>CHI PHÍ THAM KHẢO</strong></div><div className="overview-quote-rows">{quoteRows.map((row) => <div className="overview-quote-row" key={row.label}><b>{row.label}</b><span>{row.payer}</span><strong>{formatVnd(row.value)}</strong></div>)}</div><div className="overview-quote-total"><span>TỔNG CHI PHÍ DỰ TÍNH</span><strong>{formatVnd(costs.total)}</strong></div><p className="overview-quote-note">Chưa gồm ký túc xá, vé máy bay, sinh hoạt và chứng minh tài chính. Tổng dùng mức phí tư vấn đầu tiên trong cấu hình. Chi phí thực tế có thể thay đổi theo kỳ nhập học, tỷ giá và lựa chọn hồ sơ.</p></>}</div>
           </div>
           <div className="overview-quote-next"><div><h3>Thấy phương án này phù hợp?</h3><p>Xem báo giá không cần số điện thoại. Bạn có thể nhận bản chi tiết qua Zalo hoặc trao đổi trực tiếp về phương án vừa chọn.</p></div><div className="overview-quote-actions"><button type="button" disabled={!selectedUniversity || !hasTuition} onClick={() => { setQuoteIntent('quote_pdf'); setQuoteSubmitted(false); }}>Nhận báo giá này qua Zalo <ArrowUpRight size={17} /></button><a href="https://zalo.me/0967593548" target="_blank" rel="noopener noreferrer">Tư vấn Phương án này <ArrowUpRight size={17} /></a></div></div>

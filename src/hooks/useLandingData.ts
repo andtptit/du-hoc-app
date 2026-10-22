@@ -6,9 +6,13 @@ export function useLandingData(enabled = true) {
   const [universities, setUniversities] = useState<University[]>([]);
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(DEFAULT_CONFIG);
   const [schoolsLoading, setSchoolsLoading] = useState(true);
+  const [schoolsError, setSchoolsError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!enabled) return;
+    setSchoolsLoading(true);
+    setSchoolsError(false);
     let cancelled = false;
     let unsubscribeUniversities: (() => void) | undefined;
     let unsubscribeConfig: (() => void) | undefined;
@@ -18,10 +22,11 @@ export function useLandingData(enabled = true) {
       if (cancelled) return;
       unsubscribeUniversities = firestore.onSnapshot(firestore.collection(db, 'universities'), (snapshot) => {
         const schools = snapshot.docs.map((entry) => entry.data() as University);
-        if (schools.length) setUniversities(schools);
+        setUniversities(schools);
         setSchoolsLoading(false);
       }, (error) => {
         setSchoolsLoading(false);
+        setSchoolsError(true);
         console.error('University fetch error:', error);
       });
       unsubscribeConfig = firestore.onSnapshot(firestore.doc(db, 'settings', 'costs'), (snapshot) => {
@@ -36,6 +41,7 @@ export function useLandingData(enabled = true) {
       }, (error) => console.error('Cost config fetch error:', error));
     }).catch((error) => {
       setSchoolsLoading(false);
+      setSchoolsError(true);
       console.error('Landing data load error:', error);
     });
 
@@ -44,7 +50,7 @@ export function useLandingData(enabled = true) {
       unsubscribeUniversities?.();
       unsubscribeConfig?.();
     };
-  }, [enabled]);
+  }, [enabled, retryCount]);
 
-  return { universities, globalConfig, schoolsLoading };
+  return { universities, globalConfig, schoolsLoading, schoolsError, retrySchools: () => setRetryCount((count) => count + 1) };
 }
