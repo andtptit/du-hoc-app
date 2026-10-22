@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { University, GlobalConfig, Selections, CostBreakdown } from '../types';
+import { CostUniversity, GlobalConfig, Selections, CostBreakdown } from '../types';
 import { VISA_TYPES } from '../data';
 import { extractTuitionMin } from '../utils/extract';
 
@@ -48,7 +48,7 @@ export interface ParsedDormOption {
 }
 
 interface UseCostsParams {
-  selectedUni: University | undefined;
+  selectedUni: CostUniversity | undefined;
   visaTypeId: string;
   topikLevelId: string;
   exchangeRate: number;

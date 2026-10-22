@@ -7,7 +7,7 @@ import { useLandingData } from '../hooks/useLandingData';
 import { useCosts } from '../hooks/useCosts';
 import SiteFooter from './SiteFooter';
 import { VISA_TYPES } from '../data';
-import type { Selections, University } from '../types';
+import type { CostUniversity, Selections } from '../types';
 import '@fontsource/be-vietnam-pro/400.css';
 import '@fontsource/be-vietnam-pro/700.css';
 import '@fontsource/be-vietnam-pro/800.css';
@@ -16,7 +16,11 @@ import './overview-landing.css';
 const GOOGLE_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby2KObaL-ev4jBf1TqZBWli2H4y1aitQyaCCnMG_KWTRD3B6KEttx5JHqng6dHn3i17/exec';
 const formatVnd = (value: number) => `${new Intl.NumberFormat('vi-VN').format(Math.round(value))} ₫`;
 const phonePattern = /^(0|\+84|84)(3|5|7|8|9)[0-9]{8}$/;
-type LeadKind = 'school_profile' | 'school_suggestions' | 'quote_pdf';
+const featuredSchools = [
+  { id: 'i-hc-ajou', label: 'AJOU' },
+  { id: 'i-hc-catholic', label: 'CATHOLIC' },
+  { id: 'i-hc-keimyung', label: 'KEIMYUNG' },
+];
 
 const costGroups = [
   {
@@ -49,7 +53,7 @@ function SchoolPicker({ id, label, value, universities, onChange, loading, error
   id: string;
   label: string;
   value: string;
-  universities: University[];
+  universities: CostUniversity[];
   onChange: (value: string) => void;
   loading: boolean;
   error: boolean;
@@ -107,14 +111,6 @@ export default function OverviewLanding() {
   const [documentSchool, setDocumentSchool] = useState('');
   const [documentVisa, setDocumentVisa] = useState('d4-1');
   const [documentPreviewOpen, setDocumentPreviewOpen] = useState(false);
-  const [quotePhone, setQuotePhone] = useState('');
-  const [quoteConsent, setQuoteConsent] = useState(false);
-  const [quoteSubmitted, setQuoteSubmitted] = useState(false);
-  const [quoteIntent, setQuoteIntent] = useState<LeadKind | null>(null);
-  const [school, setSchool] = useState('');
-  const [visaType, setVisaType] = useState('d4-1');
-  const [topik, setTopik] = useState('0');
-  const [languageIndex, setLanguageIndex] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -124,9 +120,7 @@ export default function OverviewLanding() {
       if (entries.some((entry) => entry.isIntersecting)) startLoading();
     });
     const documentSection = document.getElementById('nhan-pdf');
-    const quoteSection = document.getElementById('xem-bao-gia');
     if (documentSection) observer.observe(documentSection);
-    if (quoteSection) observer.observe(quoteSection);
     if (window.location.hash || window.scrollY > 0) startLoading();
     return () => observer.disconnect();
   }, [loadSchoolData]);
@@ -135,18 +129,7 @@ export default function OverviewLanding() {
     () => [...universities].sort((a, b) => a.name.localeCompare(b.name, 'vi')),
     [universities]
   );
-  const languageOptions = useMemo(() => globalConfig.koreanLanguageOptions.map((option, index) => {
-    const raw = option as { label?: string; price?: number } | number;
-    const price = typeof raw === 'number' ? raw : Number(raw.price) || 0;
-    const configuredLabel = typeof raw === 'number' ? '' : raw.label?.trim();
-    const label = configuredLabel || (price === 0 ? 'Tự học (0 ₫)' : `Gói học tiếng ${index}: ${formatVnd(price)}`);
-    return { label, price };
-  }), [globalConfig.koreanLanguageOptions]);
-  const selectedUniversity = universities.find((university) => university.id === school);
   const documentUniversity = universities.find((university) => university.id === documentSchool);
-  const documentKind: LeadKind = documentSchool ? 'school_profile' : 'school_suggestions';
-  const selections: Selections = useMemo(() => ({ consultingIdx: 0, koreanLangIdx: languageIndex, dormVnMonths: 0, dormKrIdx: 0, flightIdx: 0, scholarshipPercent: 0 }), [languageIndex]);
-  const costs = useCosts({ selectedUni: selectedUniversity, visaTypeId: visaType, topikLevelId: topik, exchangeRate: globalConfig.exchangeRate, globalConfig, selections });
   const documentSelections: Selections = useMemo(() => ({ consultingIdx: 0, koreanLangIdx: 0, dormVnMonths: 0, dormKrIdx: 0, flightIdx: 0, scholarshipPercent: 0 }), []);
   const documentCosts = useCosts({ selectedUni: documentUniversity, visaTypeId: documentVisa, topikLevelId: '0', exchangeRate: globalConfig.exchangeRate, globalConfig, selections: documentSelections });
   const documentVisaField = VISA_TYPES.find((item) => item.id === documentVisa)?.field as keyof NonNullable<typeof documentUniversity> | undefined;
@@ -157,15 +140,6 @@ export default function OverviewLanding() {
     { label: 'Phí bên thứ ba', payer: 'Học viên tự nộp', value: documentCosts.thirdPartyFee ?? 0 },
     { label: 'Phí xét tuyển & nhập học', payer: 'Nộp cho trường', value: (documentCosts.applicationFee ?? 0) + (documentCosts.enrollmentFee ?? 0) },
     { label: documentVisa === 'd4-1' ? 'Học phí hệ tiếng (4 kỳ)' : 'Học phí kỳ đầu', payer: 'Nộp cho trường', value: documentCosts.tuitionVnd ?? 0 },
-  ];
-  const visaField = VISA_TYPES.find((item) => item.id === visaType)?.field as keyof NonNullable<typeof selectedUniversity> | undefined;
-  const hasTuition = !!(selectedUniversity && visaField && Number(selectedUniversity[visaField]) > 0);
-  const quoteRows = [
-    { label: 'Học tiếng tại trung tâm', payer: 'Trung tâm thu', value: costs.koreanLangCost ?? 0 },
-    { label: 'Tư vấn & xử lý hồ sơ', payer: 'Trung tâm thu', value: costs.consultingFee ?? 0 },
-    { label: 'Phí bên thứ ba', payer: 'Học viên tự nộp', value: costs.thirdPartyFee ?? 0 },
-    { label: 'Phí xét tuyển & nhập học', payer: 'Nộp cho trường', value: (costs.applicationFee ?? 0) + (costs.enrollmentFee ?? 0) },
-    { label: visaType === 'd4-1' ? 'Học phí hệ tiếng (4 kỳ)' : 'Học phí kỳ đầu', payer: 'Nộp cho trường', value: costs.tuitionVnd ?? 0 },
   ];
 
   useEffect(() => {
@@ -189,37 +163,37 @@ export default function OverviewLanding() {
     };
   }, []);
 
-  const submitLead = async (event: React.FormEvent<HTMLFormElement>, kind: LeadKind) => {
+  const submitLead = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submitting) return;
-    const cleanPhone = (kind !== 'quote_pdf' ? pdfPhone : quotePhone).replace(/[\s.-]/g, '').trim();
+    const cleanPhone = pdfPhone.replace(/[\s.-]/g, '').trim();
     if (!phonePattern.test(cleanPhone)) {
       toast.error('Vui lòng nhập số điện thoại hợp lệ');
       return;
     }
-    if (!(kind !== 'quote_pdf' ? pdfConsent : quoteConsent)) {
+    if (!pdfConsent) {
       toast.error('Vui lòng đồng ý để chúng tôi liên hệ');
       return;
     }
 
-    const classification = kind === 'school_profile' ? `Nhận hồ sơ chi phí ${documentUniversity?.name ?? ''} qua Zalo · Quan tâm ưu đãi hôm nay` : kind === 'school_suggestions' ? 'Nhận gợi ý trường và chi phí qua Zalo' : 'Nhận PDF báo giá đã xem qua Zalo';
+    const classification = `Nhận hồ sơ chi phí ${documentUniversity?.name ?? ''} qua Zalo · Quan tâm ưu đãi hôm nay`;
     const registration = {
       name: '',
       phone: cleanPhone,
-      visaType: kind === 'quote_pdf' ? visaType : documentVisa,
-      topikLevel: kind === 'quote_pdf' ? topik : '',
-      universityId: kind === 'quote_pdf' ? selectedUniversity?.id ?? '' : documentUniversity?.id ?? '',
+      visaType: documentVisa,
+      topikLevel: '',
+      universityId: documentUniversity?.id ?? '',
       gpaThpt: '',
       gpaUni: '',
       createdAt: new Date().toISOString(),
-      universityName: kind === 'quote_pdf' ? selectedUniversity?.name ?? '' : documentUniversity?.name ?? '',
-      costsTotal: kind === 'quote_pdf' ? costs.total : kind === 'school_profile' ? documentCosts.total : 0,
+      universityName: documentUniversity?.name ?? '',
+      costsTotal: documentCosts.total,
       type: 'dang_ky',
       leadSource: 'du-hoc-han-quoc',
-      leadIntent: kind,
+      leadIntent: 'school_profile',
       budgetRange: '',
-      koreanLanguageOption: kind === 'quote_pdf' ? languageOptions[languageIndex]?.label ?? '' : '',
-      promotionInterest: kind === 'school_profile' ? 'Ưu đãi hôm nay' : '',
+      koreanLanguageOption: '',
+      promotionInterest: 'Ưu đãi hôm nay',
     };
 
     setSubmitting(true);
@@ -238,11 +212,11 @@ export default function OverviewLanding() {
         }),
       }).catch((error) => console.error('Google Sheets error:', error));
       (window as Window & { fbq?: (...args: unknown[]) => void }).fbq?.('track', 'Lead', {
-        content_name: kind === 'quote_pdf' ? selectedUniversity?.name ?? 'Trang du học Hàn Quốc' : documentUniversity?.name ?? 'Gợi ý trường',
+        content_name: documentUniversity?.name ?? 'Trang du học Hàn Quốc',
       });
       sessionStorage.setItem('thankYouRequest', JSON.stringify({
         universityName: registration.universityName,
-        isSuggestion: kind === 'school_suggestions',
+        isSuggestion: false,
       }));
       window.location.assign('/thank-you');
     } catch (error) {
@@ -262,7 +236,7 @@ export default function OverviewLanding() {
             <a href="#lo-trinh" onClick={() => setMenuOpen(false)}>Lộ trình</a>
             <a href="#chi-phi" onClick={() => setMenuOpen(false)}>Chi phí</a>
             <a href="#truong-hoc" onClick={() => setMenuOpen(false)}>Trường học</a>
-            <a className="overview-nav-cta" href="#xem-bao-gia" onClick={() => setMenuOpen(false)}>Tự xem báo giá <ArrowUpRight size={15} /></a>
+            <a className="overview-nav-cta" href="#nhan-pdf" onClick={() => setMenuOpen(false)}>Tự xem báo giá <ArrowUpRight size={15} /></a>
           </nav>
           <button className="overview-menu" type="button" aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={22} /> : <Menu size={22} />}</button>
         </div>
@@ -284,11 +258,12 @@ export default function OverviewLanding() {
           <div className="overview-pdf-form">
             {schoolsLoading && <p role="status">Đang tải danh sách trường...</p>}{schoolsError && <p role="alert">Không tải được danh sách trường. <button type="button" onClick={retrySchools}>Thử lại</button></p>}
             <SchoolPicker id="overview-document-school" label="TRƯỜNG MUỐN XEM" loading={schoolsLoading} error={schoolsError} onRetry={retrySchools} onOpen={() => setLoadSchoolData(true)} value={documentSchool} universities={sortedUniversities} onChange={(id) => { setDocumentSchool(id); setDocumentPreviewOpen(false); }} />
+            <div className="overview-featured-schools" aria-label="Gợi ý trường nổi bật"><span>Gợi ý nhanh</span>{featuredSchools.map(({ id, label }) => <button key={id} type="button" aria-pressed={documentSchool === id} disabled={!universities.some((university) => university.id === id)} onClick={() => { setDocumentSchool(id); setDocumentPreviewOpen(false); }}>{label}</button>)}</div>
             <label htmlFor="overview-document-visa">HỆ HỌC</label><select id="overview-document-visa" value={documentVisa} onChange={(event) => { setDocumentVisa(event.target.value); setDocumentPreviewOpen(false); }}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select>
             <button className="overview-preview-button" type="button" disabled={!documentUniversity || schoolsLoading || !!schoolsError} onClick={() => setDocumentPreviewOpen(true)}>Xem chi phí dự tính <ArrowUpRight size={17} /></button><small>Có hơn 100 trường trong danh sách để bạn so sánh.</small>
           </div>
-          {documentPreviewOpen && <div className="overview-document-result" aria-live="polite">{documentHasTuition ? <><div className="overview-document-result-head"><span>BẢN XEM TRƯỚC · {documentUniversity?.name.toUpperCase()}</span><h3>Các khoản cần chuẩn bị</h3><p>{VISA_TYPES.find((item) => item.id === documentVisa)?.label}</p></div><div className="overview-document-result-rows">{documentPreviewRows.map((row) => <div className="overview-document-result-row" key={row.label}><div><strong>{row.label}</strong><small>{row.payer}</small></div><b>{formatVnd(row.value)}</b></div>)}</div><div className="overview-document-result-total"><span>TỔNG CHI PHÍ DỰ TÍNH</span><strong>{formatVnd(documentCosts.total)}</strong></div><p className="overview-document-result-note">Chưa gồm ký túc xá, vé máy bay, sinh hoạt và chứng minh tài chính. Dùng mức phí tư vấn và học tiếng đầu tiên trong cấu hình; số liệu có thể thay đổi theo kỳ nhập học và tỷ giá.</p></> : <div className="overview-document-result-empty"><h3>Hệ học này chưa có học phí trong dữ liệu.</h3><p>Chọn hệ khác để xem trước, hoặc xem bảng báo giá chi tiết ở mục bên dưới.</p></div>}</div>}
-          {documentPreviewOpen && documentHasTuition && <form className="overview-document-lead" onSubmit={(event) => submitLead(event, documentKind)}>
+          {documentPreviewOpen && <div className="overview-document-result" aria-live="polite">{documentHasTuition ? <><div className="overview-document-result-head"><span>BẢN XEM TRƯỚC · {documentUniversity?.name.toUpperCase()}</span><h3>Các khoản cần chuẩn bị</h3><p>{VISA_TYPES.find((item) => item.id === documentVisa)?.label}</p></div><div className="overview-document-result-rows">{documentPreviewRows.map((row) => <div className="overview-document-result-row" key={row.label}><div><strong>{row.label}</strong><small>{row.payer}</small></div><b>{formatVnd(row.value)}</b></div>)}</div><div className="overview-document-result-total"><span>TỔNG CHI PHÍ DỰ TÍNH</span><strong>{formatVnd(documentCosts.total)}</strong></div><p className="overview-document-result-note">Chưa gồm ký túc xá, vé máy bay, sinh hoạt và chứng minh tài chính. Dùng mức phí tư vấn và học tiếng đầu tiên trong cấu hình; số liệu có thể thay đổi theo kỳ nhập học và tỷ giá.</p></> : <div className="overview-document-result-empty"><h3>Hệ học này chưa có học phí trong dữ liệu.</h3><p>Chọn hệ khác để xem trước, hoặc xem danh sách trường tại trang bóc tách.</p></div>}</div>}
+          {documentPreviewOpen && documentHasTuition && <form className="overview-document-lead" onSubmit={(event) => submitLead(event)}>
             <span className="overview-section-tag">02 / NHẬN BẢN ĐẦY ĐỦ QUA ZALO</span>
             <h3>Nhận PDF chi tiết của {documentUniversity?.name} qua Zalo</h3>
             <p>Gồm học phí, nơi nộp từng khoản, mốc thanh toán và thông tin tuyển sinh. Đội ngũ chuẩn bị tài liệu theo phương án bạn đã chọn.</p>
@@ -327,28 +302,20 @@ export default function OverviewLanding() {
             <div className="overview-cost-head"><div><span className="overview-section-tag">CẤU TRÚC CHI PHÍ</span><h2>Đây là những khoản bạn cần tính.</h2></div><p>Số tiền thực tế phụ thuộc vào trường, hệ học, trình độ tiếng và lựa chọn cá nhân.</p></div>
             <div className="overview-cost-grid">
               <div className="overview-cost-main">{costGroups.map((item) => <div className="overview-cost-row" key={item.title}><div><h3>{item.title}</h3><p>{item.description}</p></div><span>{item.payer}</span></div>)}</div>
-              <div className="overview-cost-aside"><small>ĐIỀU QUAN TRỌNG</small><h3>“Tổng chi phí” không đồng nghĩa <mark>“phí trung tâm”.</mark></h3><p>Chúng tôi tách rõ đơn vị nhận từng khoản, để gia đình biết tiền sẽ được nộp ở đâu.</p><a href="#xem-bao-gia"><strong>Tự xem báo giá <ArrowUpRight size={21} /></strong><span>CHỌN TRƯỜNG, HỆ HỌC & TOPIK</span></a></div>
+              <div className="overview-cost-aside"><small>ĐIỀU QUAN TRỌNG</small><h3>“Tổng chi phí” không đồng nghĩa <mark>“phí trung tâm”.</mark></h3><p>Chúng tôi tách rõ đơn vị nhận từng khoản, để gia đình biết tiền sẽ được nộp ở đâu.</p><a href="#nhan-pdf"><strong>Tự xem báo giá <ArrowUpRight size={21} /></strong><span>CHỌN TRƯỜNG & HỆ HỌC</span></a></div>
             </div>
             <p className="overview-cost-note">* Mức chi phí cụ thể cần đối chiếu theo trường, hệ học, TOPIK, tỷ giá và thời điểm.</p>
           </div>
         </section>
 
-        <section id="xem-bao-gia" className="overview-quote overview-wrap" aria-labelledby="overview-quote-title">
-          <div className="overview-quote-head"><div><span className="overview-section-tag">THỬ THÊM PHƯƠNG ÁN KHÁC</span><h2 id="overview-quote-title">Chi phí theo lựa chọn của bạn.</h2></div><p>Đổi trường, hệ học, TOPIK và lựa chọn học tiếng để so sánh từng khoản. Chưa cần để lại số điện thoại.</p></div>
-          {schoolsLoading && <p role="status" style={{ fontSize: 13, color: '#5c6b79' }}>Đang tải danh sách trường...</p>}{schoolsError && <p role="alert">Không tải được danh sách trường. <button type="button" onClick={retrySchools}>Thử lại</button></p>}
-          <div className="overview-quote-grid">
-            <div className="overview-quote-options"><h3>Thông tin dự kiến</h3><p>Bạn có thể đổi lựa chọn để so sánh.</p><SchoolPicker id="overview-quote-school" label="TRƯỜNG DỰ KIẾN" loading={schoolsLoading} error={schoolsError} onRetry={retrySchools} onOpen={() => setLoadSchoolData(true)} value={school} universities={sortedUniversities} onChange={(id) => { setSchool(id); setQuoteIntent(null); setQuoteSubmitted(false); }} /><label htmlFor="overview-quote-visa">HỆ HỌC</label><select id="overview-quote-visa" value={visaType} onChange={(event) => { setVisaType(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select><label htmlFor="overview-quote-topik">TRÌNH ĐỘ TOPIK</label><select id="overview-quote-topik" value={topik} onChange={(event) => { setTopik(event.target.value); setQuoteIntent(null); setQuoteSubmitted(false); }}><option value="0">Chưa có chứng chỉ</option><option value="1">TOPIK 1</option><option value="2">TOPIK 2</option><option value="3">TOPIK 3</option><option value="4">TOPIK 4</option><option value="5">TOPIK 5</option><option value="6">TOPIK 6</option></select><label htmlFor="overview-quote-language">HỌC TIẾNG TẠI TRUNG TÂM</label><select id="overview-quote-language" value={languageIndex} onChange={(event) => { setLanguageIndex(Number(event.target.value)); setQuoteIntent(null); setQuoteSubmitted(false); }}>{languageOptions.map((item, index) => <option key={`${item.label}-${index}`} value={index}>{item.label}</option>)}</select><small>TOPIK được lưu để tư vấn điều kiện và học bổng; bảng dự tính này chưa tự trừ học bổng.</small></div>
-            <div className="overview-quote-preview" aria-live="polite">{!selectedUniversity ? <div className="overview-quote-empty"><span>↗</span><h3>Chọn trường để bắt đầu.</h3><p>Bảng chi phí chi tiết sẽ xuất hiện ở đây ngay sau khi bạn chọn trường.</p></div> : !hasTuition ? <div className="overview-quote-empty"><h3>Trường này chưa có học phí cho hệ đã chọn.</h3><p>Hãy chọn hệ khác hoặc yêu cầu đội ngũ kiểm tra bảng giá mới nhất.</p></div> : <><div className="overview-quote-preview-head"><div><span>BÁO GIÁ DỰ TÍNH · {selectedUniversity.name.toUpperCase()}</span><h3>{VISA_TYPES.find((item) => item.id === visaType)?.label}</h3><p>Đã tách theo nơi nhận tiền · Tỷ giá: {new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(globalConfig.exchangeRate)} ₫/KRW</p></div><strong>CHI PHÍ THAM KHẢO</strong></div><div className="overview-quote-rows">{quoteRows.map((row) => <div className="overview-quote-row" key={row.label}><b>{row.label}</b><span>{row.payer}</span><strong>{formatVnd(row.value)}</strong></div>)}</div><div className="overview-quote-total"><span>TỔNG CHI PHÍ DỰ TÍNH</span><strong>{formatVnd(costs.total)}</strong></div><p className="overview-quote-note">Chưa gồm ký túc xá, vé máy bay, sinh hoạt và chứng minh tài chính. Tổng dùng mức phí tư vấn đầu tiên trong cấu hình. Chi phí thực tế có thể thay đổi theo kỳ nhập học, tỷ giá và lựa chọn hồ sơ.</p></>}</div>
-          </div>
-          <div className="overview-quote-next"><div><h3>Thấy phương án này phù hợp?</h3><p>Xem báo giá không cần số điện thoại. Bạn có thể nhận bản chi tiết qua Zalo hoặc trao đổi trực tiếp về phương án vừa chọn.</p></div><div className="overview-quote-actions"><button type="button" disabled={!selectedUniversity || !hasTuition} onClick={() => { setQuoteIntent('quote_pdf'); setQuoteSubmitted(false); }}>Nhận báo giá này qua Zalo <ArrowUpRight size={17} /></button><a href="https://zalo.me/0967593548" target="_blank" rel="noopener noreferrer">Tư vấn Phương án này <ArrowUpRight size={17} /></a></div></div>
-          {quoteIntent && <form className="overview-quote-lead" onSubmit={(event) => submitLead(event, quoteIntent)}>{quoteSubmitted ? <div role="status"><strong>Đã nhận yêu cầu của bạn.</strong><p>Đội ngũ sẽ liên hệ qua Zalo về phương án {selectedUniversity?.name} vừa xem.</p></div> : <><div><strong>{quoteIntent === 'quote_pdf' ? 'Nhận bản báo giá qua Zalo' : 'Nhờ tư vấn về phương án này'}</strong><p>Phương án {selectedUniversity?.name} và các lựa chọn vừa xem sẽ được gửi kèm yêu cầu.</p></div><label htmlFor="overview-quote-phone">SỐ ĐIỆN THOẠI / ZALO</label><input id="overview-quote-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="09xx xxx xxx" value={quotePhone} onChange={(event) => setQuotePhone(event.target.value)} required /><label className="overview-consent"><input type="checkbox" checked={quoteConsent} onChange={(event) => setQuoteConsent(event.target.checked)} required /><span>Tôi đồng ý để Thầy Tư liên hệ về phương án này qua số đã cung cấp.</span></label><button type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : 'Gửi yêu cầu'} <ArrowUpRight size={16} /></button></>}</form>}
-          {quoteIntent && <p className="overview-form-privacy">Xem <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link> trước khi gửi yêu cầu.</p>}
-        </section>
-
-        <section id="truong-hoc" className="overview-proof overview-wrap"><div className="overview-proof-lead"><div className="overview-proof-number">HƠN 100 TRƯỜNG<span>Để so sánh</span></div><ol className="overview-proof-steps"><li><span>01</span>Chọn trường và hệ học</li><li><span>02</span>Xem từng khoản chi, biết nộp cho ai</li><li><span>03</span>Nhận bảng giá chi tiết qua Zalo</li></ol><a className="overview-proof-action" href="#xem-bao-gia">Tự xem báo giá <ArrowUpRight size={17} /></a></div><div><p><strong>Không cần đọc 100 bảng giá cùng lúc.</strong> Chọn trường bạn quan tâm, hoặc cho biết hệ học và ngân sách; đội ngũ sẽ gửi bảng chi phí cùng thông tin tuyển sinh phù hợp để bạn dễ đối chiếu.</p><small>Dữ liệu trường, chi phí và điều kiện được cập nhật theo từng kỳ tuyển sinh.</small><Link to="/boc-tach">Xem danh sách trường đang có <ArrowUpRight size={17} /></Link><figure className="overview-proof-photo"><img src="/images/center/airport-960.webp" srcSet="/images/center/airport-480.webp 480w, /images/center/airport-960.webp 960w, /images/center/airport-1440.webp 1440w" sizes="(max-width: 700px) 100vw, 600px" alt="Học viên và gia đình tại sân bay trước chuyến đi Hàn Quốc" loading="lazy" /><figcaption>Học viên và gia đình tại sân bay</figcaption></figure></div></section>
+        <section id="truong-hoc" className="overview-proof overview-wrap"><div className="overview-proof-lead"><div className="overview-proof-number">HƠN 100 TRƯỜNG<span>Để so sánh</span></div><ol className="overview-proof-steps"><li><span>01</span>Chọn trường và hệ học</li><li><span>02</span>Xem từng khoản chi, biết nộp cho ai</li><li><span>03</span>Nhận bảng giá chi tiết qua Zalo</li></ol><a className="overview-proof-action" href="https://zalo.me/0967593548" target="_blank" rel="noopener noreferrer">Liên hệ với chúng tôi <ArrowUpRight size={17} /></a></div><div><p><strong>Không cần đọc 100 bảng giá cùng lúc.</strong> Chọn trường và hệ học để xem trước từng khoản. Nếu cần tài liệu đầy đủ, đội ngũ sẽ gửi bảng chi phí cùng thông tin tuyển sinh qua Zalo.</p><small>Dữ liệu trường, chi phí và điều kiện được cập nhật theo từng kỳ tuyển sinh.</small><Link to="/boc-tach">Xem danh sách trường đang có <ArrowUpRight size={17} /></Link><figure className="overview-proof-photo"><img src="/images/center/airport-960.webp" srcSet="/images/center/airport-480.webp 480w, /images/center/airport-960.webp 960w, /images/center/airport-1440.webp 1440w" sizes="(max-width: 700px) 100vw, 600px" alt="Học viên và gia đình tại sân bay trước chuyến đi Hàn Quốc" loading="lazy" /><figcaption>Học viên và gia đình tại sân bay</figcaption></figure></div></section>
 
       </main>
       <SiteFooter />
+      <aside className="overview-sticky-contact" aria-label="Tư vấn chọn trường miễn phí">
+        <div><strong>Chưa biết chọn trường nào?</strong><span>Liên hệ với chúng tôi để tư vấn hồ sơ miễn phí.</span></div>
+        <a href="https://zalo.me/0967593548" target="_blank" rel="noopener noreferrer" aria-label="Liên hệ Zalo 0967593548 để tư vấn hồ sơ miễn phí">Nhắn Zalo <ArrowUpRight size={17} /></a>
+      </aside>
       <Toaster position="top-right" />
     </div>
   );

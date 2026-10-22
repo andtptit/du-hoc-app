@@ -38,6 +38,13 @@ export interface University {
   financialProof?: string;
 }
 
+/** The fields needed to show landing-page prices before Firestore finishes loading. */
+export type CostUniversity = Pick<University,
+  'id' | 'name' | 'calcTuitionD4' | 'calcTuitionD2_2' | 'calcTuitionD2_3' |
+  'dormitory' | 'applicationFee' | 'enrollmentFee' | 'calcTuitionD2_1' |
+  'calcTuitionD2_3_no_topik' | 'calcTuitionD2_6'
+>;
+
 export interface GlobalConfig {
   consultingOptions: number[];
   thirdPartyFee: number;
