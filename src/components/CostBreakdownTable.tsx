@@ -143,7 +143,7 @@ export default function CostBreakdownTable({
             />
             <Row
               stt="02"
-              label="Phí tư vấn & Xử lý hồ sơ"
+              label="Phí tư vấn hồ sơ"
               subLabel="Trọn gói xây dựng hồ sơ"
               cost={costs.consultingFee ?? 0}
               options={

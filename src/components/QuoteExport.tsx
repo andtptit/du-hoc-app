@@ -39,8 +39,8 @@ export default function QuoteExport() {
   const hasTuition = !!school && Number(school[tuitionField]) > 0;
   const feeRows = [
     { label: 'Học tiếng Hàn tại trung tâm', receiver: 'Trung tâm thu', value: costs.koreanLangCost ?? 0 },
-    { label: 'Tư vấn và xử lý hồ sơ', receiver: 'Trung tâm thu', value: costs.consultingFee ?? 0 },
-    { label: 'Chi phí bên thứ ba', receiver: 'Học viên tự thanh toán', value: costs.thirdPartyFee ?? 0 },
+    { label: 'Phí tư vấn hồ sơ', receiver: 'Trung tâm thu', value: costs.consultingFee ?? 0 },
+    { label: 'Chi phí bên thứ ba', receiver: 'Trung tâm thu hộ', value: costs.thirdPartyFee ?? 0 },
     { label: 'Phí xét tuyển trường', receiver: 'Nộp cho trường', value: costs.applicationFee ?? 0 },
     { label: 'Phí nhập học', receiver: 'Nộp cho trường', value: costs.enrollmentFee ?? 0 },
     { label: visaId === 'd4-1' ? 'Học phí trường · 4 kỳ' : 'Học phí trường · 1 kỳ', receiver: 'Nộp cho trường', value: costs.tuitionVnd ?? 0 },
@@ -49,7 +49,8 @@ export default function QuoteExport() {
     ...(flightIndex > 0 ? [{ label: 'Vé máy bay một chiều', receiver: 'Theo lựa chọn', value: costs.flightCost ?? 0 }] : []),
   ];
   const centerTotal = (costs.koreanLangCost ?? 0) + (costs.consultingFee ?? 0);
-  const otherTotal = costs.total - centerTotal;
+  const thirdPartyTotal = costs.thirdPartyFee ?? 0;
+  const schoolAndOptionsTotal = costs.total - centerTotal - thirdPartyTotal;
   const languageOption = globalConfig.koreanLanguageOptions[languageIndex];
   const languageLabel = typeof languageOption === 'object' ? languageOption?.label : languageIndex === 0 ? 'Tự học' : `Gói ${languageIndex + 1}`;
 
@@ -65,7 +66,7 @@ export default function QuoteExport() {
         <label>Hệ học<select value={visaId} onChange={(event) => setVisaId(event.target.value)}>{VISA_TYPES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
         <label>TOPIK<select value={topik} onChange={(event) => setTopik(event.target.value)}>{Array.from({ length: 7 }, (_, level) => <option key={level} value={level}>{level === 0 ? 'Chưa có chứng chỉ' : `TOPIK ${level}`}</option>)}</select></label>
         <label>Học tiếng tại trung tâm<select value={languageIndex} onChange={(event) => setLanguageIndex(Number(event.target.value))}>{globalConfig.koreanLanguageOptions.map((item, index) => <option key={index} value={index}>{typeof item === 'object' ? item.label : money(item)}</option>)}</select></label>
-        <label>Phí xử lý hồ sơ<select value={consultingIndex} onChange={(event) => setConsultingIndex(Number(event.target.value))}>{globalConfig.consultingOptions.map((item, index) => <option key={index} value={index}>{money(item)}</option>)}</select></label>
+        <label>Phí tư vấn hồ sơ<select value={consultingIndex} onChange={(event) => setConsultingIndex(Number(event.target.value))}>{globalConfig.consultingOptions.map((item, index) => <option key={index} value={index}>{money(item)}</option>)}</select></label>
         <label>Học bổng dự kiến<select value={scholarshipPercent} onChange={(event) => setScholarshipPercent(Number(event.target.value))}>{[0, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((value) => <option key={value} value={value}>{value}%</option>)}</select></label>
         <label>Chỗ ở Hàn Quốc<select value={dormIndex} onChange={(event) => setDormIndex(Number(event.target.value))}>{costs.parsedDormOptions.map((item, index) => <option key={index} value={index}>{item.label}</option>)}</select></label>
         <label>Vé máy bay<select value={flightIndex} onChange={(event) => setFlightIndex(Number(event.target.value))}>{(costs.flightOptions ?? []).map((item, index) => <option key={index} value={index}>{item === 0 ? 'Chưa tính' : money(item)}</option>)}</select></label>
@@ -78,8 +79,8 @@ export default function QuoteExport() {
           <div className="quote-document-title"><p>PHƯƠNG ÁN DU HỌC HÀN QUỐC</p><h2>{school.name}</h2><div>{visa.label} <span>·</span> {topik === '0' ? 'Chưa có TOPIK' : `TOPIK ${topik}`}</div></div>
           <div className="quote-document-meta"><span>Ngày lập: {new Intl.DateTimeFormat('vi-VN').format(new Date())}</span><span>Tỷ giá tham khảo: {money(globalConfig.exchangeRate)} / KRW</span><span>Học tiếng: {languageLabel}</span></div>
           <table className="quote-document-table"><thead><tr><th>Khoản chi</th><th>Đơn vị nhận tiền</th><th>Chi phí dự tính</th></tr></thead><tbody>{feeRows.map((row) => <tr key={row.label}><td>{row.label}</td><td>{row.receiver}</td><td>{row.value < 0 ? `−${money(-row.value)}` : money(row.value)}</td></tr>)}</tbody></table>
-          <div className="quote-document-totals"><div><span>Trung tâm thu</span><strong>{money(centerTotal)}</strong></div><div><span>Các khoản tự thanh toán / theo lựa chọn</span><strong>{money(otherTotal)}</strong></div><div className="quote-document-grand"><span>TỔNG CHI PHÍ DỰ TÍNH</span><strong>{money(costs.total)}</strong></div></div>
-          <section className="quote-document-notes"><h3>Lưu ý trước khi quyết định</h3><ul><li>Bảng giá chỉ mang tính tham khảo, giúp bạn hình dung chi phí cần chuẩn bị. Để hiểu rõ hơn, hãy liên hệ fanpage Du Học Thầy Tư hoặc Zalo <strong>096 759 35 48</strong> để được tư vấn trực tiếp.</li><li>Trung tâm chỉ thu phí xử lý hồ sơ và học tiếng Hàn (nếu chọn). Các khoản còn lại được hướng dẫn để học viên tự thanh toán.</li><li>Học phí, điều kiện tuyển sinh và học bổng cần xác nhận theo thông báo của trường ở kỳ nhập học thực tế.</li><li>Chi phí sinh hoạt, chứng minh tài chính và các khoản chưa chọn trong bảng chưa được tính vào tổng.</li></ul></section>
+          <div className="quote-document-totals"><div><span>Chi phí của trung tâm</span><strong>{money(centerTotal)}</strong></div><div><span>Trung tâm thu hộ bên thứ ba</span><strong>{money(thirdPartyTotal)}</strong></div><div><span>Trường và khoản theo lựa chọn</span><strong>{money(schoolAndOptionsTotal)}</strong></div><div className="quote-document-grand"><span>TỔNG CHI PHÍ DỰ TÍNH</span><strong>{money(costs.total)}</strong></div></div>
+          <section className="quote-document-notes"><h3>Lưu ý trước khi quyết định</h3><ul><li>Bảng giá chỉ mang tính tham khảo, giúp bạn hình dung chi phí cần chuẩn bị. Để hiểu rõ hơn, hãy liên hệ fanpage Du Học Thầy Tư hoặc Zalo <strong>096 759 35 48</strong> để được tư vấn trực tiếp.</li><li>Chi phí của trung tâm gồm phí tư vấn hồ sơ và học tiếng Hàn (nếu chọn). Phí bên thứ ba do trung tâm thu hộ; học phí được nộp cho trường. Các khoản theo lựa chọn được xác nhận khi tư vấn.</li><li>Học phí, điều kiện tuyển sinh và học bổng cần xác nhận theo thông báo của trường ở kỳ nhập học thực tế.</li><li>Chi phí sinh hoạt, chứng minh tài chính và các khoản chưa chọn trong bảng chưa được tính vào tổng.</li></ul></section>
           <footer className="quote-document-footer"><div><strong>DU HỌC THẦY TƯ</strong><p>Số 79 Đường Ngụy Như Kon Tum, Phường Thanh Xuân, Thành phố Hà Nội, Việt Nam</p><p>Hotline / Zalo: 0967 593 548 · contact@tbtgroup.com.vn</p></div><p>Các mốc chi phí và tỷ lệ visa phụ thuộc vào kết quả xét duyệt thực tế của Cục Xuất nhập cảnh Hàn Quốc và chính sách từng kỳ của nhà trường.</p></footer>
         </>}
       </div>

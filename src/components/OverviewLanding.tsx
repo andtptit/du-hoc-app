@@ -24,14 +24,14 @@ const featuredSchools = [
 
 const costGroups = [
   {
-    title: 'Học tiếng & xử lý hồ sơ',
+    title: 'Học tiếng & tư vấn hồ sơ',
     description: 'Gói học tiếng tùy trình độ; phí tư vấn và chuẩn bị hồ sơ.',
-    payer: 'TRUNG TÂM THU',
+    payer: 'CHI PHÍ CỦA TRUNG TÂM',
   },
   {
     title: 'Phí bên thứ ba',
     description: 'Công chứng, dịch thuật và các khoản liên quan.',
-    payer: 'HỌC VIÊN TỰ NỘP',
+    payer: 'TRUNG TÂM THU HỘ',
   },
   {
     title: 'Học phí & lệ phí trường',
@@ -136,8 +136,8 @@ export default function OverviewLanding() {
   const documentHasTuition = !!(documentUniversity && documentVisaField && Number(documentUniversity[documentVisaField]) > 0);
   const documentPreviewRows = [
     { label: 'Học tiếng tại trung tâm', payer: 'Trung tâm thu', value: documentCosts.koreanLangCost ?? 0 },
-    { label: 'Tư vấn & xử lý hồ sơ', payer: 'Trung tâm thu', value: documentCosts.consultingFee ?? 0 },
-    { label: 'Phí bên thứ ba', payer: 'Học viên tự nộp', value: documentCosts.thirdPartyFee ?? 0 },
+    { label: 'Phí tư vấn hồ sơ', payer: 'Trung tâm thu', value: documentCosts.consultingFee ?? 0 },
+    { label: 'Phí bên thứ ba', payer: 'Trung tâm thu hộ', value: documentCosts.thirdPartyFee ?? 0 },
     { label: 'Phí xét tuyển & nhập học', payer: 'Nộp cho trường', value: (documentCosts.applicationFee ?? 0) + (documentCosts.enrollmentFee ?? 0) },
     { label: documentVisa === 'd4-1' ? 'Học phí hệ tiếng (4 kỳ)' : 'Học phí kỳ đầu', payer: 'Nộp cho trường', value: documentCosts.tuitionVnd ?? 0 },
   ];
@@ -247,15 +247,16 @@ export default function OverviewLanding() {
           <div className="overview-hero-copy">
             <span className="overview-eyebrow">DU HỌC HÀN QUỐC</span>
             <h1 id="overview-title">Xem trước chi phí.<br /><span>Rồi hãy quyết định.</span></h1>
-            <p>Chọn trường và hệ học để xem các khoản dự tính. Biết khoản nào nộp cho trung tâm, khoản nào tự thanh toán. <strong className="overview-hero-highlight">Chọn trường → Chọn hệ du học → Nhận bản báo giá</strong></p>
+            <p>Chọn trường và hệ học để xem các khoản dự tính. Biết khoản nào là chi phí của trung tâm, khoản nào trung tâm thu hộ và khoản nào nộp cho trường. <strong className="overview-hero-highlight">Chọn trường → Chọn hệ du học → Nhận bản báo giá</strong></p>
             <div className="overview-hero-actions"><a className="overview-primary" href="#nhan-pdf">Xem thử chi phí theo trường <ArrowUpRight size={18} /></a><a className="overview-underlink" href="#chi-phi">Các khoản chi gồm gì?</a></div>
           </div>
           <div className="overview-hero-photo"><picture><source media="(max-width: 700px)" srcSet="/images/marketing/hero-san-bay-640.webp" /><img src="/images/marketing/hero-san-bay-1280.webp" width="1280" height="853" alt="Học viên Thầy Tư và gia đình tại sân bay trước chuyến đi Hàn Quốc" fetchPriority="high" /></picture><div className="overview-photo-label">HỌC VIÊN THẦY TƯ TẠI SÂN BAY</div><span className="overview-vertical">TIẾNG HÀN · DU HỌC THẦY TƯ</span></div>
         </section>
 
         <section id="nhan-pdf" className="overview-pdf overview-wrap" aria-labelledby="overview-pdf-title">
-          <div className="overview-pdf-heading"><span className="overview-section-tag">01 / XEM BẢN RÚT GỌN</span><h2 id="overview-pdf-title">Chi phí của trường bạn quan tâm.</h2><p>Chọn trường và hệ học để xem trước từng khoản ngay trên trang. Chưa cần nhập số điện thoại.</p><div className="overview-document-points"><span>Trung tâm thu</span><span>Học viên tự nộp</span><span>Nộp cho trường</span></div></div>
+          <div className="overview-pdf-heading"><span className="overview-section-tag">01 / XEM BẢN RÚT GỌN</span><h2 id="overview-pdf-title">Chi phí của trường bạn quan tâm.</h2><p>Chọn trường và hệ học để xem trước từng khoản ngay trên trang. Chưa cần nhập số điện thoại.</p><div className="overview-document-points"><span>Chi phí của trung tâm</span><span>Trung tâm thu hộ</span><span>Nộp cho trường</span></div></div>
           <div className="overview-pdf-form">
+            <div className="overview-pdf-form-intro"><span>XEM NGAY TRÊN TRANG</span><strong>Chọn trường để xem chi phí</strong><p>Không cần để lại thông tin để xem bản rút gọn.</p></div>
             {schoolsLoading && <p role="status">Đang tải danh sách trường...</p>}{schoolsError && <p role="alert">Không tải được danh sách trường. <button type="button" onClick={retrySchools}>Thử lại</button></p>}
             <SchoolPicker id="overview-document-school" label="TRƯỜNG MUỐN XEM" loading={schoolsLoading} error={schoolsError} onRetry={retrySchools} onOpen={() => setLoadSchoolData(true)} value={documentSchool} universities={sortedUniversities} onChange={(id) => { setDocumentSchool(id); setDocumentPreviewOpen(false); }} />
             <div className="overview-featured-schools" aria-label="Gợi ý trường nổi bật"><span>Gợi ý nhanh</span>{featuredSchools.map(({ id, label }) => <button key={id} type="button" aria-pressed={documentSchool === id} disabled={!universities.some((university) => university.id === id)} onClick={() => { setDocumentSchool(id); setDocumentPreviewOpen(false); }}>{label}</button>)}</div>
@@ -288,13 +289,13 @@ export default function OverviewLanding() {
               </div>
               <div className="overview-pdf-pages" aria-hidden="true"><div className="overview-pdf-sheet overview-pdf-sheet-back"><img src="/images/brand-logo.png" alt="" /><span>DU HỌC THẦY TƯ</span><strong>HỒ SƠ<br />CHI PHÍ DU HỌC</strong><small>Thông tin trường · Học phí · Chi phí hồ sơ</small></div><div className="overview-pdf-sheet overview-pdf-sheet-middle"><img src="/images/brand-logo.png" alt="" /><span>NỘI DUNG TÀI LIỆU</span><strong>{documentUniversity?.name ?? 'Trường bạn quan tâm'}</strong><p>Học phí theo hệ học</p><p>Chi phí nộp cho từng bên</p><p>Điều kiện tuyển sinh</p><p>Mốc thanh toán dự kiến</p></div><div className="overview-pdf-sheet overview-pdf-sheet-front" /></div>
             </div>
-            <figcaption>Ảnh Zalo và trang Ajou chỉ minh họa cách trình bày, không phải hồ sơ của trường đã chọn hoặc báo giá cuối cùng. Đội ngũ sẽ chuẩn bị thông tin theo lựa chọn của bạn. <a href="/images/marketing/bang-gia-mau-ajou.png" target="_blank" rel="noopener noreferrer">Xem trang mẫu Ajou <ArrowUpRight size={13} /></a></figcaption>
+            <figcaption>Ảnh Zalo và trang Ajou chỉ minh họa cách trình bày, không phải hồ sơ của trường đã chọn hoặc báo giá cuối cùng. Đội ngũ sẽ chuẩn bị thông tin theo lựa chọn của bạn. <a href="/images/marketing/bang-gia-mau-ajou.webp" target="_blank" rel="noopener noreferrer">Xem trang mẫu Ajou <ArrowUpRight size={13} /></a></figcaption>
           </figure>
         </section>
 
         <section id="lo-trinh" className="overview-intro overview-wrap">
           <div><span className="overview-section-tag">KHÔNG CHỈ MỘT CON SỐ TỔNG</span><h2><span>Biết mình trả tiền</span><span>cho ai, vào dịch vụ gì</span></h2></div>
-          <aside><strong>Minh bạch từ đầu</strong><p>Trung tâm chỉ thu phí xử lý hồ sơ, và chi phí học tiếng Hàn (nếu có), các chi phí còn lại như xin tem vàng, tem tím, học phí của trường Hàn Quốc, trung tâm sẽ hướng dẫn các bạn tự thanh toán</p></aside>
+          <aside><strong>Minh bạch từ đầu</strong><p>Chi phí của trung tâm gồm phí tư vấn hồ sơ và học tiếng Hàn (nếu có). Trung tâm thu hộ phí bên thứ ba; học phí của trường Hàn Quốc được nộp cho trường. Từng khoản đều được ghi rõ trong bảng chi phí.</p></aside>
         </section>
 
         <section id="chi-phi" className="overview-costs">
