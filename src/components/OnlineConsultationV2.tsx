@@ -48,8 +48,8 @@ export default function OnlineConsultationV2() {
       meta.setAttribute('name', 'description');
       document.head.appendChild(meta);
     }
-    document.title = 'Tư vấn hồ sơ du học Hàn Quốc online | Du Học Thầy Tư';
-    meta.setAttribute('content', 'Đã nghe nhiều lời tư vấn nhưng chưa biết chọn hướng nào? Cùng Du Học Thầy Tư rà soát hồ sơ, thu hẹp lựa chọn trường và chọn giờ trao đổi online phù hợp.');
+    document.title = 'Tư vấn định hướng du học Hàn Quốc chuyên sâu | Du Học Thầy Tư';
+    meta.setAttribute('content', 'Đặt cuộc tư vấn định hướng du học Hàn Quốc chuyên sâu 20 phút cùng Du Học Thầy Tư. Trao đổi về hồ sơ, chọn trường, học bổng và hành trình du học.');
     return () => {
       document.title = previousTitle;
       if (existingDescription && previousDescription !== null && previousDescription !== undefined) meta.setAttribute('content', previousDescription);
@@ -64,11 +64,6 @@ export default function OnlineConsultationV2() {
     observer.observe(form);
     return () => observer.disconnect();
   }, []);
-
-  const chooseTopic = (value: string) => {
-    setTopic(value);
-    document.getElementById('dat-lich')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -142,32 +137,8 @@ export default function OnlineConsultationV2() {
     </div></header>
 
     <main>
-      <section className="consult-hero" aria-labelledby="consult-title"><div className="consult-wrap consult-hero-grid">
-        <div className="consult-hero-copy"><span className="consult-eyebrow">TƯ VẤN HỒ SƠ DU HỌC HÀN QUỐC · ONLINE</span>
-          <h1 id="consult-title">Nghe nhiều rồi.<br /><span>Giờ cần một hướng đi rõ ràng.</span></h1>
-          <p>Cùng Thầy Tư xem hồ sơ, thu hẹp lựa chọn trường và lộ trình phù hợp với năng lực, tài chính của bạn. Bắt đầu online, chưa cần ra Hà Nội.</p>
-          <a className="consult-primary" href="#dat-lich">Gửi yêu cầu hẹn lịch <ArrowUpRight size={19} /></a>
-          <small>Chọn giờ mong muốn. Đội ngũ sẽ liên hệ để xác nhận lịch.</small>
-        </div>
-        <figure className="consult-hero-photo"><img src="/images/marketing/tu-van-thay-tu.jpg" width="2048" height="1536" alt="Buổi tư vấn hồ sơ tại Du Học Thầy Tư" fetchPriority="high" /><figcaption>BUỔI TƯ VẤN TẠI DU HỌC THẦY TƯ</figcaption></figure>
-      </div></section>
-
-      <div className="consult-thesis"><div className="consult-wrap"><strong>Đừng nhận thêm một danh sách trường dài.</strong><p>Điều bạn cần là biết trường nào đáng tìm hiểu trước, vì sao phù hợp và phần nào trong hồ sơ còn phải kiểm tra.</p></div></div>
-
-      <section className="consult-problems consult-wrap" id="van-de" aria-labelledby="consult-problems-title">
-        <div className="consult-section-top"><div><span className="consult-eyebrow">BẮT ĐẦU TỪ ĐIỀU BẠN ĐANG PHÂN VÂN</span><h2 id="consult-problems-title">Bạn đang mắc ở bước nào?</h2></div><p>Không cần biết sẵn tên trường hay hệ du học. Chọn vấn đề gần với bạn nhất để buổi tư vấn đi thẳng vào việc cần giải quyết.</p></div>
-        <div className="consult-problem-list">{topics.map((item, index) => <button key={item.id} className={topic === item.id ? 'consult-problem is-selected' : 'consult-problem'} type="button" onClick={() => chooseTopic(item.id)}><span>0{index + 1}</span><strong>{item.title}</strong><p>{item.description}</p><ArrowUpRight size={18} aria-hidden="true" /></button>)}</div>
-      </section>
-
-      <section className="consult-outcome" id="nhan-duoc" aria-labelledby="consult-outcome-title"><div className="consult-wrap consult-outcome-grid">
-        <div className="consult-outcome-copy"><span className="consult-eyebrow">SAU BUỔI TƯ VẤN</span><h2 id="consult-outcome-title">Rõ phương án.<br />Rõ lý do.<br />Rõ bước tiếp theo.</h2><p>Thay vì thêm thông tin rời rạc, bạn có phần tóm tắt để tự cân nhắc cùng gia đình.</p>
-          <ol><li><span>01</span>Lộ trình nên tìm hiểu trước, dựa trên hồ sơ</li><li><span>02</span>Nhóm trường đáng cân nhắc và lý do</li><li><span>03</span>Những điều còn thiếu và việc cần làm tiếp</li></ol>
-        </div>
-        <div className="consult-paper-frame"><span className="consult-example-label">VÍ DỤ MINH HỌA</span><div className="consult-paper"><div className="consult-paper-head"><b>DU HỌC THẦY TƯ</b><b>HỒ SƠ / MẪU</b></div><h3>Định hướng sau buổi trao đổi</h3><div className="consult-paper-row"><b>TÌNH TRẠNG</b><span>Đã tốt nghiệp THPT · Đang học tiếng Hàn · Ngân sách cần xác nhận</span></div><div className="consult-paper-row"><b>HƯỚNG XEM</b><span>Bắt đầu so sánh hệ tiếng tại nhóm trường đáp ứng điều kiện hồ sơ.</span></div><div className="consult-paper-row"><b>CẦN KIỂM TRA</b><span>Điều kiện từng kỳ tuyển sinh và mức chi phí theo trường.</span></div><div className="consult-paper-row"><b>BƯỚC TIẾP</b><span>Đối chiếu học bạ, chọn danh sách ngắn rồi xem báo giá chi tiết.</span></div><p>Nội dung minh họa cách trình bày; phương án thực tế phụ thuộc thông tin từng hồ sơ.</p></div></div>
-      </div></section>
-
-      <section className="consult-booking" id="dat-lich" aria-labelledby="consult-booking-title"><div className="consult-wrap consult-booking-grid">
-        <div className="consult-booking-copy"><span className="consult-eyebrow">HẸN THỜI GIAN PHÙ HỢP VỚI BẠN</span><h2 id="consult-booking-title">Chọn giờ bạn muốn trao đổi.</h2><p>Cho Thầy Tư biết vấn đề bạn đang phân vân và thời gian thuận tiện. Đội ngũ sẽ chuẩn bị nội dung, liên hệ xác nhận lịch qua kênh bạn chọn.</p><ul><li><Check size={17} />Tư vấn ban đầu miễn phí</li><li><Check size={17} />Có thể trao đổi online, chưa cần ra Hà Nội</li><li><Check size={17} />Bạn quyết định có tiếp tục sau buổi tư vấn</li></ul><div className="consult-schedule-note"><Clock3 size={18} /><span>Giờ bạn chọn là mong muốn, chưa phải lịch đã xác nhận.</span></div></div>
+      <section className="consult-booking" id="dat-lich" aria-labelledby="consult-title"><div className="consult-wrap consult-booking-grid">
+        <div className="consult-booking-copy"><span className="consult-eyebrow">DU HỌC HÀN QUỐC · TƯ VẤN ONLINE</span><h1 id="consult-title">Tư vấn định hướng du học <span>chuyên sâu.</span></h1><strong className="consult-availability">Chỉ 20 suất miễn phí / tháng</strong><p>Đặt một cuộc tư vấn chuyên sâu 20 phút, giải đáp mọi thắc mắc của bạn về hồ sơ, chọn trường, học bổng và hành trình du học.</p><div className="consult-booking-promise"><Check size={18} /><span>Không spam tư vấn. Bạn chủ động đặt lịch theo mong muốn.</span></div><div className="consult-schedule-note"><Clock3 size={18} /><span>Khung giờ bạn chọn sẽ được đội ngũ liên hệ xác nhận.</span></div></div>
         <div className="consult-form-panel"><div className="consult-form-heading"><span>{step === 1 ? 'BƯỚC 01 / VẤN ĐỀ CỦA BẠN' : 'BƯỚC 02 / THỜI GIAN & LIÊN HỆ'}</span><h3>{step === 1 ? 'Để cuộc trao đổi đi đúng vấn đề' : 'Chọn thời gian thuận tiện'}</h3><p>{step === 1 ? 'Chỉ cần vài thông tin cơ bản. Chưa cần chuẩn bị đủ giấy tờ.' : 'Thầy Tư sẽ liên hệ xác nhận; đây chưa phải lịch hẹn được chốt.'}</p></div>
           <div className="consult-progress"><span className={step === 1 ? 'is-active' : 'is-done'}>01&nbsp; Hồ sơ</span><span className={step === 2 ? 'is-active' : ''}>02&nbsp; Hẹn lịch</span></div>
           <form onSubmit={submit}>{step === 1 ? <div className="consult-fields">
@@ -185,6 +156,18 @@ export default function OnlineConsultationV2() {
             <button className="consult-submit" type="submit" disabled={submitting}>{submitting ? 'Đang gửi yêu cầu...' : 'Gửi yêu cầu hẹn lịch'} <ArrowUpRight size={18} /></button><p className="consult-form-foot">Đội ngũ sẽ xác nhận lại khung giờ với bạn qua {contactMethod === 'Zalo' ? 'Zalo' : 'điện thoại'}.</p>
           </div>}</form>
         </div>
+      </div></section>
+
+      <section className="consult-clarity" id="van-de" aria-labelledby="consult-clarity-title"><div className="consult-wrap consult-clarity-grid">
+        <div className="consult-clarity-problem"><span className="consult-eyebrow">KHI THÔNG TIN CÀNG NHIỀU, QUYẾT ĐỊNH CÀNG KHÓ</span><h2 id="consult-clarity-title">Đã hỏi nhiều nơi.<br /><span>Vẫn thấy mông lung?</span></h2><p>Bạn không thiếu lời tư vấn. Bạn cần một cuộc trao đổi đủ sâu để nhìn rõ hồ sơ của chính mình.</p><ol><li><span>01</span><strong>Nghe quá nhiều ý kiến</strong><p>Cùng một câu hỏi nhưng bạn nhận được nhiều câu trả lời khác nhau.</p></li><li><span>02</span><strong>Mỗi nơi gợi ý một hướng</strong><p>Trường, hệ học và mức tài chính được nói đến rời rạc, khó đặt cạnh nhau.</p></li><li><span>03</span><strong>Chưa được nghe đủ thông tin</strong><p>Có những thắc mắc chỉ được hẹn “đến trực tiếp rồi trao đổi tiếp”.</p></li></ol></div>
+        <div className="consult-clarity-answer"><div className="consult-clarity-answer-top"><span>20 PHÚT VỚI DU HỌC THẦY TƯ</span><strong>20<span>′</span></strong></div><h3>Một cuộc trao đổi để rõ hướng đi.</h3><div className="consult-clarity-steps"><div><span>01 / HỒ SƠ</span><h4>Hiểu tình trạng hiện tại</h4><p>Cùng xem học lực, điều kiện hồ sơ, mục tiêu và khoảng tài chính gia đình dự tính.</p></div><div><span>02 / LỰA CHỌN</span><h4>Đối chiếu trường với thực tế</h4><p>Thông tin về trường được đặt cạnh trải nghiệm của học viên Thầy Tư từng theo học, khi có trường hợp phù hợp để tham khảo.</p></div><div><span>03 / LỘ TRÌNH</span><h4>Giải đáp và thống nhất bước tiếp</h4><p>Trả lời những điều bạn còn phân vân, đề xuất một hướng ưu tiên và nói rõ phần nào cần kiểm tra thêm.</p></div></div></div>
+      </div></section>
+
+      <section className="consult-outcome" id="nhan-duoc" aria-labelledby="consult-outcome-title"><div className="consult-wrap consult-outcome-grid">
+        <div className="consult-outcome-copy"><span className="consult-eyebrow">SAU BUỔI TƯ VẤN</span><h2 id="consult-outcome-title">Rõ phương án.<br />Rõ lý do.<br />Rõ bước tiếp theo.</h2><p>Thay vì thêm thông tin rời rạc, bạn có phần tóm tắt để tự cân nhắc cùng gia đình.</p>
+          <ol><li><span>01</span>Lộ trình nên tìm hiểu trước, dựa trên hồ sơ</li><li><span>02</span>Nhóm trường đáng cân nhắc và lý do</li><li><span>03</span>Những điều còn thiếu và việc cần làm tiếp</li></ol>
+        </div>
+        <div className="consult-paper-frame"><span className="consult-example-label">VÍ DỤ MINH HỌA</span><div className="consult-paper"><div className="consult-paper-head"><b>DU HỌC THẦY TƯ</b><b>HỒ SƠ / MẪU</b></div><h3>Định hướng sau buổi trao đổi</h3><div className="consult-paper-row"><b>TÌNH TRẠNG</b><span>Đã tốt nghiệp THPT · Đang học tiếng Hàn · Ngân sách cần xác nhận</span></div><div className="consult-paper-row"><b>HƯỚNG XEM</b><span>Bắt đầu so sánh hệ tiếng tại nhóm trường đáp ứng điều kiện hồ sơ.</span></div><div className="consult-paper-row"><b>CẦN KIỂM TRA</b><span>Điều kiện từng kỳ tuyển sinh và mức chi phí theo trường.</span></div><div className="consult-paper-row"><b>BƯỚC TIẾP</b><span>Đối chiếu học bạ, chọn danh sách ngắn rồi xem báo giá chi tiết.</span></div><p>Nội dung minh họa cách trình bày; phương án thực tế phụ thuộc thông tin từng hồ sơ.</p></div></div>
       </div></section>
 
       <section className="consult-faq consult-wrap" aria-labelledby="consult-faq-title"><div><span className="consult-eyebrow">TRƯỚC KHI BẠN ĐẶT LỊCH</span><h2 id="consult-faq-title">Một vài điều nên biết.</h2></div><div className="consult-faq-list"><details><summary>Chưa biết chọn trường thì có gửi yêu cầu được không?</summary><p>Có. Việc thu hẹp lựa chọn trường theo hồ sơ là một nội dung của buổi tư vấn.</p></details><details><summary>Buổi trao đổi ban đầu có mất phí không?</summary><p>Không. Buổi tư vấn ban đầu miễn phí. Nếu bạn muốn sử dụng dịch vụ tiếp theo, trung tâm sẽ trao đổi rõ các khoản phí trước khi bạn quyết định.</p></details><details><summary>Tôi ở xa Hà Nội thì trao đổi như thế nào?</summary><p>Bạn có thể bắt đầu online qua Zalo hoặc cuộc gọi. Nếu một bước sau này cần thực hiện trực tiếp, đội ngũ sẽ nói rõ trước.</p></details><details><summary>Chọn giờ trên trang đã được xác nhận chưa?</summary><p>Chưa. Đây là giờ bạn mong muốn. Đội ngũ sẽ liên hệ qua kênh bạn chọn để xác nhận lịch cụ thể.</p></details></div></section>
