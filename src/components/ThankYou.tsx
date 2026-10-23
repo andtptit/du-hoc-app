@@ -8,7 +8,7 @@ import '@fontsource/be-vietnam-pro/800.css';
 import './overview-landing.css';
 import './thank-you.css';
 
-type RequestContext = { universityName?: string; isSuggestion?: boolean };
+type RequestContext = { universityName?: string; isSuggestion?: boolean; kind?: string; contactTime?: string };
 
 export default function ThankYou() {
   const [request] = useState<RequestContext>(() => {
@@ -35,8 +35,8 @@ export default function ThankYou() {
           <span className="thank-you-mark"><Check size={29} strokeWidth={2.5} aria-hidden="true" /></span>
           <p className="overview-section-tag">ĐÃ NHẬN YÊU CẦU</p>
           <h1>Cảm ơn bạn<br />đã để lại thông tin.</h1>
-          <p className="thank-you-lead">{request.universityName ? `Đội ngũ Thầy Tư sẽ chuẩn bị thông tin chi phí của ${request.universityName} và liên hệ với bạn qua Zalo.` : request.isSuggestion ? 'Đội ngũ Thầy Tư sẽ xem lựa chọn của bạn, gợi ý trường phù hợp và liên hệ qua Zalo.' : 'Đội ngũ Thầy Tư sẽ kiểm tra yêu cầu và liên hệ với bạn qua Zalo để gửi thông tin chi phí.'}</p>
-          <div className="thank-you-note"><strong>Trong lúc chờ tài liệu</strong><span>Bạn có thể tự xem chi phí dự tính theo trường và hệ học ngay trên website.</span></div>
+          <p className="thank-you-lead">{request.kind === 'onlineConsultation' ? 'Đội ngũ Thầy Tư đã nhận thông tin học tập của bạn và sẽ liên hệ qua số bạn cung cấp để xác nhận lịch tư vấn online.' : request.universityName ? `Đội ngũ Thầy Tư sẽ chuẩn bị thông tin chi phí của ${request.universityName} và liên hệ với bạn qua Zalo.` : request.isSuggestion ? 'Đội ngũ Thầy Tư sẽ xem lựa chọn của bạn, gợi ý trường phù hợp và liên hệ qua Zalo.' : 'Đội ngũ Thầy Tư sẽ kiểm tra yêu cầu và liên hệ với bạn qua Zalo để gửi thông tin chi phí.'}</p>
+          <div className="thank-you-note"><strong>{request.kind === 'onlineConsultation' ? 'Trong lúc chờ xác nhận lịch' : 'Trong lúc chờ tài liệu'}</strong><span>{request.kind === 'onlineConsultation' ? 'Bạn có thể xem trước chi phí dự tính theo trường và hệ học. Thời gian bạn chọn trong form sẽ được đội ngũ xác nhận khi liên hệ.' : 'Bạn có thể tự xem chi phí dự tính theo trường và hệ học ngay trên website.'}</span></div>
           <a className="thank-you-action" href="/du-hoc-han-quoc#xem-bao-gia">Tự xem báo giá <ArrowUpRight size={18} /></a>
         </div>
         <figure className="thank-you-photo"><img src="/images/center/airport-960.webp" alt="Học viên và gia đình tại sân bay trước chuyến đi Hàn Quốc" /><figcaption>DU HỌC THẦY TƯ · HÀNH TRÌNH HÀN QUỐC</figcaption></figure>
