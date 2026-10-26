@@ -19,6 +19,8 @@ export default function SiteFooter() {
         </div>
         <div className="overview-footer-links">
           <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link>
+          <Link to="/gioi-thieu-lien-he">Giới thiệu & liên hệ</Link>
+          <Link to="/thong-tin-dat-lich">Thông tin đặt lịch</Link>
           <Link to="/">Trang chủ</Link>
         </div>
         <p className="overview-footer-disclaimer">Các mốc chi phí và tỷ lệ visa phụ thuộc vào kết quả xét duyệt thực tế của Cục Xuất nhập cảnh Hàn Quốc và chính sách từng kỳ của nhà trường.</p>
